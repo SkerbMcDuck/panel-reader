@@ -256,7 +256,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
         <tr><td><kbd>D</kbd> or layout button</td><td>Auto, one page, or two pages. Auto shows two on wide screens, one on tall ones</td></tr>
         <tr><td><kbd>W</kbd> or Fit width</td><td>One page across the full width; scroll up and down. Side taps and left/right swipes still turn pages; <kbd>Space</kbd> scrolls, then turns at the bottom. Pinch or double-tap still zooms in further</td></tr>
         <tr><td><kbd>S</kbd> or Shift pairing</td><td>Fix split two-page art in this issue only</td></tr>
-        <tr><td><kbd>F</kbd> or Fullscreen (iPad and PC)</td><td>Hides the time and battery bar too. Stays on while you move between issues and the shelf</td></tr>
+        <tr><td>Full screen</td><td>On iPad it's automatic: opening an issue hides the time and battery bar, going back to the shelf brings it back. On PC use <kbd>F</kbd> or the Fullscreen button</td></tr>
         <tr><td>Mouse to top or bottom edge</td><td>Show the controls</td></tr>
         <tr><td>Tap the middle, or near the top or bottom edge</td><td>Show or hide the controls</td></tr>
         <tr><td><kbd>H</kbd></td><td>Show or hide this list</td></tr>
@@ -1183,6 +1183,7 @@ function nextIssueNode(){
 function nextIssue(){ const n = nextIssueNode(); if (n) openComic(n, R.siblings); else toast("That was the last issue in this folder"); }
 
 async function openComic(node, siblings){
+  enterFs();   // iPad: hide the time/battery bar while reading (must run right at the tap, before any waiting)
   freePages();
   if (siblings) R.siblings = siblings;
   R.node = node; R.tok++;
@@ -1215,7 +1216,8 @@ function closeReader(){
   freePages();
   $("reader").classList.remove("open");
   toggleHelp(false);
-  if (stack.length) renderLib(); // fullscreen stays on for the shelf too
+  exitFs();                      // iPad: back to the normal screen on the shelf
+  if (stack.length) renderLib();
 }
 function status(t){ $("status").textContent = t || ""; }
 let toastT;
@@ -1294,6 +1296,15 @@ const LAYOUT_ICON = {
 const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 // iPads support true fullscreen (hides the time/battery bar), iPhones don't; show the button only where it works
 const canFullscreen = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+// On touch devices (iPad), go fullscreen automatically while reading instead of offering a button
+const autoFs = canFullscreen && matchMedia("(pointer: coarse)").matches;
+const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+function enterFs(){
+  if (!autoFs || isFs()) return;
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
+  try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
+}
+function exitFs(){ if (autoFs && isFs()) { try { const p = (document.exitFullscreen || document.webkitExitFullscreen).call(document); if (p && p.catch) p.catch(() => {}); } catch {} } }
 function syncButtons(){
   const lb = $("layoutBtn");
   lb.innerHTML = '<svg viewBox="0 0 24 24">' + LAYOUT_ICON[R.layout] + '</svg><span class="lbl">' + LAYOUT_LABEL[R.layout] + '</span>';
@@ -1302,7 +1313,7 @@ function syncButtons(){
   $("fitBtn").classList.toggle("on", R.fitw);
   $("shiftBtn").hidden = !R.two;
   $("shiftBtn").classList.toggle("on", !R.cover);
-  $("fsBtn").hidden = !canFullscreen;
+  $("fsBtn").hidden = !canFullscreen || autoFs; // automatic on iPad, button on PC
   $("reader").classList.toggle("fitw", R.fitw);
 }
 function setFitW(v){
