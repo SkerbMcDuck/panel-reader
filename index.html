@@ -279,6 +279,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
         <tr><td>Import comics</td><td>Adds CBZ files from the Files app straight to this device</td></tr>
         <tr><td>Progress</td><td>Saved on the device and synced through OneDrive, so every device you sign in on picks up where you left off</td></tr>
       </table>
+      <p id="aboutLine" class="muted"></p>
       <button id="helpClose">Close</button>
     </div>
   </div>
@@ -1304,6 +1305,12 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
+const APP_VERSION = 8;
+function aboutText(){
+  return "Version " + APP_VERSION + ". Full screen on this device: " +
+    (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
+    (standalone ? ". Running as a Home Screen app." : ".");
+}
 function exitFs(){ if (autoFs && isFs()) { try { const p = (document.exitFullscreen || document.webkitExitFullscreen).call(document); if (p && p.catch) p.catch(() => {}); } catch {} } }
 function syncButtons(){
   const lb = $("layoutBtn");
@@ -1347,7 +1354,7 @@ function toggleFs(){
     else toast("Fullscreen isn't available in this browser");
   }
 }
-function toggleHelp(v){ $("helpPanel").classList.toggle("open", v); }
+function toggleHelp(v){ if (v) $("aboutLine").textContent = aboutText(); $("helpPanel").classList.toggle("open", v); }
 addEventListener("resize", () => { if ($("reader").classList.contains("open")) relayout(); });
 
 /* controls appear at the edges, fade away while reading */
