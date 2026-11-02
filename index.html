@@ -43,6 +43,9 @@ button.on{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
 h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 #libActions,#appActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 #storageUse{color:var(--muted);font-size:13px;margin-right:6px}
+#notice{margin:16px 0 0;padding:10px 14px;border:1px solid var(--edge);border-radius:10px;color:var(--paper);background:var(--shelf);font-size:14px;max-width:720px}
+#libToast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40}
+#libToast.show{opacity:1}
 /* iPad home screen app: keep clear of the status bar */
 #lib{padding-top:max(28px,env(safe-area-inset-top))}
 #top{padding-top:max(14px,env(safe-area-inset-top))}
@@ -154,8 +157,10 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
     <div id="appActions" hidden>
       <span id="storageUse"></span>
       <button id="importBtn">Import comics</button>
+      <button id="cloudBtn">Connect OneDrive</button>
     </div>
   </div>
+  <p id="notice" hidden></p>
   <!-- no "accept" filter: iPads don't know the .cbz type and would grey those files out; the app filters by name instead -->
   <input id="importInput" type="file" multiple hidden>
   <nav id="crumbs"></nav>
@@ -164,6 +169,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   <div id="empty">Choose your comics folder to start: <b>C:\Users\Georg\Comics</b></div>
   <input id="dirInput" type="file" webkitdirectory multiple hidden>
 </main>
+<div id="libToast"></div>
 
 <div id="importPanel" class="modal">
   <div class="modalBox">
@@ -245,11 +251,13 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
         <tr><td>Continue reading</td><td>Top of the main shelf: issues you're partway through, plus the next issue after one you finished</td></tr>
         <tr><td><kbd>Backspace</kbd></td><td>Up one folder</td></tr>
       </table>
-      <h3>Getting comics onto the iPad</h3>
+      <h3>OneDrive and offline reading</h3>
       <table>
-        <tr><td>••• then Download to this device</td><td>On the home server: saves that issue to the iPad's Files app (Downloads)</td></tr>
-        <tr><td>Import comics</td><td>In the iPad app: copies CBZ files you pick from Files into the app, for reading anywhere</td></tr>
-        <tr><td>••• then Remove from this device</td><td>In the iPad app: frees up space, your PC copy is untouched</td></tr>
+        <tr><td>Connect OneDrive</td><td>Shows the Publisher and Series folders inside the Comics folder at the top of your OneDrive. Issues stream as you read</td></tr>
+        <tr><td>••• then Keep on this device</td><td>Saves an issue (or a whole series) for reading offline</td></tr>
+        <tr><td>••• then Remove from this device</td><td>Frees up space. The OneDrive copy is untouched</td></tr>
+        <tr><td>Import comics</td><td>Adds CBZ files from the Files app straight to this device</td></tr>
+        <tr><td>Progress</td><td>Saved on the device and synced through OneDrive, so every device you sign in on picks up where you left off</td></tr>
       </table>
       <button id="helpClose">Close</button>
     </div>
@@ -284,22 +292,55 @@ function postState(key, value){
     .catch(()=>{}).finally(() => pendingSaves.delete(p));
   pendingSaves.add(p);
 }
-async function refreshState(){
+async function refreshState(force){
+  if (APP) return cloudSync(force);
   if (!SERVER) return;
   if (pendingSaves.size) await Promise.all([...pendingSaves]); // don't overwrite saves still on their way to the PC
   try { const r = await fetch("api/state", {cache:"no-store"}); if (r.ok) serverState = await r.json(); } catch {}
 }
+
+/* App (iPad/iPhone/PC from the GitHub address): progress lives on the device and syncs through
+   OneDrive's private app folder whenever signed in and online. Changes made offline are marked
+   "dirty" and win over the OneDrive copy at the next sync; everything else takes OneDrive's version. */
+let APP = false, CLOUD = false;
+const dirty = new Set();
+function loadAppState(){
+  try { const j = JSON.parse(localStorage.getItem("pr:appState") || "{}"); serverState = j.state || {}; (j.dirty || []).forEach(k => dirty.add(k)); } catch { serverState = {}; }
+}
+function saveAppState(){ try { localStorage.setItem("pr:appState", JSON.stringify({state: serverState, dirty: [...dirty]})); } catch {} }
+let uploadT = null, lastSync = 0, syncing = null;
+function scheduleUpload(){ clearTimeout(uploadT); uploadT = setTimeout(() => cloudSync(true), 2500); }
+document.addEventListener("visibilitychange", () => { if (document.hidden && dirty.size) cloudSync(true); });
+async function cloudSync(force){
+  if (!CLOUD || !msAccount || navigator.onLine === false) return;
+  if (!force && Date.now() - lastSync < 20000) return;
+  if (syncing) return syncing;
+  syncing = (async () => {
+    try {
+      const remote = await cloudReadState();
+      const merged = {...remote};
+      for (const k of dirty) { if (k in serverState) merged[k] = serverState[k]; else delete merged[k]; }
+      serverState = merged;
+      if (dirty.size) { await cloudWriteState(merged); dirty.clear(); }
+      saveAppState(); lastSync = Date.now();
+    } catch (e) { console.warn("sync", e); }
+  })();
+  try { await syncing; } finally { syncing = null; }
+}
+
 const store = {
   get(k, d){
-    if (SERVER && SYNC.test(k)) return k in serverState ? serverState[k] : d;
+    if ((SERVER || APP) && SYNC.test(k)) return k in serverState ? serverState[k] : d;
     try{ const v = localStorage.getItem("pr:"+k); return v===null ? d : JSON.parse(v); }catch{ return d; }
   },
   set(k, v){
     if (SERVER && SYNC.test(k)) { serverState[k] = v; postState(k, v); return; }
+    if (APP && SYNC.test(k)) { serverState[k] = v; dirty.add(k); saveAppState(); scheduleUpload(); return; }
     try{ localStorage.setItem("pr:"+k, JSON.stringify(v)); }catch{}
   },
   del(k){
     if (SERVER && SYNC.test(k)) { delete serverState[k]; postState(k, null); return; }
+    if (APP && SYNC.test(k)) { delete serverState[k]; dirty.add(k); saveAppState(); scheduleUpload(); return; }
     try{ localStorage.removeItem("pr:"+k); }catch{}
   }
 };
@@ -385,7 +426,19 @@ const listCache = new Map();
 async function listNode(node){
   if (listCache.has(node.path)) return listCache.get(node.path);
   let kids = [];
-  if (node.remote) {
+  if (node.cloud) {
+    for (const x of await cloudChildren(node.rel)) {
+      if (x.name.startsWith(".")) continue;
+      const kind = x.folder ? "dir" : "file";
+      if (kind === "file" && !(isComic(x.name) || isUnsupported(x.name))) continue;
+      const rel = node.rel ? node.rel + "/" + x.name : x.name;
+      kids.push({name:x.name, path:node.path + "/" + x.name, kind, cloud:true, rel, appKey:rel, id:x.id,
+                 size:x.size, mtime:Date.parse(x.lastModifiedDateTime) || 0, dl:x["@microsoft.graph.downloadUrl"]});
+    }
+    // comics imported on this device that aren't in OneDrive still show up in the same place
+    const local = findLocal(node.rel);
+    if (local && local.children) for (const [name, ln] of local.children) if (!kids.some(k => k.name === name)) kids.push(ln);
+  } else if (node.remote) {
     const r = await fetch("api/list?path=" + encodeURIComponent(node.rel), {cache:"no-store"});
     if (!r.ok) throw new Error("the PC server couldn't read this folder");
     for (const x of await r.json()) {
@@ -407,7 +460,12 @@ async function listNode(node){
 }
 async function fileOf(node){
   if (node.remote) return remoteFile(node);
-  if (node.appKey) { const b = await dbGet("comics", node.appKey); if (!b) throw new Error("This comic is no longer on this device."); return b; }
+  if (node.appKey) {
+    const b = await dbGet("comics", node.appKey).catch(() => null);
+    if (b) return b;                       // saved on this device: fastest, works offline
+    if (!node.cloud) throw new Error("This comic is no longer on this device.");
+  }
+  if (node.cloud) return cloudFile(node);
   return node.handle ? node.handle.getFile() : node.file;
 }
 function remoteFile(node){
@@ -485,7 +543,7 @@ function setRead(path, read, t){
 // every saved progress entry: [{path, i, n, done, t}]
 function allProgress(){
   const out = [];
-  if (SERVER) { for (const [k, v] of Object.entries(serverState)) if (k.startsWith("pos:") && v) out.push({path:k.slice(4), ...v}); }
+  if (SERVER || APP) { for (const [k, v] of Object.entries(serverState)) if (k.startsWith("pos:") && v) out.push({path:k.slice(4), ...v}); }
   else {
     try { for (let j = 0; j < localStorage.length; j++) { const k = localStorage.key(j);
       if (k && k.startsWith("pr:pos:")) { const v = JSON.parse(localStorage.getItem(k)); if (v) out.push({path:k.slice(7), ...v}); } } } catch {}
@@ -709,9 +767,13 @@ function makeCard(k, comics, atRoot){
     attachMenu(card, () => [
       {label:"Mark series as read", act: async () => { const t = Date.now(); (await comicsIn(k)).forEach((c, j) => setRead(c.path, true, t + j)); }},
       {label:"Mark series as unread", act: async () => { (await comicsIn(k)).forEach(c => setRead(c.path, false)); }},
+      ...(CLOUD ? [{label:"Keep series on this device", act: async () => {
+        try { await keepOnDevice(await comicsIn(k)); } catch (e) { libToast(e.message, 4000); }
+      }}] : []),
       ...(APP ? [{label:"Remove series from this device", act: async () => {
-        const cs = await comicsIn(k);
-        if (confirm("Remove all " + cs.length + " issues of " + k.name + " from this device? Your PC copies aren't affected.")) await removeFromDevice(cs);
+        const cs = (await comicsIn(k)).filter(c => localKeys.has(c.appKey) || !c.cloud);
+        if (!cs.length) { libToast("None of this series is saved on this device"); return; }
+        if (confirm("Remove " + cs.length + " saved issue" + (cs.length === 1 ? "" : "s") + " of " + k.name + " from this device?" + (CLOUD ? " OneDrive copies aren't affected." : ""))) await removeFromDevice(cs);
       }}] : [])
     ]);
   } else if (isUnsupported(k.name)) {
@@ -724,6 +786,7 @@ function makeCard(k, comics, atRoot){
     cover.textContent = baseName(k.name);
     cap.textContent = no || baseName(k.name);
     if (no) { const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = baseName(k.name).replace(/\s*#\s*\d+(\.\d+)?\s*$/, ""); card.append(sub); }
+    if (CLOUD && localKeys.has(k.appKey)) { const s = document.createElement("div"); s.className = "sub"; s.textContent = "On this device"; card.append(s); }
     const pos = progressOf(k.path);
     if (!pos) { const d = document.createElement("span"); d.className = "dot"; d.title = "Unread"; card.append(d); }
     else if (pos.done) card.classList.add("done");
@@ -750,8 +813,12 @@ function makeCard(k, comics, atRoot){
         a.href = "api/file?download=1&path=" + encodeURIComponent(k.rel); a.download = k.name;
         document.body.append(a); a.click(); a.remove();
       }});
-      if (APP) items.push({label:"Remove from this device", act: async () => {
-        if (confirm("Remove " + baseName(k.name) + " from this device? Your PC copy isn't affected.")) await removeFromDevice([k]);
+      const onDevice = APP && (localKeys.has(k.appKey) || !k.cloud);
+      if (CLOUD && k.cloud && !onDevice) items.push({label:"Keep on this device", act: async () => {
+        try { await keepOnDevice([k]); } catch (e) { libToast(e.message, 4000); }
+      }});
+      if (onDevice) items.push({label:"Remove from this device", act: async () => {
+        if (confirm("Remove " + baseName(k.name) + " from this device?" + (k.cloud ? " The OneDrive copy isn't affected." : ""))) await removeFromDevice([k]);
       }});
       return items;
     });
@@ -792,7 +859,6 @@ $("dirInput").onchange = () => {
   openRoot(root);
 };
 /* ---------- iPad app mode: comics imported into on-device storage ---------- */
-let APP = false;
 const APP_ROOT = "Comics";
 async function dbKeys(s){ const db = await idb(); return new Promise((res, rej) => { const q = db.transaction(s).objectStore(s).getAllKeys(); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
 async function dbDel(s, k){ const db = await idb(); return new Promise((res, rej) => { const t = db.transaction(s, "readwrite"); t.objectStore(s).delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
@@ -817,7 +883,8 @@ async function openAppLibrary(){
   const root = await appTree();
   const has = root.children.size > 0;
   $("empty").hidden = has;
-  if (!has) { rootNode = null; stack = []; $("empty").innerHTML = "Nothing here yet. Tap <b>Import comics</b> and pick CBZ files from the Files app."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
+  if (!has) { rootNode = null; stack = []; $("empty").innerHTML = msAccount ? "Nothing saved on this device yet. When you're online your OneDrive shelf shows here, and <b>Keep on this device</b> saves issues for offline reading."
+  : "Nothing here yet. Tap <b>Connect OneDrive</b> to show the comics in your OneDrive " + CLOUD_FOLDER + " folder, or <b>Import comics</b> to add CBZ files from the Files app."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
   updateStorageUse();
   if (has) await openRoot(root);
 }
@@ -826,8 +893,12 @@ async function updateStorageUse(){
     $("storageUse").textContent = (gb >= 1 ? gb.toFixed(1) + " GB" : e.usage < 1e6 ? "Under 1 MB" : Math.round(e.usage / 1e6) + " MB") + " on this device"; } catch {}
 }
 async function removeFromDevice(nodes){
-  for (const n of nodes) if (n.appKey) { await dbDel("comics", n.appKey); store.del("pos:" + n.path); }
-  await openAppLibrary();
+  for (const n of nodes) if (n.appKey) {
+    await dbDel("comics", n.appKey);
+    if (!n.cloud) store.del("pos:" + n.path); // a OneDrive comic keeps its progress; only the device copy goes
+  }
+  if (CLOUD) { await refreshLocal(); libToast("Removed from this device"); }
+  else await openAppLibrary();
 }
 
 // Import: pick CBZ files in the Files app; series comes from the file name, publisher is asked once for new series
@@ -876,8 +947,148 @@ $("impGo").onclick = async () => {
   }
   pendingImport = [];
   $("importPanel").classList.remove("open");
-  await openAppLibrary();
+  if (CLOUD) { await refreshLocal(); await renderLib(); libToast("Added to this device"); }
+  else await openAppLibrary();
 };
+
+/* ---------- OneDrive library (app mode) ---------- */
+const MS_CLIENT_ID = "0e68c45f-e424-49c5-8b42-2b04b7fe7f9f";   // Panel Reader's app registration (an ID, not a secret)
+const CLOUD_FOLDER = "Comics";                                   // top-level OneDrive folder holding Publisher/Series
+const GRAPH = "https://graph.microsoft.com/v1.0";
+const SCOPES = ["Files.Read", "Files.ReadWrite.AppFolder"];       // read your files; write only Panel Reader's own app folder
+const STATE_FILE = "panel-reader-state.json";
+let msalApp = null, msAccount = null, localTree = null, localKeys = new Set();
+
+function loadScript(src){ return new Promise((res, rej) => { const s = document.createElement("script"); s.src = src; s.onload = res; s.onerror = () => rej(new Error("couldn't load " + src)); document.head.append(s); }); }
+const appHome = () => new URL("./", location.href).href;
+async function msalInit(){
+  if (window.__PR_TEST) { msAccount = window.__PR_TEST.signedIn ? {username:"test@example.com"} : null; return; }
+  await loadScript("msal-browser.min.js");
+  msalApp = new msal.PublicClientApplication({
+    auth: {clientId: MS_CLIENT_ID, authority: "https://login.microsoftonline.com/consumers", redirectUri: appHome(), navigateToLoginRequestUrl: false},
+    cache: {cacheLocation: "localStorage"}
+  });
+  await msalApp.initialize();
+  let r = null;
+  try { r = await msalApp.handleRedirectPromise(); } catch (e) { showNotice("Sign-in didn't finish: " + (e.errorCode || e.message) + ". Try Connect OneDrive again."); }
+  msAccount = (r && r.account) || msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null;
+  if (msAccount) msalApp.setActiveAccount(msAccount);
+}
+async function msToken(){
+  if (window.__PR_TEST) return "test-token";
+  try { return (await msalApp.acquireTokenSilent({scopes: SCOPES, account: msAccount})).accessToken; }
+  catch (e) {
+    if (navigator.onLine === false) throw new Error("You're offline.");
+    await msalApp.acquireTokenRedirect({scopes: SCOPES, account: msAccount}); // signs back in, then returns here
+    return new Promise(() => {});
+  }
+}
+async function graph(path, opts = {}){
+  const token = await msToken();
+  return fetch(path.startsWith("http") ? path : GRAPH + path, {...opts, headers: {...(opts.headers || {}), Authorization: "Bearer " + token}});
+}
+const encPath = p => p.split("/").map(encodeURIComponent).join("/");
+async function cloudChildren(rel){
+  let url = "/me/drive/root:/" + encPath(CLOUD_FOLDER + (rel ? "/" + rel : "")) + ":/children?$top=999";
+  const out = [];
+  while (url) {
+    const r = await graph(url);
+    if (r.status === 404) throw new Error(rel ? "That folder isn't in your OneDrive anymore." : "There's no folder named " + CLOUD_FOLDER + " at the top of your OneDrive yet.");
+    if (!r.ok) throw new Error("OneDrive didn't respond (error " + r.status + ").");
+    const j = await r.json(); out.push(...j.value); url = j["@odata.nextLink"] || null;
+  }
+  return out;
+}
+// progress file in OneDrive's private "Apps/Panel Reader" folder
+async function cloudReadState(){
+  const r = await graph("/me/drive/special/approot:/" + STATE_FILE);
+  if (r.status === 404) return {};
+  if (!r.ok) throw new Error("state " + r.status);
+  const dl = (await r.json())["@microsoft.graph.downloadUrl"];
+  const d = await fetch(dl, {cache:"no-store"});
+  if (!d.ok) throw new Error("state download " + d.status);
+  try { return await d.json(); } catch { return {}; }
+}
+async function cloudWriteState(state){
+  const r = await graph("/me/drive/special/approot:/" + STATE_FILE + ":/content", {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify(state)});
+  if (!r.ok) throw new Error("state upload " + r.status);
+}
+// a OneDrive comic, read in pieces like a local file (falls back to one full download if needed)
+function cloudFile(node){
+  let dl = node.dl, whole = null;
+  const fresh = async () => {
+    const r = await graph("/me/drive/items/" + encodeURIComponent(node.id));
+    if (!r.ok) throw new Error("OneDrive didn't respond (error " + r.status + ").");
+    dl = node.dl = (await r.json())["@microsoft.graph.downloadUrl"];
+  };
+  const get = (headers) => fetch(dl, {headers}).catch(() => null);
+  return {
+    remote:true, size:node.size, lastModified:node.mtime, name:node.name,
+    async range(start, end){
+      if (end <= start) return new Blob([]);
+      if (whole) return whole.slice(start, end);
+      if (!dl) await fresh();
+      const rh = {Range: "bytes=" + start + "-" + (end - 1)};
+      let r = await get(rh);
+      if (r && [401, 403, 404, 410].includes(r.status)) { await fresh(); r = await get(rh); } // download link expired
+      if (r && r.status === 206) return r.blob();
+      if (r && r.ok) { whole = await r.blob(); return whole.slice(start, end); }
+      if (!r) { const w = await get({}); if (w && w.ok) { whole = await w.blob(); return whole.slice(start, end); } }
+      throw new Error(navigator.onLine === false ? "You're offline, and this issue isn't saved on this device." : "Couldn't download from OneDrive.");
+    }
+  };
+}
+async function refreshLocal(){ localTree = await appTree(); localKeys = new Set(await dbKeys("comics")); listCache.clear(); updateStorageUse(); }
+function findLocal(rel){
+  let n = localTree; if (!n) return null;
+  for (const part of rel ? rel.split("/") : []) { n = n.children && n.children.get(part); if (!n) return null; }
+  return n;
+}
+async function keepOnDevice(nodes){
+  const list = nodes.filter(n => n.cloud && n.kind === "file" && !localKeys.has(n.appKey));
+  let i = 0;
+  for (const n of list) {
+    i++; libToast("Saving " + i + " of " + list.length + " to this device…", 0);
+    const b = await cloudFile(n).range(0, n.size);
+    await dbPut("comics", n.appKey, new Blob([b], {type:"application/zip"}));
+    localKeys.add(n.appKey);
+  }
+  try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch {}
+  await refreshLocal();
+  libToast(list.length ? "Saved for offline reading" : "Already on this device");
+}
+let libToastT;
+function libToast(t, ms = 2200){ const el = $("libToast"); el.textContent = t; el.classList.add("show"); clearTimeout(libToastT); if (ms) libToastT = setTimeout(() => el.classList.remove("show"), ms); }
+function showNotice(t){ const n = $("notice"); n.textContent = t || ""; n.hidden = !t; }
+function updateCloudButton(){
+  const b = $("cloudBtn");
+  b.textContent = msAccount ? "Sign out of OneDrive" : "Connect OneDrive";
+  b.title = msAccount ? "Signed in as " + msAccount.username : "Show the comics in your OneDrive " + CLOUD_FOLDER + " folder";
+}
+$("cloudBtn").onclick = async () => {
+  if (window.__PR_TEST) return;
+  if (!msalApp) { try { await msalInit(); } catch { showNotice("Couldn't load Microsoft sign-in. Check your connection."); return; } }
+  if (!msAccount) { await msalApp.loginRedirect({scopes: SCOPES, prompt: "select_account"}); return; }
+  if (!confirm("Sign out of OneDrive on this device? Comics you saved to this device stay readable.")) return;
+  await msalApp.logoutRedirect({account: msAccount, onRedirectNavigate: () => false}); // forget this device's sign-in only
+  msAccount = null; CLOUD = false; updateCloudButton(); await openAppLibrary();
+};
+async function openCloudLibrary(){
+  CLOUD = true;
+  await refreshLocal();
+  const root = {name:APP_ROOT, path:APP_ROOT, kind:"dir", cloud:true, rel:""};
+  try { await listNode(root); }
+  catch (e) {
+    CLOUD = false;
+    showNotice(e.message + (/no folder/.test(e.message) ? " Create it in OneDrive and put your Publisher folders inside, then reopen Panel Reader." : " Showing comics saved on this device."));
+    return false;
+  }
+  showNotice("");
+  $("empty").hidden = true;
+  cloudSync(true);
+  await openRoot(root);
+  return true;
+}
 
 function setReopen(h){
   const b = $("reopenBtn");
@@ -908,10 +1119,14 @@ function setReopen(h){
     } catch {}
     // Not the PC server: the hosted iPad app (https), with its own on-device library
     if (location.protocol === "https:") {
-      APP = true;
+      APP = true; loadAppState();
       $("libActions").hidden = true; $("appActions").hidden = false;
       if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+      try { await msalInit(); } catch { /* offline or sign-in library unavailable: device library only */ }
+      updateCloudButton();
+      if (msAccount && navigator.onLine !== false && await openCloudLibrary()) return;
       await openAppLibrary();
+      if (msAccount && navigator.onLine === false) showNotice("You're offline, so this shows comics saved on this device. Your OneDrive shelf comes back when you're online.");
       return;
     }
   }
