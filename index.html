@@ -133,6 +133,8 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 #reader.fitw #stage{display:block;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain}
 #reader.fitw .pair{display:flex;flex-direction:column;justify-content:center;min-height:100%}
 #reader.fitw .pair img{width:100vw;max-width:none;max-height:none;height:auto}
+#reader.fitw.zoomed #stage{overflow-x:auto;touch-action:pan-x pan-y}
+#reader.fitw.zoomed .pair{align-items:flex-start;width:max-content}
 /* feel like an app, not a web page */
 html{-webkit-tap-highlight-color:transparent}
 html,body{overscroll-behavior:none}
@@ -226,8 +228,8 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       <table>
         <tr><td><kbd>&rarr;</kbd> <kbd>Space</kbd> <kbd>Page Down</kbd></td><td>Next page</td></tr>
         <tr><td><kbd>&larr;</kbd> <kbd>Page Up</kbd></td><td>Previous page</td></tr>
-        <tr><td>Click or tap right side</td><td>Next page</td></tr>
-        <tr><td>Click or tap left side</td><td>Previous page</td></tr>
+        <tr><td>Tap the right quarter of the page</td><td>Next page</td></tr>
+        <tr><td>Tap the left quarter of the page</td><td>Previous page</td></tr>
         <tr><td>Mouse wheel</td><td>Down for next, up for previous</td></tr>
         <tr><td>Swipe (touch)</td><td>Left for next, right for previous</td></tr>
         <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>First / last page</td></tr>
@@ -252,11 +254,11 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       <h3>View</h3>
       <table>
         <tr><td><kbd>D</kbd> or layout button</td><td>Auto, one page, or two pages. Auto shows two on wide screens, one on tall ones</td></tr>
-        <tr><td><kbd>W</kbd> or Fit width</td><td>One page across the full width; scroll up and down. Side taps and left/right swipes still turn pages; <kbd>Space</kbd> scrolls, then turns at the bottom</td></tr>
+        <tr><td><kbd>W</kbd> or Fit width</td><td>One page across the full width; scroll up and down. Side taps and left/right swipes still turn pages; <kbd>Space</kbd> scrolls, then turns at the bottom. Pinch or double-tap still zooms in further</td></tr>
         <tr><td><kbd>S</kbd> or Shift pairing</td><td>Fix split two-page art in this issue only</td></tr>
-        <tr><td><kbd>F</kbd></td><td>Fullscreen on or off</td></tr>
+        <tr><td><kbd>F</kbd> or Fullscreen (iPad and PC)</td><td>Hides the time and battery bar too. Stays on while you move between issues and the shelf</td></tr>
         <tr><td>Mouse to top or bottom edge</td><td>Show the controls</td></tr>
-        <tr><td>Click or tap the middle</td><td>Show or hide the controls</td></tr>
+        <tr><td>Tap the middle, or near the top or bottom edge</td><td>Show or hide the controls</td></tr>
         <tr><td><kbd>H</kbd></td><td>Show or hide this list</td></tr>
       </table>
       <h3>Shelf</h3>
@@ -1213,8 +1215,7 @@ function closeReader(){
   freePages();
   $("reader").classList.remove("open");
   toggleHelp(false);
-  if (document.fullscreenElement || document.webkitFullscreenElement) toggleFs();
-  if (stack.length) renderLib();
+  if (stack.length) renderLib(); // fullscreen stays on for the shelf too
 }
 function status(t){ $("status").textContent = t || ""; }
 let toastT;
@@ -1291,7 +1292,8 @@ const LAYOUT_ICON = {
 };
 // Fullscreen does nothing in the Home Screen app (already full screen) or on iPhone (not supported)
 const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-const canFullscreen = !standalone && !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+// iPads support true fullscreen (hides the time/battery bar), iPhones don't; show the button only where it works
+const canFullscreen = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 function syncButtons(){
   const lb = $("layoutBtn");
   lb.innerHTML = '<svg viewBox="0 0 24 24">' + LAYOUT_ICON[R.layout] + '</svg><span class="lbl">' + LAYOUT_LABEL[R.layout] + '</span>';
@@ -1329,7 +1331,7 @@ function toggleFs(){
   const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
   if (fsEl) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
   else {
-    const el = $("reader"), req = el.requestFullscreen || el.webkitRequestFullscreen;
+    const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen; // whole app, so it stays on across issues and the shelf
     if (req) { const p = req.call(el); if (p && p.catch) p.catch(()=>{}); }
     else toast("Fullscreen isn't available in this browser");
   }
@@ -1360,6 +1362,11 @@ const pairEl = () => $("stage").querySelector(".pair");
 function applyZoom(){
   const p = pairEl(); if (!p) return;
   if (Z.s <= 1.001) { Z.s = 1; Z.x = 0; Z.y = 0; }
+  if (R.fitw) { // fit width: zoom makes the page wider and you scroll around it
+    const img = p.querySelector("img"); if (img) img.style.width = Z.s > 1 ? (100 * Z.s) + "vw" : "";
+    $("reader").classList.toggle("zoomed", Z.s > 1);
+    return;
+  }
   // keep the page covering the screen while zoomed (no panning off into empty space)
   const mx = Math.max(0, (p.offsetWidth * Z.s - innerWidth) / 2), my = Math.max(0, (p.offsetHeight * Z.s - innerHeight) / 2);
   Z.x = Math.min(mx, Math.max(-mx, Z.x)); Z.y = Math.min(my, Math.max(-my, Z.y));
@@ -1367,22 +1374,29 @@ function applyZoom(){
   $("reader").classList.toggle("zoomed", Z.s > 1);
 }
 function zoomAt(ns, cx, cy){
-  if (R.fitw) return; // fit width already fills the screen; you scroll instead
   ns = Math.min(MAX_ZOOM, Math.max(1, ns));
+  if (R.fitw) { // keep the spot under your fingers (or mouse) in place while the page grows
+    const st = $("stage"), k = ns / Z.s, sl = st.scrollLeft, stp = st.scrollTop;
+    Z.s = ns; applyZoom();
+    st.scrollLeft = (sl + cx) * k - cx; st.scrollTop = (stp + cy) * k - cy;
+    return;
+  }
   const k = ns / Z.s, ox = cx - innerWidth / 2, oy = cy - innerHeight / 2;
   Z.x = ox - (ox - Z.x) * k; Z.y = oy - (oy - Z.y) * k; Z.s = ns;
   applyZoom();
 }
 function resetZoom(){ Z.s = 1; Z.x = 0; Z.y = 0; applyZoom(); }
-function toggleZoomAt(cx, cy){ if (Z.s > 1) resetZoom(); else zoomAt(2.5, cx, cy); }
+function toggleZoomAt(cx, cy){ zoomAt(Z.s > 1 ? 1 : 2.5, cx, cy); }
 
 /* ---------- Gestures: tap sides to turn, swipe, pinch, drag to pan when zoomed ---------- */
 const ptrs = new Map();
 let gest = null, lastTap = null, tapTimer = null;
-function singleTap(x){
-  const f = x / innerWidth;
-  if (Z.s === 1 && f < 1/3) prev();
-  else if (Z.s === 1 && f > 2/3) next();
+// Tap zones: outer quarter on each side turns pages; the middle half, and a strip along the top and
+// bottom edges (where the controls live), shows or hides the controls. Bigger target, fewer accidental turns.
+function singleTap(x, y){
+  const f = x / innerWidth, edge = y !== undefined && (y < innerHeight * 0.15 || y > innerHeight * 0.85);
+  if (Z.s === 1 && !edge && f < 0.25) prev();
+  else if (Z.s === 1 && !edge && f > 0.75) next();
   else if ($("reader").classList.contains("hideui")) showUI(); else { clearTimeout(uiT); $("reader").classList.add("hideui"); }
 }
 const stageEl = $("stage");
@@ -1391,7 +1405,9 @@ stageEl.addEventListener("pointerdown", e => {
   try { stageEl.setPointerCapture(e.pointerId); } catch {}
   if (ptrs.size === 2) {
     const [a, b] = [...ptrs.values()];
-    gest = {type:"pinch", d0:Math.hypot(a.x - b.x, a.y - b.y) || 1, mx:(a.x + b.x) / 2, my:(a.y + b.y) / 2, s0:Z.s, x0:Z.x, y0:Z.y};
+    const st = $("stage");
+    gest = {type:"pinch", d0:Math.hypot(a.x - b.x, a.y - b.y) || 1, mx:(a.x + b.x) / 2, my:(a.y + b.y) / 2, s0:Z.s, x0:Z.x, y0:Z.y,
+            sl0:st.scrollLeft, st0:st.scrollTop};
   } else if (ptrs.size === 1) {
     // while zoomed, note whether the page's left/right edge is already showing (swiping past it turns the page)
     const p = pairEl(), mx = p ? Math.max(0, (p.offsetWidth * Z.s - innerWidth) / 2) : 0;
@@ -1406,12 +1422,18 @@ stageEl.addEventListener("pointermove", e => {
   if (gest.type === "pinch" && ptrs.size >= 2) {
     const [a, b] = [...ptrs.values()];
     const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    if (R.fitw) { // fit width: grow the page and scroll so the pinched spot follows your fingers
+      const ns = Math.min(MAX_ZOOM, Math.max(1, gest.s0 * d / gest.d0)), st = $("stage");
+      Z.s = ns; applyZoom();
+      st.scrollLeft = (gest.sl0 + gest.mx) * ns / gest.s0 - mx; st.scrollTop = (gest.st0 + gest.my) * ns / gest.s0 - my;
+      return;
+    }
     Z.s = gest.s0; Z.x = gest.x0 + (mx - gest.mx); Z.y = gest.y0 + (my - gest.my);
     zoomAt(gest.s0 * d / gest.d0, mx, my);
   } else if (gest.type === "one") {
     const dx = e.clientX - gest.sx, dy = e.clientY - gest.sy;
     if (Math.hypot(dx, dy) > 8) gest.moved = true;
-    if (Z.s > 1 && gest.moved) { Z.x = gest.x0 + dx; Z.y = gest.y0 + dy; applyZoom(); }
+    if (Z.s > 1 && gest.moved && !R.fitw) { Z.x = gest.x0 + dx; Z.y = gest.y0 + dy; applyZoom(); } // fit width scrolls natively
   }
 });
 function endPointer(e){
@@ -1430,7 +1452,7 @@ function endPointer(e){
   if (g.moved) {
     const horiz = Math.abs(dx) > Math.abs(dy) * 1.5;
     if (Z.s === 1 && Math.abs(dx) > 50 && horiz) dx < 0 ? next() : prev();          // swipe
-    else if (Z.s > 1 && Math.abs(dx) > 60 && horiz) {                                // zoomed: push past the edge
+    else if (Z.s > 1 && !R.fitw && Math.abs(dx) > 60 && horiz) {                     // zoomed: push past the edge
       if (dx < 0 && g.atRight) next();
       else if (dx > 0 && g.atLeft) prev();
     }
@@ -1443,9 +1465,9 @@ function endPointer(e){
       clearTimeout(tapTimer); lastTap = null; toggleZoomAt(e.clientX, e.clientY);
     } else {
       lastTap = {t:now, x:e.clientX, y:e.clientY};
-      const x = e.clientX; tapTimer = setTimeout(() => { lastTap = null; singleTap(x); }, 260);
+      const x = e.clientX, y = e.clientY; tapTimer = setTimeout(() => { lastTap = null; singleTap(x, y); }, 260);
     }
-  } else singleTap(e.clientX);
+  } else singleTap(e.clientX, e.clientY);
 }
 stageEl.addEventListener("pointerup", endPointer);
 stageEl.addEventListener("pointercancel", endPointer);
@@ -1510,7 +1532,7 @@ document.addEventListener("keydown", e => {
   else if (k === "d" || k === "D") cycleLayout();
   else if (k === "s" || k === "S") toggleShift();
   else if (k === "f" || k === "F") toggleFs();
-  else if (k === "Escape" && !document.fullscreenElement) closeReader();
+  else if (k === "Escape") closeReader();
 });
 </script>
 </body>
