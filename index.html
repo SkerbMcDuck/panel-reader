@@ -133,6 +133,10 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 #reader.fitw #stage{display:block;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain}
 #reader.fitw .pair{display:flex;flex-direction:column;justify-content:center;min-height:100%}
 #reader.fitw .pair img{width:100vw;max-width:none;max-height:none;height:auto}
+/* iPad: start the page just below the time/battery bar so it sits on the dark strip, not over the art */
+#reader.padtop #stage{top:env(safe-area-inset-top)}
+#reader.padtop .pair img{max-height:calc(100vh - env(safe-area-inset-top));max-height:calc(100dvh - env(safe-area-inset-top))}
+#reader.padtop.fitw .pair img{max-height:none}
 #reader.fitw.zoomed #stage{overflow-x:auto;touch-action:pan-x pan-y}
 #reader.fitw.zoomed .pair{align-items:flex-start;width:max-content}
 /* feel like an app, not a web page */
@@ -1305,7 +1309,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 8;
+const APP_VERSION = 9;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
@@ -1322,6 +1326,8 @@ function syncButtons(){
   $("shiftBtn").classList.toggle("on", !R.cover);
   $("fsBtn").hidden = !canFullscreen || autoFs; // automatic on iPad, button on PC
   $("reader").classList.toggle("fitw", R.fitw);
+  // iPad only (touch screen with a short side of 600+ points); iPhones already have space above the page
+  $("reader").classList.toggle("padtop", matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) >= 600);
 }
 function setFitW(v){
   R.fitw = v; store.set("fitWidth", v);
