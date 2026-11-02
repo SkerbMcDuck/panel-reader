@@ -253,7 +253,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       </table>
       <h3>OneDrive and offline reading</h3>
       <table>
-        <tr><td>Connect OneDrive</td><td>Shows the Publisher and Series folders inside the Comics folder at the top of your OneDrive. Issues stream as you read</td></tr>
+        <tr><td>Connect OneDrive</td><td>Shows the Publisher and Series folders in OneDrive\Apps\Panel Reader\Comics, the only folder Panel Reader can see. Issues stream as you read</td></tr>
         <tr><td>••• then Keep on this device</td><td>Saves an issue (or a whole series) for reading offline</td></tr>
         <tr><td>••• then Remove from this device</td><td>Frees up space. The OneDrive copy is untouched</td></tr>
         <tr><td>Import comics</td><td>Adds CBZ files from the Files app straight to this device</td></tr>
@@ -884,7 +884,7 @@ async function openAppLibrary(){
   const has = root.children.size > 0;
   $("empty").hidden = has;
   if (!has) { rootNode = null; stack = []; $("empty").innerHTML = msAccount ? "Nothing saved on this device yet. When you're online your OneDrive shelf shows here, and <b>Keep on this device</b> saves issues for offline reading."
-  : "Nothing here yet. Tap <b>Connect OneDrive</b> to show the comics in your OneDrive " + CLOUD_FOLDER + " folder, or <b>Import comics</b> to add CBZ files from the Files app."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
+  : "Nothing here yet. Tap <b>Connect OneDrive</b> to show the comics in OneDrive\\Apps\\Panel Reader\\" + CLOUD_FOLDER + ", or <b>Import comics</b> to add CBZ files from the Files app."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
   updateStorageUse();
   if (has) await openRoot(root);
 }
@@ -953,9 +953,10 @@ $("impGo").onclick = async () => {
 
 /* ---------- OneDrive library (app mode) ---------- */
 const MS_CLIENT_ID = "0e68c45f-e424-49c5-8b42-2b04b7fe7f9f";   // Panel Reader's app registration (an ID, not a secret)
-const CLOUD_FOLDER = "Comics";                                   // top-level OneDrive folder holding Publisher/Series
+const CLOUD_FOLDER = "Comics";                                   // folder inside Panel Reader's app folder holding Publisher/Series
 const GRAPH = "https://graph.microsoft.com/v1.0";
-const SCOPES = ["Files.Read", "Files.ReadWrite.AppFolder"];       // read your files; write only Panel Reader's own app folder
+const SCOPES = ["Files.ReadWrite.AppFolder"];                     // ONLY Panel Reader's own folder (OneDrive\Apps\Panel Reader); nothing else in OneDrive
+let appFolderPath = "Apps\\Panel Reader";                         // replaced with the real name once OneDrive reports it
 const STATE_FILE = "panel-reader-state.json";
 let msalApp = null, msAccount = null, localTree = null, localKeys = new Set();
 
@@ -989,11 +990,11 @@ async function graph(path, opts = {}){
 }
 const encPath = p => p.split("/").map(encodeURIComponent).join("/");
 async function cloudChildren(rel){
-  let url = "/me/drive/root:/" + encPath(CLOUD_FOLDER + (rel ? "/" + rel : "")) + ":/children?$top=999";
+  let url = "/me/drive/special/approot:/" + encPath(CLOUD_FOLDER + (rel ? "/" + rel : "")) + ":/children?$top=999";
   const out = [];
   while (url) {
     const r = await graph(url);
-    if (r.status === 404) throw new Error(rel ? "That folder isn't in your OneDrive anymore." : "There's no folder named " + CLOUD_FOLDER + " at the top of your OneDrive yet.");
+    if (r.status === 404) throw new Error(rel ? "That folder isn't in your OneDrive anymore." : "NO_COMICS_FOLDER");
     if (!r.ok) throw new Error("OneDrive didn't respond (error " + r.status + ").");
     const j = await r.json(); out.push(...j.value); url = j["@odata.nextLink"] || null;
   }
@@ -1063,7 +1064,7 @@ function showNotice(t){ const n = $("notice"); n.textContent = t || ""; n.hidden
 function updateCloudButton(){
   const b = $("cloudBtn");
   b.textContent = msAccount ? "Sign out of OneDrive" : "Connect OneDrive";
-  b.title = msAccount ? "Signed in as " + msAccount.username : "Show the comics in your OneDrive " + CLOUD_FOLDER + " folder";
+  b.title = msAccount ? "Signed in as " + msAccount.username : "Show the comics in OneDrive\\Apps\\Panel Reader\\" + CLOUD_FOLDER;
 }
 $("cloudBtn").onclick = async () => {
   if (window.__PR_TEST) return;
@@ -1077,10 +1078,17 @@ async function openCloudLibrary(){
   CLOUD = true;
   await refreshLocal();
   const root = {name:APP_ROOT, path:APP_ROOT, kind:"dir", cloud:true, rel:""};
-  try { await listNode(root); }
+  try {
+    // touching the app folder makes OneDrive create it (OneDrive\Apps\<app name>) and tells us its exact name
+    const a = await graph("/me/drive/special/approot");
+    if (a.ok) { const j = await a.json(); if (j.name) appFolderPath = "Apps\\" + j.name; }
+    await listNode(root);
+  }
   catch (e) {
     CLOUD = false;
-    showNotice(e.message + (/no folder/.test(e.message) ? " Create it in OneDrive and put your Publisher folders inside, then reopen Panel Reader." : " Showing comics saved on this device."));
+    showNotice(e.message === "NO_COMICS_FOLDER"
+      ? "Connected. Now move your " + CLOUD_FOLDER + " folder into OneDrive\\" + appFolderPath + " (on your PC: C:\\Users\\Georg\\OneDrive\\" + appFolderPath + "), then reopen Panel Reader. That's the only folder Panel Reader can see."
+      : e.message + " Showing comics saved on this device.");
     return false;
   }
   showNotice("");

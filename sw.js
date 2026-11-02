@@ -1,7 +1,7 @@
 // Panel Reader offline support: keeps the app itself available with no connection.
 // Your comics live in the app's on-device storage, not here.
 // After you upload a new index.html, the iPad shows it from the second launch on (the first launch fetches it in the background).
-const CACHE = "panel-reader-v3";
+const CACHE = "panel-reader-v4";
 const CORE = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "msal-browser.min.js"];
 
 self.addEventListener("install", e => {
