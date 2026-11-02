@@ -1,0 +1,1231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Panel Reader</title>
+<meta name="theme-color" content="#101216">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Panel Reader">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --room:#101216;      /* reader backdrop */
+  --ink:#171a20;       /* library background */
+  --shelf:#21252d;     /* cover placeholders, buttons */
+  --edge:#30353f;      /* borders */
+  --paper:#eee8da;     /* text, newsprint tone */
+  --muted:#8c919c;
+  --yellow:#ffd23f;    /* process yellow, highlights only */
+  --display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --ui:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;min-height:100%;background:var(--ink);color:var(--paper);font:15px/1.45 var(--ui);-webkit-font-smoothing:antialiased}
+button{font:500 14px/1 var(--ui);color:var(--paper);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+button:hover{border-color:var(--muted)}
+button:disabled{opacity:.35;cursor:default}
+button:disabled:hover{border-color:var(--edge)}
+button.on{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+
+/* ---------- Library ---------- */
+#lib{max-width:1240px;margin:0 auto;padding:28px 24px 64px}
+#libHead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
+#libActions,#appActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#storageUse{color:var(--muted);font-size:13px;margin-right:6px}
+/* iPad home screen app: keep clear of the status bar */
+#lib{padding-top:max(28px,env(safe-area-inset-top))}
+#top{padding-top:max(14px,env(safe-area-inset-top))}
+#bottom{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+/* import dialog */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(8,9,11,.82);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modalBox{background:var(--ink);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;max-width:460px;width:100%;max-height:100%;overflow:auto}
+.modalBox h2{margin:0 0 10px;font:700 30px/1 var(--display)}
+.modalBox label{display:block;font-weight:600;margin:14px 0 6px}
+.modalBox input{width:100%;font:16px var(--ui);color:var(--paper);background:var(--shelf);border:1px solid var(--edge);border-radius:8px;padding:10px 12px}
+.muted{color:var(--muted);font-size:14px;margin:6px 0}
+#impStatus{min-height:20px;margin:14px 0 0}
+.modalBtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+#crumbs{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:22px 0 26px;font:600 22px/1.2 var(--display);color:var(--muted);min-height:26px}
+#crumbs a{color:var(--muted);cursor:pointer;text-decoration:none}
+#crumbs a:hover{color:var(--paper)}
+#crumbs a:last-child{color:var(--paper);cursor:default}
+#crumbs .sep{opacity:.5}
+#grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:30px 22px}
+.card{cursor:pointer;min-width:0;border-radius:6px;outline-offset:6px}
+.cover{position:relative;aspect-ratio:2/3;background:var(--shelf);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:12px;text-align:center;font:600 18px/1.1 var(--display);color:var(--muted)}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.cover img.ok{opacity:1}
+.card.dir .cover{box-shadow:5px -5px 0 -1px var(--ink),5px -5px 0 0 var(--edge),10px -10px 0 -1px var(--ink),10px -10px 0 0 var(--edge);overflow:visible}
+.card.dir .cover img{border-radius:4px}
+.cover.name{background:var(--tint);color:var(--paper);justify-content:flex-start;align-items:flex-end;text-align:left;padding:16px 14px;font:700 var(--fs)/.92 var(--display);letter-spacing:-.01em;overflow-wrap:normal;word-break:normal}
+.cover.name img{filter:grayscale(.35) contrast(.95);transition:opacity 1.5s ease-in-out;border-radius:4px}
+.cover.name img.ok{opacity:.34}
+.cover.name::after{content:"";position:absolute;inset:0;border-radius:4px;background:linear-gradient(to top,var(--tint) 12%,transparent 75%);pointer-events:none}
+.cover.name span{position:relative;z-index:1;text-shadow:0 1px 12px rgba(0,0,0,.35)}
+.card:hover .cover{filter:brightness(1.08)}
+.cap{margin-top:10px;font:600 19px/1.1 var(--display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sub{font-size:13px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prog{height:3px;background:var(--edge);border-radius:2px;margin-top:8px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--yellow)}
+.card.dis{cursor:default;opacity:.45}
+.card{position:relative}
+/* read state: yellow dot = unread, dimmed cover = finished */
+.dot{position:absolute;top:9px;left:9px;width:11px;height:11px;border-radius:50%;background:var(--yellow);box-shadow:0 0 0 2px rgba(16,18,22,.85);z-index:1;pointer-events:none}
+.card.done .cover{filter:brightness(.5) saturate(.7)}
+.card.done:hover .cover{filter:brightness(.7) saturate(.85)}
+/* options menu */
+.more{position:absolute;top:6px;right:6px;z-index:2;padding:4px 9px 7px;font:700 16px/1 var(--ui);letter-spacing:1px;background:rgba(16,18,22,.88);opacity:0;transition:opacity .15s}
+.card:hover .more,.more:focus-visible,.more.open{opacity:1}
+@media (hover:none){.more{opacity:.85}}
+.menu{position:absolute;top:40px;right:6px;z-index:5;min-width:190px;background:var(--ink);border:1px solid var(--edge);border-radius:10px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
+.menu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:9px 10px;font-size:14px}
+.menu button:hover,.menu button:focus-visible{background:var(--shelf)}
+/* continue reading row */
+#contWrap{margin:0 0 38px}
+#contWrap h2{font:600 24px/1 var(--display);margin:0 0 16px}
+#contRow{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:22px;overflow-x:auto;padding:10px 0 12px}
+.upnext{color:var(--yellow)}
+#empty{max-width:520px;margin:48px 0;color:var(--muted);font-size:16px}
+#empty b{color:var(--paper);font-weight:600}
+
+/* ---------- Reader ---------- */
+#reader{position:fixed;inset:0;z-index:50;background:var(--room);display:none;overflow:hidden;touch-action:none}
+#reader.open{display:block}
+#reader.idle{cursor:none}
+#stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none}
+.pair{position:relative;display:flex;align-items:center;justify-content:center;transform-origin:50% 50%}
+#reader.zoomed #stage{cursor:grab}
+#reader.zoomed #stage:active{cursor:grabbing}
+.pair img{display:block;max-width:100vw;max-height:100vh;max-height:100dvh;-webkit-user-drag:none}
+.pair.two img{max-width:50vw}
+.pair.two::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,transparent 46%,rgba(0,0,0,.16) 49.6%,rgba(0,0,0,.22) 50%,rgba(0,0,0,.16) 50.4%,transparent 54%)}
+#status{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);pointer-events:none;padding:24px;text-align:center}
+.bar{position:absolute;left:0;right:0;display:flex;align-items:center;gap:8px;padding:14px 18px;transition:opacity .2s;z-index:2}
+#top{top:0;background:linear-gradient(rgba(10,11,14,.92),rgba(10,11,14,.6) 70%,transparent)}
+#bottom{bottom:0;background:linear-gradient(transparent,rgba(10,11,14,.6) 30%,rgba(10,11,14,.92));padding-top:26px}
+#reader.hideui .bar{opacity:0;pointer-events:none}
+#title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 22px/1 var(--display);padding:0 6px}
+#slider{flex:1;accent-color:var(--yellow);min-width:80px}
+#plabel{color:var(--paper);font:600 17px/1 var(--display);min-width:112px;text-align:right;font-variant-numeric:tabular-nums}
+#toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:3}
+#toast.show{opacity:1}
+
+/* Controls panel */
+#helpPanel{position:absolute;inset:0;background:rgba(8,9,11,.82);display:none;align-items:center;justify-content:center;padding:16px;z-index:4}
+#helpPanel.open{display:flex}
+#helpBox{background:var(--ink);border:1px solid var(--edge);border-radius:14px;padding:22px 26px;max-width:540px;width:100%;max-height:100%;overflow:auto}
+#helpBox h2{margin:0 0 4px;font:700 30px/1 var(--display)}
+#helpBox h3{margin:18px 0 6px;font:600 19px/1 var(--display);color:var(--yellow)}
+#helpBox table{width:100%;border-collapse:collapse}
+#helpBox td{padding:5px 0;vertical-align:top;border-bottom:1px solid var(--shelf)}
+#helpBox td:first-child{color:var(--muted);width:44%;padding-right:14px}
+kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;padding:1px 6px;font:500 12px/1.4 var(--ui);color:var(--paper)}
+#helpClose{margin-top:18px}
+
+@media (max-width:640px){
+  h1{font-size:36px}
+  #grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:24px 16px}
+  .bar{flex-wrap:wrap}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<main id="lib">
+  <div id="libHead">
+    <h1>Panel Reader</h1>
+    <div id="libActions">
+      <button id="reopenBtn" hidden></button>
+      <button id="openBtn">Choose library folder</button>
+    </div>
+    <div id="appActions" hidden>
+      <span id="storageUse"></span>
+      <button id="importBtn">Import comics</button>
+    </div>
+  </div>
+  <input id="importInput" type="file" multiple accept=".cbz,.zip,application/zip,application/vnd.comicbook+zip" hidden>
+  <nav id="crumbs"></nav>
+  <section id="contWrap" hidden><h2>Continue reading</h2><div id="contRow"></div></section>
+  <div id="grid"></div>
+  <div id="empty">Choose your comics folder to start: <b>C:\Users\Georg\Comics</b></div>
+  <input id="dirInput" type="file" webkitdirectory multiple hidden>
+</main>
+
+<div id="importPanel" class="modal">
+  <div class="modalBox">
+    <h2 id="impTitle">Add comics</h2>
+    <p id="impKnown" class="muted"></p>
+    <div id="impPubWrap">
+      <label for="impPub">Publisher for the new series</label>
+      <input id="impPub" list="impPubList" autocomplete="off" placeholder="e.g. Marvel">
+      <datalist id="impPubList"></datalist>
+      <p id="impSeries" class="muted"></p>
+    </div>
+    <p id="impStatus"></p>
+    <div class="modalBtns"><button id="impCancel">Cancel</button><button id="impGo" class="on">Add to library</button></div>
+  </div>
+</div>
+
+<div id="reader" class="hideui">
+  <div id="stage"></div>
+  <div id="status"></div>
+  <div id="top" class="bar">
+    <button id="closeBtn">Library</button>
+    <div id="title"></div>
+    <button id="layoutBtn" title="Layout (D)"></button>
+    <button id="shiftBtn" title="Fix split two-page art in this issue (S)">Shift pairing</button>
+    <button id="fsBtn" title="Fullscreen (F)">Fullscreen</button>
+    <button id="nextIssueBtn" title="Next issue (N)">Next issue</button>
+    <button id="helpBtn" title="Controls (H)">Controls</button>
+  </div>
+  <div id="bottom" class="bar">
+    <input id="slider" type="range" min="1" max="1" value="1" aria-label="Page">
+    <div id="plabel"></div>
+  </div>
+  <div id="toast"></div>
+  <div id="helpPanel">
+    <div id="helpBox">
+      <h2>Controls</h2>
+      <h3>Turning pages</h3>
+      <table>
+        <tr><td><kbd>&rarr;</kbd> <kbd>Space</kbd> <kbd>Page Down</kbd></td><td>Next page</td></tr>
+        <tr><td><kbd>&larr;</kbd> <kbd>Page Up</kbd></td><td>Previous page</td></tr>
+        <tr><td>Click or tap right side</td><td>Next page</td></tr>
+        <tr><td>Click or tap left side</td><td>Previous page</td></tr>
+        <tr><td>Mouse wheel</td><td>Down for next, up for previous</td></tr>
+        <tr><td>Swipe (touch)</td><td>Left for next, right for previous</td></tr>
+        <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>First / last page</td></tr>
+        <tr><td>Page slider</td><td>Jump to any page</td></tr>
+      </table>
+      <h3>Zoom</h3>
+      <table>
+        <tr><td>Pinch (touch)</td><td>Zoom in and out</td></tr>
+        <tr><td>Double-tap (touch)</td><td>Zoom in on that spot, double-tap again to zoom out</td></tr>
+        <tr><td><kbd>Ctrl</kbd> + scroll wheel, or trackpad pinch</td><td>Zoom where the mouse is</td></tr>
+        <tr><td><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></td><td>Zoom in / zoom out / back to full page</td></tr>
+        <tr><td>Drag, or scroll, while zoomed</td><td>Move around the page</td></tr>
+        <tr><td>Turning the page</td><td>Goes back to full page</td></tr>
+      </table>
+      <h3>Issues</h3>
+      <table>
+        <tr><td><kbd>N</kbd> or Next issue</td><td>Open the next issue in this folder</td></tr>
+        <tr><td>Next page on the last page</td><td>Also opens the next issue</td></tr>
+        <tr><td><kbd>Esc</kbd> or Library</td><td>Back to your shelf</td></tr>
+      </table>
+      <h3>View</h3>
+      <table>
+        <tr><td><kbd>D</kbd> or layout button</td><td>Auto, one page, or two pages. Auto shows two on wide screens, one on tall ones</td></tr>
+        <tr><td><kbd>S</kbd> or Shift pairing</td><td>Fix split two-page art in this issue only</td></tr>
+        <tr><td><kbd>F</kbd></td><td>Fullscreen on or off</td></tr>
+        <tr><td>Mouse to top or bottom edge</td><td>Show the controls</td></tr>
+        <tr><td>Click or tap the middle</td><td>Show or hide the controls</td></tr>
+        <tr><td><kbd>H</kbd></td><td>Show or hide this list</td></tr>
+      </table>
+      <h3>Shelf</h3>
+      <table>
+        <tr><td>Yellow dot</td><td>Unread issue</td></tr>
+        <tr><td>Yellow line under a cover</td><td>How far you are into an issue, or how much of a series you've read</td></tr>
+        <tr><td>Dimmed cover</td><td>Finished</td></tr>
+        <tr><td>••• on an issue</td><td>Mark read or unread, use as series cover</td></tr>
+        <tr><td>••• on a series</td><td>Mark the whole series read or unread</td></tr>
+        <tr><td>Continue reading</td><td>Top of the main shelf: issues you're partway through, plus the next issue after one you finished</td></tr>
+        <tr><td><kbd>Backspace</kbd></td><td>Up one folder</td></tr>
+      </table>
+      <h3>Getting comics onto the iPad</h3>
+      <table>
+        <tr><td>••• then Download to this device</td><td>On the home server: saves that issue to the iPad's Files app (Downloads)</td></tr>
+        <tr><td>Import comics</td><td>In the iPad app: copies CBZ files you pick from Files into the app, for reading anywhere</td></tr>
+        <tr><td>••• then Remove from this device</td><td>In the iPad app: frees up space, your PC copy is untouched</td></tr>
+      </table>
+      <button id="helpClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Plain old-style script on purpose: if anything below fails (even on an older iPad), say what on screen.
+(function(){
+  function show(m){ var d = document.getElementById("empty"); if (!d) return;
+    d.hidden = false; d.style.color = "#ffb4a8"; d.textContent = "Something went wrong: " + m; }
+  window.addEventListener("error", function(e){ show((e.message || "unknown error") + (e.lineno ? " (line " + e.lineno + ")" : "")); });
+  window.addEventListener("unhandledrejection", function(e){ var r = e.reason; show(String(r && r.message || r)); });
+})();
+</script>
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const collator = new Intl.Collator(undefined, {numeric:true, sensitivity:"base"});
+const IMG_RE = /\.(jpe?g|png|webp|gif|avif|bmp)$/i;
+const MIME = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",gif:"image/gif",avif:"image/avif",bmp:"image/bmp"};
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- storage (never fatal) ---------- */
+// Reading progress, pairing fixes and series covers are shared through the PC server when there is one.
+// Per-device settings (layout, last folder) always stay on this device.
+const SYNC = /^(pos|shift|seriesCover):/;
+let SERVER = false, serverState = {};
+const pendingSaves = new Set();
+function postState(key, value){
+  const p = fetch("api/state", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({key, value}), keepalive:true})
+    .catch(()=>{}).finally(() => pendingSaves.delete(p));
+  pendingSaves.add(p);
+}
+async function refreshState(){
+  if (!SERVER) return;
+  if (pendingSaves.size) await Promise.all([...pendingSaves]); // don't overwrite saves still on their way to the PC
+  try { const r = await fetch("api/state", {cache:"no-store"}); if (r.ok) serverState = await r.json(); } catch {}
+}
+const store = {
+  get(k, d){
+    if (SERVER && SYNC.test(k)) return k in serverState ? serverState[k] : d;
+    try{ const v = localStorage.getItem("pr:"+k); return v===null ? d : JSON.parse(v); }catch{ return d; }
+  },
+  set(k, v){
+    if (SERVER && SYNC.test(k)) { serverState[k] = v; postState(k, v); return; }
+    try{ localStorage.setItem("pr:"+k, JSON.stringify(v)); }catch{}
+  },
+  del(k){
+    if (SERVER && SYNC.test(k)) { delete serverState[k]; postState(k, null); return; }
+    try{ localStorage.removeItem("pr:"+k); }catch{}
+  }
+};
+let dbP = null;
+function idb(){
+  return dbP ||= new Promise((res,rej)=>{
+    const r = indexedDB.open("panel-reader", 3);
+    r.onupgradeneeded = () => { const db = r.result;
+      if (!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
+      if (!db.objectStoreNames.contains("thumbs")) db.createObjectStore("thumbs");
+      if (!db.objectStoreNames.contains("comics")) db.createObjectStore("comics"); }; // iPad app: imported CBZ files
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function dbGet(s,k){ const db=await idb(); return new Promise((res,rej)=>{ const q=db.transaction(s).objectStore(s).get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
+async function dbPut(s,k,v){ const db=await idb(); return new Promise((res,rej)=>{ const t=db.transaction(s,"readwrite"); t.objectStore(s).put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); }
+
+/* ---------- ZIP / CBZ reading (reads only the parts it needs) ---------- */
+/*ZIP-START*/
+// A local File slices itself; a file on the PC server fetches just the bytes asked for.
+async function readRange(file, start, end){ return file.remote ? file.range(start, end) : file.slice(start, end); }
+async function zipEntries(file){
+  const size = file.size;
+  const tailLen = Math.min(size, 65557);
+  const tail = new DataView(await (await readRange(file, size - tailLen, size)).arrayBuffer());
+  let eo = -1;
+  for (let i = tailLen - 22; i >= 0; i--) { if (tail.getUint32(i, true) === 0x06054b50) { eo = i; break; } }
+  if (eo < 0) throw new Error("This file isn't a valid CBZ/ZIP archive.");
+  const count = tail.getUint16(eo + 10, true);
+  const cdSize = tail.getUint32(eo + 12, true);
+  const cdOff = tail.getUint32(eo + 16, true);
+  if (count === 0xFFFF || cdOff === 0xFFFFFFFF || cdSize === 0xFFFFFFFF) throw new Error("This archive uses ZIP64, which isn't supported yet.");
+  const cd = new DataView(await (await readRange(file, cdOff, cdOff + cdSize)).arrayBuffer());
+  const dec = new TextDecoder();
+  const out = [];
+  let p = 0;
+  for (let n = 0; n < count; n++) {
+    if (cd.getUint32(p, true) !== 0x02014b50) throw new Error("The archive's directory is damaged.");
+    const flags = cd.getUint16(p + 8, true), method = cd.getUint16(p + 10, true);
+    const csize = cd.getUint32(p + 20, true);
+    const nlen = cd.getUint16(p + 28, true), xlen = cd.getUint16(p + 30, true), clen = cd.getUint16(p + 32, true);
+    const loff = cd.getUint32(p + 42, true);
+    const name = dec.decode(new Uint8Array(cd.buffer, cd.byteOffset + p + 46, nlen));
+    out.push({name, flags, method, csize, loff});
+    p += 46 + nlen + xlen + clen;
+  }
+  return out;
+}
+async function zipRead(file, e){
+  if (e.flags & 1) throw new Error("This archive is password protected.");
+  if (e.csize === 0xFFFFFFFF || e.loff === 0xFFFFFFFF) throw new Error("This archive uses ZIP64, which isn't supported yet.");
+  // grab header + data in one read (with room for the header's variable-length fields)
+  const chunk = await readRange(file, e.loff, Math.min(file.size, e.loff + 30 + e.csize + 1024));
+  const lh = new DataView(await chunk.slice(0, 30).arrayBuffer());
+  if (lh.getUint32(0, true) !== 0x04034b50) throw new Error("Damaged page entry: " + e.name);
+  const off = 30 + lh.getUint16(26, true) + lh.getUint16(28, true);
+  const raw = off + e.csize <= chunk.size ? chunk.slice(off, off + e.csize)
+            : await readRange(file, e.loff + off, e.loff + off + e.csize);
+  const ext = (e.name.split(".").pop() || "").toLowerCase();
+  const type = MIME[ext] || "application/octet-stream";
+  if (e.method === 0) return new Blob([raw], {type});
+  if (e.method === 8) {
+    const stream = raw.stream().pipeThrough(new DecompressionStream("deflate-raw"));
+    return new Blob([await new Response(stream).blob()], {type});
+  }
+  throw new Error("Unsupported compression (method " + e.method + ") in " + e.name);
+}
+function pageEntries(entries){
+  return entries
+    .filter(e => !e.name.endsWith("/") && IMG_RE.test(e.name) && !/(^|\/)__MACOSX\//.test(e.name) && !/(^|\/)\./.test(e.name))
+    .sort((a, b) => collator.compare(a.name, b.name));
+}
+/*ZIP-END*/
+
+/* ---------- Library tree ---------- */
+let rootNode = null, stack = [];
+const isComic = n => /\.(cbz|zip)$/i.test(n);
+const isUnsupported = n => /\.(cbr|rar|cb7|7z|pdf)$/i.test(n);
+const baseName = n => n.replace(/\.[^.]+$/, "");
+const issueNo = n => { const m = baseName(n).match(/#\s*0*(\d+(?:\.\d+)?)/); return m ? "#" + m[1] : null; };
+
+const listCache = new Map();
+async function listNode(node){
+  if (listCache.has(node.path)) return listCache.get(node.path);
+  let kids = [];
+  if (node.remote) {
+    const r = await fetch("api/list?path=" + encodeURIComponent(node.rel), {cache:"no-store"});
+    if (!r.ok) throw new Error("the PC server couldn't read this folder");
+    for (const x of await r.json()) {
+      if (x.name.startsWith(".")) continue;
+      kids.push({name:x.name, path:node.path + "/" + x.name, kind:x.kind, remote:true,
+                 rel: node.rel ? node.rel + "/" + x.name : x.name, size:x.size, mtime:x.mtime});
+    }
+  } else if (node.handle) {
+    for await (const [name, h] of node.handle.entries()) {
+      if (name.startsWith(".")) continue;
+      if (h.kind === "directory") kids.push({name, path: node.path + "/" + name, kind:"dir", handle:h});
+      else if (isComic(name) || isUnsupported(name)) kids.push({name, path: node.path + "/" + name, kind:"file", handle:h});
+    }
+  } else kids = [...node.children.values()];
+  kids = kids.filter(k => !(k.kind === "dir" && k.name.startsWith("_"))); // _Inbox and other _folders stay off the shelf
+  kids.sort((a,b) => (a.kind===b.kind ? collator.compare(a.name,b.name) : a.kind==="dir" ? -1 : 1));
+  listCache.set(node.path, kids);
+  return kids;
+}
+async function fileOf(node){
+  if (node.remote) return remoteFile(node);
+  if (node.appKey) { const b = await dbGet("comics", node.appKey); if (!b) throw new Error("This comic is no longer on this device."); return b; }
+  return node.handle ? node.handle.getFile() : node.file;
+}
+function remoteFile(node){
+  const url = "api/file?path=" + encodeURIComponent(node.rel);
+  return {
+    remote:true, size:node.size, lastModified:node.mtime, name:node.name,
+    async range(start, end){
+      if (end <= start) return new Blob([]);
+      const r = await fetch(url, {headers:{Range:"bytes=" + start + "-" + (end - 1)}});
+      if (r.status === 206) return r.blob();
+      if (r.ok) return (await r.blob()).slice(start, end); // server ignored the range
+      throw new Error("Lost connection to the PC (is the server still running?)");
+    }
+  };
+}
+
+/* ---------- Covers (first page, cached between visits) ---------- */
+const coverMem = new Map();
+let active = 0; const queue = [];
+function enqueue(fn){ return new Promise((res, rej) => { queue.push({fn, res, rej}); pump(); }); }
+function pump(){ while (active < 3 && queue.length) { const t = queue.shift(); active++; t.fn().then(t.res, t.rej).finally(() => { active--; pump(); }); } }
+
+async function makeThumb(f){
+  const pages = pageEntries(await zipEntries(f));
+  if (!pages.length) throw new Error("no pages");
+  const bmp = await createImageBitmap(await zipRead(f, pages[0]));
+  const w = 360, h = Math.round(bmp.height * w / bmp.width);
+  const c = document.createElement("canvas"); c.width = w; c.height = h;
+  const x = c.getContext("2d"); x.imageSmoothingQuality = "high"; x.drawImage(bmp, 0, 0, w, h);
+  bmp.close && bmp.close();
+  return new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error("thumb")), "image/webp", 0.82));
+}
+function coverFor(fileNode){
+  if (coverMem.has(fileNode.path)) return coverMem.get(fileNode.path);
+  const p = (async () => {
+    const f = await fileOf(fileNode);
+    const key = fileNode.path + "|" + f.size + "|" + f.lastModified;
+    let blob = null;
+    try { blob = await dbGet("thumbs", key); } catch {}
+    if (!blob) { blob = await enqueue(() => makeThumb(f)); dbPut("thumbs", key, blob).catch(()=>{}); }
+    return URL.createObjectURL(blob);
+  })();
+  coverMem.set(fileNode.path, p);
+  p.catch(() => coverMem.delete(fileNode.path));
+  return p;
+}
+async function firstComicIn(dir, depth = 0){
+  const kids = await listNode(dir);
+  const chosen = store.get("seriesCover:" + dir.path, null);
+  const f = (chosen && kids.find(k => k.path === chosen)) || kids.find(k => k.kind === "file" && isComic(k.name));
+  if (f) return f;
+  if (depth >= 3) return null;
+  for (const d of kids.filter(k => k.kind === "dir").slice(0, 3)) { const r = await firstComicIn(d, depth + 1); if (r) return r; }
+  return null;
+}
+const seen = new IntersectionObserver(entries => {
+  for (const e of entries) if (e.isIntersecting) { seen.unobserve(e.target); e.target._load && e.target._load(); }
+}, {rootMargin:"300px"});
+
+/* ---------- Library view ---------- */
+async function openRoot(node){
+  rootNode = node; stack = [node]; listCache.clear();
+  // return to the folder you were last in
+  const last = store.get("lastPath", []);
+  for (const name of last) {
+    try { const kids = await listNode(stack[stack.length - 1]); const d = kids.find(k => k.kind === "dir" && k.name === name); if (!d) break; stack.push(d); } catch { break; }
+  }
+  renderLib();
+}
+function progressOf(path){ return store.get("pos:" + path, null); }
+function setRead(path, read, t){
+  if (read) { const p = progressOf(path) || {i:0, n:0}; store.set("pos:" + path, {i:p.i, n:p.n, done:true, t: t || Date.now()}); }
+  else store.del("pos:" + path);
+}
+// every saved progress entry: [{path, i, n, done, t}]
+function allProgress(){
+  const out = [];
+  if (SERVER) { for (const [k, v] of Object.entries(serverState)) if (k.startsWith("pos:") && v) out.push({path:k.slice(4), ...v}); }
+  else {
+    try { for (let j = 0; j < localStorage.length; j++) { const k = localStorage.key(j);
+      if (k && k.startsWith("pr:pos:")) { const v = JSON.parse(localStorage.getItem(k)); if (v) out.push({path:k.slice(7), ...v}); } } } catch {}
+  }
+  return out;
+}
+// find a library item from its saved path
+async function resolvePath(path){
+  if (!rootNode || !path.startsWith(rootNode.path + "/")) return null;
+  let node = rootNode, parent = null;
+  for (const part of path.slice(rootNode.path.length + 1).split("/")) {
+    const kids = await listNode(node);
+    const next = kids.find(k => k.name === part);
+    if (!next) return null;
+    parent = node; node = next;
+  }
+  return {node, parent};
+}
+
+async function renderLib(){
+  if (!stack.length) return;
+  const node = stack[stack.length - 1];
+  await refreshState(); // pick up progress made on the other device
+  store.set("lastPath", stack.slice(1).map(n => n.name));
+  const crumbs = $("crumbs"); crumbs.innerHTML = "";
+  stack.forEach((n, i) => {
+    if (i) { const s = document.createElement("span"); s.className = "sep"; s.textContent = "/"; crumbs.append(s); }
+    const a = document.createElement("a"); a.textContent = n.name;
+    if (i < stack.length - 1) a.onclick = () => { stack = stack.slice(0, i + 1); renderLib(); };
+    crumbs.append(a);
+  });
+  const grid = $("grid"); grid.innerHTML = "";
+  let kids;
+  try { kids = await listNode(node); }
+  catch (err) { $("empty").hidden = false; $("empty").textContent = "Couldn't read this folder: " + err.message; return; }
+  $("empty").hidden = kids.length > 0;
+  if (!kids.length) $("empty").textContent = "This folder has no comics or subfolders yet.";
+  const comics = kids.filter(k => k.kind === "file" && isComic(k.name));
+  const atRoot = stack.length === 1; // folders here are publishers
+  for (const k of kids) grid.append(makeCard(k, comics, atRoot));
+  // stagger publisher panels so they change one at a time
+  const pubs = [...grid.querySelectorAll(".card.pub")];
+  pubs.forEach((c, i) => { c._offset = Math.round(i * ROTATE_MS / pubs.length); });
+  fitNames();
+  renderContinue();
+}
+
+/* ---------- Options menu (•••) on cards ---------- */
+let openMenuEl = null;
+function closeMenu(){ if (openMenuEl) { openMenuEl.remove(); openMenuEl = null; document.querySelectorAll(".more.open").forEach(b => b.classList.remove("open")); } }
+document.addEventListener("click", closeMenu);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
+function attachMenu(card, getItems){
+  const b = document.createElement("button");
+  b.className = "more"; b.textContent = "•••"; b.title = "Options"; b.setAttribute("aria-label", "Options");
+  b.onclick = e => {
+    e.stopPropagation();
+    const wasOpen = b.classList.contains("open");
+    closeMenu();
+    if (wasOpen) return;
+    const m = document.createElement("div"); m.className = "menu";
+    for (const it of getItems()) {
+      const mi = document.createElement("button"); mi.textContent = it.label;
+      mi.onclick = async ev => { ev.stopPropagation(); closeMenu(); await it.act(); renderLib(); };
+      m.append(mi);
+    }
+    m.onclick = ev => ev.stopPropagation();
+    card.append(m); openMenuEl = m; b.classList.add("open");
+  };
+  card.append(b);
+}
+const comicsIn = async dir => (await listNode(dir)).filter(x => x.kind === "file" && isComic(x.name));
+
+/* ---------- Continue reading row (main shelf only) ---------- */
+let contTok = 0;
+async function renderContinue(){
+  const tok = ++contTok, wrap = $("contWrap"), row = $("contRow");
+  if (stack.length !== 1 || !rootNode) { wrap.hidden = true; row.innerHTML = ""; return; }
+  const all = allProgress().filter(p => p.path.startsWith(rootNode.path + "/"));
+  const parentOf = p => p.slice(0, p.lastIndexOf("/"));
+  const inProgress = all.filter(p => !p.done);
+  const busySeries = new Set(inProgress.map(p => parentOf(p.path)));
+  // latest finished issue per series, where nothing in that series is mid-read
+  const lastDone = new Map();
+  for (const p of all.filter(p => p.done)) {
+    const s = parentOf(p.path), cur = lastDone.get(s);
+    if (!busySeries.has(s) && (!cur || (p.t || 0) > (cur.t || 0) || ((p.t || 0) === (cur.t || 0) && collator.compare(p.path, cur.path) > 0))) lastDone.set(s, p);
+  }
+  const wanted = [...inProgress.map(p => ({p, kind:"resume"})), ...[...lastDone.values()].map(p => ({p, kind:"next"}))]
+    .sort((a, b) => (b.p.t || 0) - (a.p.t || 0)).slice(0, 12);
+  const cards = [];
+  for (const w of wanted) {
+    try {
+      const r = await resolvePath(w.p.path); if (!r) continue;
+      const comics = await comicsIn(r.parent);
+      let node = r.node;
+      if (w.kind === "next") {
+        const idx = comics.findIndex(c => c.path === node.path);
+        node = comics.slice(idx + 1).find(c => { const np = progressOf(c.path); return !(np && np.done); });
+        if (!node) continue;
+      }
+      cards.push(contCard(node, comics, r.parent.name, w.kind));
+    } catch {}
+    if (tok !== contTok) return;
+  }
+  if (tok !== contTok || stack.length !== 1) return;
+  row.replaceChildren(...cards);
+  wrap.hidden = cards.length === 0;
+}
+function contCard(k, comics, seriesName, kind){
+  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0; card.title = k.name;
+  const cover = document.createElement("div"); cover.className = "cover"; cover.textContent = baseName(k.name);
+  const cap = document.createElement("div"); cap.className = "cap"; cap.textContent = issueNo(k.name) || baseName(k.name);
+  const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = seriesName;
+  card.append(cover, cap, sub);
+  const pos = progressOf(k.path);
+  if (kind === "next") { const u = document.createElement("div"); u.className = "sub upnext"; u.textContent = "Up next"; card.append(u); }
+  else if (pos && pos.n) {
+    const bar = document.createElement("div"); bar.className = "prog";
+    const fill = document.createElement("i"); fill.style.width = Math.max(4, Math.round((pos.i + 1) / pos.n * 100)) + "%";
+    bar.append(fill); card.append(bar);
+  }
+  const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
+  card._load = async () => { try { img.src = await coverFor(k); cover.append(img); } catch {} };
+  card.onclick = () => openComic(k, comics);
+  card.onkeydown = e => { if (e.key === "Enter") card.click(); };
+  seen.observe(card);
+  return card;
+}
+
+// shrink publisher names until every word fits on its panel
+function fitNames(){
+  for (const el of document.querySelectorAll(".cover.name")) {
+    let fs = 56;
+    el.style.setProperty("--fs", fs + "px");
+    while (fs > 16 && (el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight)) { fs -= 2; el.style.setProperty("--fs", fs + "px"); }
+  }
+}
+let fitT;
+addEventListener("resize", () => { clearTimeout(fitT); fitT = setTimeout(fitNames, 120); });
+if (document.fonts) document.fonts.ready.then(fitNames);
+
+const ROTATE_MS = 8000; // how long each publisher cover stays before crossfading
+function hueOf(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+
+function makeCard(k, comics, atRoot){
+  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0;
+  const cover = document.createElement("div"); cover.className = "cover";
+  const cap = document.createElement("div"); cap.className = "cap";
+  card.title = k.name;
+  card.append(cover, cap);
+  const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
+  if (k.kind === "dir" && atRoot) {
+    // publisher: name panel instead of a comic cover
+    card.classList.add("dir");
+    cover.classList.add("name");
+    cover.style.setProperty("--tint", "hsl(" + hueOf(k.name) + " 32% 26%)");
+    const nm = document.createElement("span"); nm.textContent = k.name; cover.append(nm);
+    // faded random covers from this publisher, crossfading in turn
+    card.classList.add("pub");
+    const layers = [img, new Image()];
+    for (const l of layers) { l.alt = ""; l.onload = null; }
+    let front = 0, curPath = null;
+    const pickRandom = async () => {
+      const kids = await listNode(k);
+      const pool = kids.filter(x => x.kind === "file" && isComic(x.name));
+      const dirs = kids.filter(x => x.kind === "dir");
+      for (let tries = 0; tries < 6; tries++) {
+        let pick = null;
+        if (dirs.length && (!pool.length || Math.random() < dirs.length / (dirs.length + 1))) {
+          const d = dirs[Math.floor(Math.random() * dirs.length)];
+          const issues = (await listNode(d)).filter(x => x.kind === "file" && isComic(x.name));
+          if (issues.length) pick = issues[Math.floor(Math.random() * issues.length)];
+        } else if (pool.length) pick = pool[Math.floor(Math.random() * pool.length)];
+        if (pick && pick.path !== curPath) return pick;
+      }
+      return null;
+    };
+    const showNext = async () => {
+      const pick = await pickRandom(); if (!pick) return;
+      const url = await coverFor(pick);
+      const back = layers[1 - front];
+      back.src = url;
+      try { await back.decode(); } catch {}
+      if (!card.isConnected) return;
+      if (!back.parentNode) cover.prepend(back);
+      back.classList.add("ok"); layers[front].classList.remove("ok");
+      front = 1 - front; curPath = pick.path;
+    };
+    card._load = async () => {
+      try { await showNext(); } catch {}
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      await sleep(card._offset || 0);
+      while (card.isConnected) {
+        await sleep(ROTATE_MS);
+        if (!card.isConnected) break;
+        if (!document.hidden && !$("reader").classList.contains("open")) { try { await showNext(); } catch {} }
+      }
+    };
+    cap.className = "sub"; cap.style.marginTop = "10px";
+    listNode(k).then(ks => { const n = ks.filter(x => x.kind === "dir").length, f = ks.filter(x => x.kind === "file").length;
+      cap.textContent = n ? n + (n === 1 ? " series" : " series") : f ? f + (f === 1 ? " issue" : " issues") : "Empty"; }).catch(()=>{});
+    card.onclick = () => { stack.push(k); renderLib(); window.scrollTo(0, 0); };
+  } else if (k.kind === "dir") {
+    card.classList.add("dir");
+    cover.textContent = k.name; cap.textContent = k.name;
+    card._load = async () => { try { const f = await firstComicIn(k); if (f) { img.src = await coverFor(f); cover.append(img); } } catch {} };
+    card.onclick = () => { stack.push(k); renderLib(); window.scrollTo(0, 0); };
+    // "X of Y read" for the series
+    const sub = document.createElement("div"); sub.className = "sub"; card.append(sub);
+    comicsIn(k).then(cs => {
+      if (!cs.length) return;
+      const read = cs.filter(c => { const p = progressOf(c.path); return p && p.done; }).length;
+      sub.textContent = read === cs.length ? "All " + cs.length + " read" : read + " of " + cs.length + " read";
+      if (read) {
+        const bar = document.createElement("div"); bar.className = "prog";
+        const fill = document.createElement("i"); fill.style.width = Math.round(read / cs.length * 100) + "%";
+        bar.append(fill); card.append(bar);
+      }
+    }).catch(()=>{});
+    attachMenu(card, () => [
+      {label:"Mark series as read", act: async () => { const t = Date.now(); (await comicsIn(k)).forEach((c, j) => setRead(c.path, true, t + j)); }},
+      {label:"Mark series as unread", act: async () => { (await comicsIn(k)).forEach(c => setRead(c.path, false)); }},
+      ...(APP ? [{label:"Remove series from this device", act: async () => {
+        const cs = await comicsIn(k);
+        if (confirm("Remove all " + cs.length + " issues of " + k.name + " from this device? Your PC copies aren't affected.")) await removeFromDevice(cs);
+      }}] : [])
+    ]);
+  } else if (isUnsupported(k.name)) {
+    card.classList.add("dis");
+    cover.textContent = k.name.split(".").pop().toUpperCase() + " files aren't supported";
+    cap.textContent = issueNo(k.name) || baseName(k.name);
+    const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = baseName(k.name); card.append(sub);
+  } else {
+    const no = issueNo(k.name);
+    cover.textContent = baseName(k.name);
+    cap.textContent = no || baseName(k.name);
+    if (no) { const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = baseName(k.name).replace(/\s*#\s*\d+(\.\d+)?\s*$/, ""); card.append(sub); }
+    const pos = progressOf(k.path);
+    if (!pos) { const d = document.createElement("span"); d.className = "dot"; d.title = "Unread"; card.append(d); }
+    else if (pos.done) card.classList.add("done");
+    else if (pos.n) {
+      const bar = document.createElement("div"); bar.className = "prog";
+      const fill = document.createElement("i"); fill.style.width = Math.max(4, Math.round((pos.i + 1) / pos.n * 100)) + "%";
+      bar.append(fill); card.append(bar);
+    }
+    card._load = async () => { try { img.src = await coverFor(k); cover.append(img); } catch {} };
+    card.onclick = () => openComic(k, comics);
+    const seriesPath = stack[stack.length - 1].path;
+    attachMenu(card, () => {
+      const p = progressOf(k.path), items = [];
+      if (!p || !p.done) items.push({label:"Mark as read", act: () => setRead(k.path, true)});
+      if (p) items.push({label: p.done ? "Mark as unread" : "Mark as unread (clear progress)", act: () => setRead(k.path, false)});
+      if (stack.length > 1) {
+        const chosen = store.get("seriesCover:" + seriesPath, null);
+        items.push(chosen === k.path
+          ? {label:"Use first issue as series cover", act: () => store.del("seriesCover:" + seriesPath)}
+          : {label:"Use as series cover", act: () => store.set("seriesCover:" + seriesPath, k.path)});
+      }
+      if (SERVER) items.push({label:"Download to this device", act: () => {
+        const a = document.createElement("a");
+        a.href = "api/file?download=1&path=" + encodeURIComponent(k.rel); a.download = k.name;
+        document.body.append(a); a.click(); a.remove();
+      }});
+      if (APP) items.push({label:"Remove from this device", act: async () => {
+        if (confirm("Remove " + baseName(k.name) + " from this device? Your PC copy isn't affected.")) await removeFromDevice([k]);
+      }});
+      return items;
+    });
+  }
+  card.onkeydown = e => { if (e.key === "Enter") card.click(); };
+  if (card._load) seen.observe(card);
+  return card;
+}
+
+/* ---------- Opening the library ---------- */
+$("openBtn").onclick = async () => {
+  if (window.showDirectoryPicker) {
+    try {
+      const h = await window.showDirectoryPicker({id:"comics", mode:"read"});
+      try { await dbPut("kv", "root", h); } catch {}
+      if (!rootNode || rootNode.name !== h.name) store.set("lastPath", []);
+      setReopen(h);
+      await openRoot({name:h.name, path:h.name, kind:"dir", handle:h});
+    } catch (err) { if (err.name !== "AbortError") { $("empty").hidden = false; $("empty").textContent = "Couldn't open that folder: " + err.message; } }
+  } else $("dirInput").click();
+};
+$("dirInput").onchange = () => {
+  const files = [...$("dirInput").files];
+  if (!files.length) return;
+  const rootName = files[0].webkitRelativePath.split("/")[0];
+  const root = {name:rootName, path:rootName, kind:"dir", children:new Map()};
+  for (const f of files) {
+    const parts = f.webkitRelativePath.split("/");
+    const fname = parts[parts.length - 1];
+    if (fname.startsWith(".") || !(isComic(fname) || isUnsupported(fname))) continue;
+    let cur = root;
+    for (let i = 1; i < parts.length - 1; i++) {
+      if (!cur.children.has(parts[i])) cur.children.set(parts[i], {name:parts[i], path:cur.path + "/" + parts[i], kind:"dir", children:new Map()});
+      cur = cur.children.get(parts[i]);
+    }
+    cur.children.set(fname, {name:fname, path:cur.path + "/" + fname, kind:"file", file:f});
+  }
+  openRoot(root);
+};
+/* ---------- iPad app mode: comics imported into on-device storage ---------- */
+let APP = false;
+const APP_ROOT = "Comics";
+async function dbKeys(s){ const db = await idb(); return new Promise((res, rej) => { const q = db.transaction(s).objectStore(s).getAllKeys(); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
+async function dbDel(s, k){ const db = await idb(); return new Promise((res, rej) => { const t = db.transaction(s, "readwrite"); t.objectStore(s).delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
+const seriesFromName = n => baseName(n).replace(/\s*#\s*\d+(\.\d+)?.*$/, "").trim() || baseName(n);
+
+// Build the shelf tree from stored keys like "Marvel/Daredevil (2019)/Daredevil (2019) #001.cbz".
+// Comic data is loaded only when an issue (or its cover) is opened.
+async function appTree(){
+  const root = {name:APP_ROOT, path:APP_ROOT, kind:"dir", children:new Map()};
+  for (const key of await dbKeys("comics")) {
+    const parts = key.split("/"); let cur = root;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!cur.children.has(parts[i])) cur.children.set(parts[i], {name:parts[i], path:cur.path + "/" + parts[i], kind:"dir", children:new Map()});
+      cur = cur.children.get(parts[i]);
+    }
+    const fname = parts[parts.length - 1];
+    cur.children.set(fname, {name:fname, path:cur.path + "/" + fname, kind:"file", appKey:key});
+  }
+  return root;
+}
+async function openAppLibrary(){
+  const root = await appTree();
+  const has = root.children.size > 0;
+  $("empty").hidden = has;
+  if (!has) { rootNode = null; stack = []; $("empty").innerHTML = "Nothing here yet. Tap <b>Import comics</b> and pick CBZ files from the Files app."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
+  updateStorageUse();
+  if (has) await openRoot(root);
+}
+async function updateStorageUse(){
+  try { const e = await navigator.storage.estimate(); const gb = e.usage / 1e9;
+    $("storageUse").textContent = (gb >= 1 ? gb.toFixed(1) + " GB" : e.usage < 1e6 ? "Under 1 MB" : Math.round(e.usage / 1e6) + " MB") + " on this device"; } catch {}
+}
+async function removeFromDevice(nodes){
+  for (const n of nodes) if (n.appKey) { await dbDel("comics", n.appKey); store.del("pos:" + n.path); }
+  await openAppLibrary();
+}
+
+// Import: pick CBZ files in the Files app; series comes from the file name, publisher is asked once for new series
+let pendingImport = [];
+$("importBtn").onclick = () => $("importInput").click();
+$("importInput").onchange = async () => {
+  const files = [...$("importInput").files].filter(f => isComic(f.name));
+  $("importInput").value = "";
+  if (!files.length) return;
+  pendingImport = files;
+  const keys = await dbKeys("comics");
+  const seriesPub = new Map(), pubs = new Set();
+  for (const k of keys) { const p = k.split("/"); if (p.length >= 3) { seriesPub.set(p[1], p[0]); pubs.add(p[0]); } }
+  const known = files.filter(f => seriesPub.has(seriesFromName(f.name)));
+  const fresh = [...new Set(files.filter(f => !seriesPub.has(seriesFromName(f.name))).map(f => seriesFromName(f.name)))];
+  $("impTitle").textContent = "Add " + files.length + (files.length === 1 ? " comic" : " comics");
+  $("impKnown").textContent = known.length ? known.length + " will go into series you already have." : "";
+  $("impPubWrap").hidden = fresh.length === 0;
+  $("impSeries").textContent = fresh.length ? "New series: " + fresh.join(", ") : "";
+  $("impPubList").innerHTML = ""; for (const p of [...pubs].sort(collator.compare)) { const o = document.createElement("option"); o.value = p; $("impPubList").append(o); }
+  $("impPub").value = store.get("lastPublisher", "");
+  $("impStatus").textContent = ""; $("impGo").disabled = false;
+  $("importPanel").classList.add("open");
+  if (fresh.length) $("impPub").focus();
+};
+$("impCancel").onclick = () => { pendingImport = []; $("importPanel").classList.remove("open"); };
+$("impGo").onclick = async () => {
+  const pub = $("impPub").value.trim().replace(/[\/\\]/g, "-");
+  if (!$("impPubWrap").hidden && !pub) { $("impStatus").textContent = "Type a publisher name first."; $("impPub").focus(); return; }
+  if (pub) store.set("lastPublisher", pub);
+  $("impGo").disabled = true;
+  const seriesPub = new Map();
+  for (const k of await dbKeys("comics")) { const p = k.split("/"); if (p.length >= 3) seriesPub.set(p[1], p[0]); }
+  try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch {}
+  let n = 0;
+  for (const f of pendingImport) {
+    n++; $("impStatus").textContent = "Copying " + n + " of " + pendingImport.length + "…";
+    const series = seriesFromName(f.name);
+    const key = (seriesPub.get(series) || pub) + "/" + series + "/" + f.name;
+    try { await dbPut("comics", key, new Blob([await f.arrayBuffer()], {type:"application/zip"})); }
+    catch (err) { $("impStatus").textContent = "Couldn't copy " + f.name + ": " + (err.message || err) + ". The device may be out of space."; $("impGo").disabled = false; return; }
+  }
+  pendingImport = [];
+  $("importPanel").classList.remove("open");
+  await openAppLibrary();
+};
+
+function setReopen(h){
+  const b = $("reopenBtn");
+  b.textContent = "Open " + h.name; b.hidden = false;
+  b.onclick = async () => {
+    try {
+      let perm = await h.queryPermission({mode:"read"});
+      if (perm !== "granted") perm = await h.requestPermission({mode:"read"});
+      if (perm === "granted") { b.hidden = true; await openRoot({name:h.name, path:h.name, kind:"dir", handle:h}); }
+      else { $("empty").textContent = "Access wasn't allowed. Use Choose library folder instead."; }
+    } catch (err) { $("empty").textContent = "Couldn't open it: " + err.message + ". Use Choose library folder instead."; }
+  };
+}
+(async () => {
+  // Served from the PC? Then the library comes from the server and there's nothing to choose.
+  if (/^https?:$/.test(location.protocol)) {
+    try {
+      const r = await fetch("api/info", {cache:"no-store"});
+      if (r.ok) {
+        const info = await r.json();
+        SERVER = true;
+        await refreshState();
+        $("libActions").hidden = true;
+        $("empty").hidden = true;
+        await openRoot({name:info.name, path:info.name, kind:"dir", remote:true, rel:""});
+        return;
+      }
+    } catch {}
+    // Not the PC server: the hosted iPad app (https), with its own on-device library
+    if (location.protocol === "https:") {
+      APP = true;
+      $("libActions").hidden = true; $("appActions").hidden = false;
+      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
+      await openAppLibrary();
+      return;
+    }
+  }
+  if (!window.showDirectoryPicker) return;
+  try {
+    const h = await dbGet("kv", "root");
+    if (h) {
+      setReopen(h);
+      // Chrome/Edge sometimes keep access between visits; open straight away when they do
+      if ((await h.queryPermission({mode:"read"})) === "granted") { $("reopenBtn").hidden = true; openRoot({name:h.name, path:h.name, kind:"dir", handle:h}); }
+      else $("empty").innerHTML = "Click <b>Open " + h.name.replace(/[<&]/g, "") + "</b> to return to your shelf.";
+    }
+  } catch {}
+})();
+
+/* ---------- Reader ---------- */
+const R = { node:null, file:null, pages:[], cache:new Map(), index:0, shown:1, tok:0, siblings:[], two:true, cover:true,
+  layout: store.get("layout", "auto") };
+
+function wantTwo(){ return R.layout === "two" || (R.layout === "auto" && innerWidth >= innerHeight * 1.2); }
+
+function nextIssueNode(){
+  const i = R.siblings.findIndex(s => s.path === R.node.path);
+  return i >= 0 && i + 1 < R.siblings.length ? R.siblings[i + 1] : null;
+}
+function nextIssue(){ const n = nextIssueNode(); if (n) openComic(n, R.siblings); else toast("That was the last issue in this folder"); }
+
+async function openComic(node, siblings){
+  freePages();
+  if (siblings) R.siblings = siblings;
+  R.node = node; R.tok++;
+  R.cover = !store.get("shift:" + node.path, false);
+  R.two = wantTwo();
+  $("reader").classList.add("open");
+  $("title").textContent = baseName(node.name);
+  $("nextIssueBtn").disabled = !nextIssueNode();
+  $("stage").innerHTML = ""; status("Opening…");
+  syncButtons(); peekUI();
+  try {
+    await refreshState();
+    R.cover = !store.get("shift:" + node.path, false);
+    syncButtons();
+    R.file = await fileOf(node);
+    R.pages = pageEntries(await zipEntries(R.file));
+    if (!R.pages.length) throw new Error("No pages found inside this file.");
+  } catch (err) { status(err.message); return; }
+  $("slider").max = R.pages.length;
+  const pos = progressOf(node.path);
+  const start = pos && !pos.done && pos.i < R.pages.length ? pos.i : 0;
+  show(parityStart(start));
+}
+function freePages(){
+  R.tok++;
+  for (const p of R.cache.values()) p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{});
+  R.cache.clear(); R.pages = []; R.file = null;
+}
+function closeReader(){
+  freePages();
+  $("reader").classList.remove("open");
+  toggleHelp(false);
+  if (document.fullscreenElement || document.webkitFullscreenElement) toggleFs();
+  if (stack.length) renderLib();
+}
+function status(t){ $("status").textContent = t || ""; }
+let toastT;
+function toast(t){ const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove("show"), 1800); }
+
+function page(i){
+  if (R.cache.has(i)) return R.cache.get(i);
+  const file = R.file, e = R.pages[i];
+  const pr = (async () => {
+    const url = URL.createObjectURL(await zipRead(file, e));
+    const img = new Image(); img.src = url;
+    try { await img.decode(); } catch {}
+    return {url, w:img.naturalWidth, h:img.naturalHeight};
+  })();
+  R.cache.set(i, pr);
+  return pr;
+}
+function parityStart(p){
+  if (!R.two) return p;
+  if (R.cover) return p === 0 ? 0 : p - ((p - 1) % 2);
+  return p - (p % 2);
+}
+async function spreadFor(i){
+  const n = R.pages.length;
+  if (!R.two || (R.cover && i === 0) || i + 1 >= n) return [i];
+  const [a, b] = await Promise.all([page(i), page(i + 1)]);
+  if (a.w > a.h || b.w > b.h) return [i]; // wide double-page images show alone
+  return [i, i + 1];
+}
+async function show(i){
+  const n = R.pages.length; if (!n) return;
+  i = Math.max(0, Math.min(n - 1, i));
+  const tok = ++R.tok;
+  const slow = setTimeout(() => { if (tok === R.tok) status("Loading…"); }, 200);
+  let idx, imgs;
+  try { idx = await spreadFor(i); imgs = await Promise.all(idx.map(page)); }
+  catch (err) { clearTimeout(slow); if (tok === R.tok) status("Couldn't load this page: " + err.message); return; }
+  clearTimeout(slow);
+  if (tok !== R.tok) return;
+  status("");
+  R.index = i; R.shown = idx.length;
+  const pair = document.createElement("div");
+  pair.className = "pair" + (idx.length === 2 ? " two" : "");
+  for (const im of imgs) { const el = document.createElement("img"); el.src = im.url; el.alt = ""; el.draggable = false; pair.append(el); }
+  $("stage").replaceChildren(pair);
+  Z.s = 1; Z.x = 0; Z.y = 0; $("reader").classList.remove("zoomed"); // each new page starts unzoomed
+  const atEnd = i + idx.length >= n;
+  $("slider").value = i + 1;
+  $("plabel").textContent = (idx.length === 2 ? (i + 1) + "–" + (i + 2) : (i + 1)) + " of " + n;
+  const prevPos = progressOf(R.node.path);
+  store.set("pos:" + R.node.path, {i, n, done: atEnd || !!(prevPos && prevPos.done), t: Date.now()}); // finished stays finished on a re-read
+  for (const [k, p] of R.cache) if (k < i - 6 || k > i + 8) { p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{}); R.cache.delete(k); }
+  for (let k = i + idx.length; k < Math.min(n, i + idx.length + 4); k++) page(k).catch(()=>{});
+  if (i > 0) page(i - 1).catch(()=>{});
+}
+function next(){
+  if (!R.pages.length) return;
+  if (R.index + R.shown < R.pages.length) show(R.index + R.shown);
+  else nextIssue();
+}
+async function prev(){
+  const t = R.index - 1; if (t < 0) return;
+  let s = parityStart(t);
+  if (s < t) { try { if ((await spreadFor(s)).length === 1) s = t; } catch { s = t; } }
+  show(s);
+}
+
+const LAYOUT_LABEL = {auto:"Auto layout", single:"One page", two:"Two pages"};
+function syncButtons(){
+  $("layoutBtn").textContent = LAYOUT_LABEL[R.layout];
+  $("shiftBtn").hidden = !R.two;
+  $("shiftBtn").classList.toggle("on", !R.cover);
+}
+function cycleLayout(){
+  R.layout = {auto:"single", single:"two", two:"auto"}[R.layout];
+  store.set("layout", R.layout);
+  relayout(); toast(LAYOUT_LABEL[R.layout]);
+}
+function relayout(){
+  const t = wantTwo();
+  syncButtons();
+  if (t !== R.two) { R.two = t; syncButtons(); if (R.pages.length) show(parityStart(R.index)); }
+}
+function toggleShift(){
+  if (!R.two || !R.node) return;
+  R.cover = !R.cover;
+  if (R.cover) store.del("shift:" + R.node.path); else store.set("shift:" + R.node.path, true);
+  syncButtons(); show(parityStart(R.index));
+}
+function toggleFs(){
+  const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+  if (fsEl) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+  else {
+    const el = $("reader"), req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) { const p = req.call(el); if (p && p.catch) p.catch(()=>{}); }
+    else toast("Fullscreen isn't available in this browser");
+  }
+}
+function toggleHelp(v){ $("helpPanel").classList.toggle("open", v); }
+addEventListener("resize", () => { if ($("reader").classList.contains("open")) relayout(); });
+
+/* controls appear at the edges, fade away while reading */
+let uiT, idleT, overBar = false;
+function showUI(ms){ $("reader").classList.remove("hideui"); clearTimeout(uiT); if (ms) uiT = setTimeout(hideUI, ms); }
+function hideUI(){ if (overBar || $("helpPanel").classList.contains("open")) return; $("reader").classList.add("hideui"); }
+function peekUI(){ showUI(1600); }
+for (const b of document.querySelectorAll(".bar")) {
+  b.addEventListener("pointerenter", () => { overBar = true; showUI(); });
+  b.addEventListener("pointerleave", () => { overBar = false; showUI(1200); });
+}
+$("reader").addEventListener("pointermove", e => {
+  if (e.pointerType !== "mouse") return;
+  const r = $("reader"); r.classList.remove("idle"); clearTimeout(idleT);
+  idleT = setTimeout(() => { if (!overBar) r.classList.add("idle"); }, 1800);
+  if (e.clientY < 90 || e.clientY > innerHeight - 90) showUI(1500);
+});
+
+/* ---------- Zoom: pinch, double-tap, Ctrl+wheel, + / - / 0 ---------- */
+const Z = {s:1, x:0, y:0};
+const MAX_ZOOM = 5;
+const pairEl = () => $("stage").querySelector(".pair");
+function applyZoom(){
+  const p = pairEl(); if (!p) return;
+  if (Z.s <= 1.001) { Z.s = 1; Z.x = 0; Z.y = 0; }
+  // keep the page covering the screen while zoomed (no panning off into empty space)
+  const mx = Math.max(0, (p.offsetWidth * Z.s - innerWidth) / 2), my = Math.max(0, (p.offsetHeight * Z.s - innerHeight) / 2);
+  Z.x = Math.min(mx, Math.max(-mx, Z.x)); Z.y = Math.min(my, Math.max(-my, Z.y));
+  p.style.transform = Z.s === 1 ? "" : "translate(" + Z.x + "px," + Z.y + "px) scale(" + Z.s + ")";
+  $("reader").classList.toggle("zoomed", Z.s > 1);
+}
+function zoomAt(ns, cx, cy){
+  ns = Math.min(MAX_ZOOM, Math.max(1, ns));
+  const k = ns / Z.s, ox = cx - innerWidth / 2, oy = cy - innerHeight / 2;
+  Z.x = ox - (ox - Z.x) * k; Z.y = oy - (oy - Z.y) * k; Z.s = ns;
+  applyZoom();
+}
+function resetZoom(){ Z.s = 1; Z.x = 0; Z.y = 0; applyZoom(); }
+function toggleZoomAt(cx, cy){ if (Z.s > 1) resetZoom(); else zoomAt(2.5, cx, cy); }
+
+/* ---------- Gestures: tap sides to turn, swipe, pinch, drag to pan when zoomed ---------- */
+const ptrs = new Map();
+let gest = null, lastTap = null, tapTimer = null;
+function singleTap(x){
+  const f = x / innerWidth;
+  if (Z.s === 1 && f < 1/3) prev();
+  else if (Z.s === 1 && f > 2/3) next();
+  else if ($("reader").classList.contains("hideui")) showUI(); else { clearTimeout(uiT); $("reader").classList.add("hideui"); }
+}
+const stageEl = $("stage");
+stageEl.addEventListener("pointerdown", e => {
+  ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  try { stageEl.setPointerCapture(e.pointerId); } catch {}
+  if (ptrs.size === 2) {
+    const [a, b] = [...ptrs.values()];
+    gest = {type:"pinch", d0:Math.hypot(a.x - b.x, a.y - b.y) || 1, mx:(a.x + b.x) / 2, my:(a.y + b.y) / 2, s0:Z.s, x0:Z.x, y0:Z.y};
+  } else if (ptrs.size === 1) {
+    gest = {type:"one", sx:e.clientX, sy:e.clientY, x0:Z.x, y0:Z.y, moved:false, ptype:e.pointerType};
+  }
+});
+stageEl.addEventListener("pointermove", e => {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (!gest) return;
+  if (gest.type === "pinch" && ptrs.size >= 2) {
+    const [a, b] = [...ptrs.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+    Z.s = gest.s0; Z.x = gest.x0 + (mx - gest.mx); Z.y = gest.y0 + (my - gest.my);
+    zoomAt(gest.s0 * d / gest.d0, mx, my);
+  } else if (gest.type === "one") {
+    const dx = e.clientX - gest.sx, dy = e.clientY - gest.sy;
+    if (Math.hypot(dx, dy) > 8) gest.moved = true;
+    if (Z.s > 1 && gest.moved) { Z.x = gest.x0 + dx; Z.y = gest.y0 + dy; applyZoom(); }
+  }
+});
+function endPointer(e){
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.delete(e.pointerId);
+  if (!gest) return;
+  if (gest.type === "pinch") {
+    if (ptrs.size === 1) { const [r] = [...ptrs.values()]; gest = {type:"one", sx:r.x, sy:r.y, x0:Z.x, y0:Z.y, moved:true, ptype:"touch"}; }
+    else if (!ptrs.size) gest = null;
+    return;
+  }
+  if (ptrs.size) return;
+  const g = gest; gest = null;
+  if (e.type === "pointercancel") return;
+  const dx = e.clientX - g.sx, dy = e.clientY - g.sy;
+  if (g.moved) {
+    if (Z.s === 1 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) dx < 0 ? next() : prev(); // swipe
+    return;
+  }
+  // a tap: on touch, wait briefly to see if it's a double-tap (zoom)
+  if (g.ptype === "touch" || g.ptype === "pen") {
+    const now = performance.now();
+    if (lastTap && now - lastTap.t < 300 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) {
+      clearTimeout(tapTimer); lastTap = null; toggleZoomAt(e.clientX, e.clientY);
+    } else {
+      lastTap = {t:now, x:e.clientX, y:e.clientY};
+      const x = e.clientX; tapTimer = setTimeout(() => { lastTap = null; singleTap(x); }, 260);
+    }
+  } else singleTap(e.clientX);
+}
+stageEl.addEventListener("pointerup", endPointer);
+stageEl.addEventListener("pointercancel", endPointer);
+stageEl.addEventListener("dblclick", e => { if (e.pointerType !== "touch") e.preventDefault(); });
+// Safari's own page zoom gestures would fight ours
+for (const ev of ["gesturestart", "gesturechange"]) document.addEventListener(ev, e => { if ($("reader").classList.contains("open")) e.preventDefault(); });
+
+let wheelAcc = 0, wheelLock = 0;
+$("reader").addEventListener("wheel", e => {
+  if ($("helpPanel").classList.contains("open") || e.target.closest(".bar")) return;
+  e.preventDefault();
+  if (e.ctrlKey) { // Ctrl+wheel or trackpad pinch: ~1.35x per wheel notch, smooth for trackpads
+    zoomAt(Z.s * Math.exp(-Math.max(-50, Math.min(50, e.deltaY)) * 0.006), e.clientX, e.clientY); return;
+  }
+  if (Z.s > 1) { Z.x -= e.deltaX; Z.y -= e.deltaY; applyZoom(); return; }                  // pan while zoomed
+  const now = performance.now();
+  if (now < wheelLock) return;
+  wheelAcc += e.deltaY;
+  if (Math.abs(wheelAcc) > 40) { wheelAcc > 0 ? next() : prev(); wheelAcc = 0; wheelLock = now + 280; }
+}, {passive:false});
+addEventListener("resize", () => { if (Z.s > 1) applyZoom(); });
+
+$("closeBtn").onclick = closeReader;
+$("layoutBtn").onclick = cycleLayout;
+$("shiftBtn").onclick = toggleShift;
+$("fsBtn").onclick = toggleFs;
+$("nextIssueBtn").onclick = nextIssue;
+$("helpBtn").onclick = () => toggleHelp(true);
+$("helpClose").onclick = () => { toggleHelp(false); hideUI(); };
+$("helpPanel").onclick = e => { if (e.target.id === "helpPanel") toggleHelp(false); };
+$("slider").oninput = () => { $("plabel").textContent = $("slider").value + " of " + R.pages.length; };
+$("slider").onchange = () => show(parityStart(+$("slider").value - 1));
+
+document.addEventListener("keydown", e => {
+  const k = e.key;
+  if (!$("reader").classList.contains("open")) {
+    if (k === "Backspace" && stack.length > 1 && e.target.tagName !== "INPUT") { e.preventDefault(); stack.pop(); renderLib(); }
+    return;
+  }
+  if (e.target.tagName === "INPUT" && (k === "ArrowLeft" || k === "ArrowRight")) return;
+  const helpOpen = $("helpPanel").classList.contains("open");
+  if (k === "h" || k === "H" || k === "?") { toggleHelp(!helpOpen); if (!helpOpen) showUI(); return; }
+  if (helpOpen) { if (k === "Escape") toggleHelp(false); return; }
+  if (k === "ArrowRight" || k === "PageDown" || k === " ") { e.preventDefault(); next(); }
+  else if (k === "ArrowLeft" || k === "PageUp") { e.preventDefault(); prev(); }
+  else if (k === "Home") show(0);
+  else if (k === "End") show(parityStart(R.pages.length - 1));
+  else if (k === "+" || k === "=") zoomAt(Z.s * 1.5, innerWidth / 2, innerHeight / 2);
+  else if (k === "-" || k === "_") zoomAt(Z.s / 1.5, innerWidth / 2, innerHeight / 2);
+  else if (k === "0") resetZoom();
+  else if (k === "n" || k === "N") nextIssue();
+  else if (k === "d" || k === "D") cycleLayout();
+  else if (k === "s" || k === "S") toggleShift();
+  else if (k === "f" || k === "F") toggleFs();
+  else if (k === "Escape" && !document.fullscreenElement) closeReader();
+});
+</script>
+</body>
+</html>
