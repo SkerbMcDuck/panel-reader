@@ -119,9 +119,24 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 #top{top:0;background:linear-gradient(rgba(10,11,14,.92),rgba(10,11,14,.6) 70%,transparent)}
 #bottom{bottom:0;background:linear-gradient(transparent,rgba(10,11,14,.6) 30%,rgba(10,11,14,.92));padding-top:26px}
 #reader.hideui .bar{opacity:0;pointer-events:none}
-#title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 22px/1 var(--display);padding:0 6px}
-#slider{flex:1;accent-color:var(--yellow);min-width:80px}
-#plabel{color:var(--paper);font:600 17px/1 var(--display);min-width:112px;text-align:right;font-variant-numeric:tabular-nums}
+/* icon buttons: icon + label on wide screens, icon only on phones */
+.ib{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 13px}
+.ib svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#top .spacer{flex:1}
+@media (max-width:720px){ .ib .lbl{display:none} .ib{width:42px;padding:0} #top{gap:6px} }
+#bottom{flex-direction:column;align-items:stretch;gap:10px}
+.binfo{display:flex;align-items:baseline;gap:14px;min-width:0}
+#title{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 21px/1.15 var(--display)}
+#slider{width:100%;accent-color:var(--yellow);margin:0}
+#plabel{flex:none;color:var(--muted);font:600 17px/1 var(--display);text-align:right;font-variant-numeric:tabular-nums}
+/* fit width: one page across the full width, scroll up and down */
+#reader.fitw #stage{display:block;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain}
+#reader.fitw .pair{display:flex;flex-direction:column;justify-content:center;min-height:100%}
+#reader.fitw .pair img{width:100vw;max-width:none;max-height:none;height:auto}
+/* feel like an app, not a web page */
+html{-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none}
+#reader img,.cover img{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 #toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:3}
 #toast.show{opacity:1}
 
@@ -190,17 +205,18 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   <div id="stage"></div>
   <div id="status"></div>
   <div id="top" class="bar">
-    <button id="closeBtn">Library</button>
-    <div id="title"></div>
-    <button id="layoutBtn" title="Layout (D)"></button>
-    <button id="shiftBtn" title="Fix split two-page art in this issue (S)">Shift pairing</button>
-    <button id="fsBtn" title="Fullscreen (F)">Fullscreen</button>
-    <button id="nextIssueBtn" title="Next issue (N)">Next issue</button>
-    <button id="helpBtn" title="Controls (H)">Controls</button>
+    <button id="closeBtn" class="ib" title="Back to the shelf (Esc)" aria-label="Library"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span class="lbl">Library</span></button>
+    <div class="spacer"></div>
+    <button id="layoutBtn" class="ib" title="Layout (D)"></button>
+    <button id="fitBtn" class="ib" title="Fit width: fill the screen's width and scroll (W)" aria-label="Fit width"><svg viewBox="0 0 24 24"><path d="M3 4v16M21 4v16M6.5 12h11M9 9l-2.5 3L9 15M15 9l2.5 3-2.5 3"/></svg><span class="lbl">Fit width</span></button>
+    <button id="shiftBtn" class="ib" title="Fix split two-page art in this issue (S)" aria-label="Shift pairing"><svg viewBox="0 0 24 24"><path d="M5 7h14M16 4l3 3-3 3M19 17H5M8 14l-3 3 3 3"/></svg><span class="lbl">Shift pairing</span></button>
+    <button id="nextIssueBtn" class="ib" title="Next issue (N)" aria-label="Next issue"><svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7z"/><path d="M18 5v14"/></svg><span class="lbl">Next issue</span></button>
+    <button id="fsBtn" class="ib" title="Fullscreen (F)" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Fullscreen</span></button>
+    <button id="helpBtn" class="ib" title="Controls (H)" aria-label="Controls"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.4M12 17h.01"/></svg><span class="lbl">Controls</span></button>
   </div>
   <div id="bottom" class="bar">
+    <div class="binfo"><div id="title"></div><div id="plabel"></div></div>
     <input id="slider" type="range" min="1" max="1" value="1" aria-label="Page">
-    <div id="plabel"></div>
   </div>
   <div id="toast"></div>
   <div id="helpPanel">
@@ -224,6 +240,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
         <tr><td><kbd>Ctrl</kbd> + scroll wheel, or trackpad pinch</td><td>Zoom where the mouse is</td></tr>
         <tr><td><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></td><td>Zoom in / zoom out / back to full page</td></tr>
         <tr><td>Drag, or scroll, while zoomed</td><td>Move around the page</td></tr>
+        <tr><td>Swipe past the page's edge while zoomed</td><td>Turns the page. Taps on the sides don't, so you can't flip away from a panel by accident</td></tr>
         <tr><td>Turning the page</td><td>Goes back to full page</td></tr>
       </table>
       <h3>Issues</h3>
@@ -235,6 +252,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       <h3>View</h3>
       <table>
         <tr><td><kbd>D</kbd> or layout button</td><td>Auto, one page, or two pages. Auto shows two on wide screens, one on tall ones</td></tr>
+        <tr><td><kbd>W</kbd> or Fit width</td><td>One page across the full width; scroll up and down. Side taps and left/right swipes still turn pages; <kbd>Space</kbd> scrolls, then turns at the bottom</td></tr>
         <tr><td><kbd>S</kbd> or Shift pairing</td><td>Fix split two-page art in this issue only</td></tr>
         <tr><td><kbd>F</kbd></td><td>Fullscreen on or off</td></tr>
         <tr><td>Mouse to top or bottom edge</td><td>Show the controls</td></tr>
@@ -1152,9 +1170,9 @@ function setReopen(h){
 
 /* ---------- Reader ---------- */
 const R = { node:null, file:null, pages:[], cache:new Map(), index:0, shown:1, tok:0, siblings:[], two:true, cover:true,
-  layout: store.get("layout", "auto") };
+  layout: store.get("layout", "auto"), fitw: store.get("fitWidth", false) };
 
-function wantTwo(){ return R.layout === "two" || (R.layout === "auto" && innerWidth >= innerHeight * 1.2); }
+function wantTwo(){ return !R.fitw && (R.layout === "two" || (R.layout === "auto" && innerWidth >= innerHeight * 1.2)); }
 
 function nextIssueNode(){
   const i = R.siblings.findIndex(s => s.path === R.node.path);
@@ -1243,6 +1261,7 @@ async function show(i){
   for (const im of imgs) { const el = document.createElement("img"); el.src = im.url; el.alt = ""; el.draggable = false; pair.append(el); }
   $("stage").replaceChildren(pair);
   Z.s = 1; Z.x = 0; Z.y = 0; $("reader").classList.remove("zoomed"); // each new page starts unzoomed
+  $("stage").scrollTo({top: 0, behavior: "instant"});                  // fit width: each new page starts at the top (also stops any smooth scroll still running)
   const atEnd = i + idx.length >= n;
   $("slider").value = i + 1;
   $("plabel").textContent = (idx.length === 2 ? (i + 1) + "–" + (i + 2) : (i + 1)) + " of " + n;
@@ -1265,10 +1284,30 @@ async function prev(){
 }
 
 const LAYOUT_LABEL = {auto:"Auto layout", single:"One page", two:"Two pages"};
+const LAYOUT_ICON = {
+  single: '<rect x="7" y="4" width="10" height="16" rx="1.5"/>',
+  two:    '<rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/>',
+  auto:   '<rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5" stroke-dasharray="2.5 2.5"/>' // dashed: second page only when it fits
+};
+// Fullscreen does nothing in the Home Screen app (already full screen) or on iPhone (not supported)
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+const canFullscreen = !standalone && !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
 function syncButtons(){
-  $("layoutBtn").textContent = LAYOUT_LABEL[R.layout];
+  const lb = $("layoutBtn");
+  lb.innerHTML = '<svg viewBox="0 0 24 24">' + LAYOUT_ICON[R.layout] + '</svg><span class="lbl">' + LAYOUT_LABEL[R.layout] + '</span>';
+  lb.setAttribute("aria-label", LAYOUT_LABEL[R.layout]);
+  lb.hidden = R.fitw;                      // fit width is always one page
+  $("fitBtn").classList.toggle("on", R.fitw);
   $("shiftBtn").hidden = !R.two;
   $("shiftBtn").classList.toggle("on", !R.cover);
+  $("fsBtn").hidden = !canFullscreen;
+  $("reader").classList.toggle("fitw", R.fitw);
+}
+function setFitW(v){
+  R.fitw = v; store.set("fitWidth", v);
+  resetZoom(); relayout();
+  if (R.pages.length) show(parityStart(R.index));
+  toast(v ? "Fit width: scroll up and down" : "Fit page");
 }
 function cycleLayout(){
   R.layout = {auto:"single", single:"two", two:"auto"}[R.layout];
@@ -1328,6 +1367,7 @@ function applyZoom(){
   $("reader").classList.toggle("zoomed", Z.s > 1);
 }
 function zoomAt(ns, cx, cy){
+  if (R.fitw) return; // fit width already fills the screen; you scroll instead
   ns = Math.min(MAX_ZOOM, Math.max(1, ns));
   const k = ns / Z.s, ox = cx - innerWidth / 2, oy = cy - innerHeight / 2;
   Z.x = ox - (ox - Z.x) * k; Z.y = oy - (oy - Z.y) * k; Z.s = ns;
@@ -1353,7 +1393,10 @@ stageEl.addEventListener("pointerdown", e => {
     const [a, b] = [...ptrs.values()];
     gest = {type:"pinch", d0:Math.hypot(a.x - b.x, a.y - b.y) || 1, mx:(a.x + b.x) / 2, my:(a.y + b.y) / 2, s0:Z.s, x0:Z.x, y0:Z.y};
   } else if (ptrs.size === 1) {
-    gest = {type:"one", sx:e.clientX, sy:e.clientY, x0:Z.x, y0:Z.y, moved:false, ptype:e.pointerType};
+    // while zoomed, note whether the page's left/right edge is already showing (swiping past it turns the page)
+    const p = pairEl(), mx = p ? Math.max(0, (p.offsetWidth * Z.s - innerWidth) / 2) : 0;
+    gest = {type:"one", sx:e.clientX, sy:e.clientY, x0:Z.x, y0:Z.y, moved:false, ptype:e.pointerType,
+            atLeft: Z.x >= mx - 1, atRight: Z.x <= -mx + 1};
   }
 });
 stageEl.addEventListener("pointermove", e => {
@@ -1385,7 +1428,12 @@ function endPointer(e){
   if (e.type === "pointercancel") return;
   const dx = e.clientX - g.sx, dy = e.clientY - g.sy;
   if (g.moved) {
-    if (Z.s === 1 && Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) dx < 0 ? next() : prev(); // swipe
+    const horiz = Math.abs(dx) > Math.abs(dy) * 1.5;
+    if (Z.s === 1 && Math.abs(dx) > 50 && horiz) dx < 0 ? next() : prev();          // swipe
+    else if (Z.s > 1 && Math.abs(dx) > 60 && horiz) {                                // zoomed: push past the edge
+      if (dx < 0 && g.atRight) next();
+      else if (dx > 0 && g.atLeft) prev();
+    }
     return;
   }
   // a tap: on touch, wait briefly to see if it's a double-tap (zoom)
@@ -1408,6 +1456,7 @@ for (const ev of ["gesturestart", "gesturechange"]) document.addEventListener(ev
 let wheelAcc = 0, wheelLock = 0;
 $("reader").addEventListener("wheel", e => {
   if ($("helpPanel").classList.contains("open") || e.target.closest(".bar")) return;
+  if (R.fitw && !e.ctrlKey) return;   // fit width: the wheel scrolls the page normally
   e.preventDefault();
   if (e.ctrlKey) { // Ctrl+wheel or trackpad pinch: ~1.35x per wheel notch, smooth for trackpads
     zoomAt(Z.s * Math.exp(-Math.max(-50, Math.min(50, e.deltaY)) * 0.006), e.clientX, e.clientY); return;
@@ -1422,6 +1471,8 @@ addEventListener("resize", () => { if (Z.s > 1) applyZoom(); });
 
 $("closeBtn").onclick = closeReader;
 $("layoutBtn").onclick = cycleLayout;
+$("fitBtn").onclick = () => setFitW(!R.fitw);
+$("stage").addEventListener("contextmenu", e => e.preventDefault()); // no long-press "Save Image" popup on pages
 $("shiftBtn").onclick = toggleShift;
 $("fsBtn").onclick = toggleFs;
 $("nextIssueBtn").onclick = nextIssue;
@@ -1441,8 +1492,15 @@ document.addEventListener("keydown", e => {
   const helpOpen = $("helpPanel").classList.contains("open");
   if (k === "h" || k === "H" || k === "?") { toggleHelp(!helpOpen); if (!helpOpen) showUI(); return; }
   if (helpOpen) { if (k === "Escape") toggleHelp(false); return; }
-  if (k === "ArrowRight" || k === "PageDown" || k === " ") { e.preventDefault(); next(); }
-  else if (k === "ArrowLeft" || k === "PageUp") { e.preventDefault(); prev(); }
+  const st = $("stage");
+  const atBottom = st.scrollTop + st.clientHeight >= st.scrollHeight - 2, atTop = st.scrollTop <= 2;
+  // fit width: Space / Page Down scroll down a screen, and only turn the page once you're at the bottom
+  if (R.fitw && (k === " " || k === "PageDown") && !e.shiftKey && !atBottom) { e.preventDefault(); st.scrollBy({top: st.clientHeight * 0.85, behavior:"smooth"}); }
+  else if (R.fitw && (k === "PageUp" || (k === " " && e.shiftKey)) && !atTop) { e.preventDefault(); st.scrollBy({top: -st.clientHeight * 0.85, behavior:"smooth"}); }
+  else if (R.fitw && (k === "ArrowDown" || k === "ArrowUp")) { e.preventDefault(); st.scrollBy({top: k === "ArrowDown" ? 90 : -90, behavior:"smooth"}); }
+  else if (k === "ArrowRight" || k === "PageDown" || (k === " " && !e.shiftKey)) { e.preventDefault(); next(); }
+  else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && e.shiftKey)) { e.preventDefault(); prev(); }
+  else if (k === "w" || k === "W") setFitW(!R.fitw);
   else if (k === "Home") show(0);
   else if (k === "End") show(parityStart(R.pages.length - 1));
   else if (k === "+" || k === "=") zoomAt(Z.s * 1.5, innerWidth / 2, innerHeight / 2);
