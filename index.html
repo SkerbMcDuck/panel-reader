@@ -156,7 +156,8 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       <button id="importBtn">Import comics</button>
     </div>
   </div>
-  <input id="importInput" type="file" multiple accept=".cbz,.zip,application/zip,application/vnd.comicbook+zip" hidden>
+  <!-- no "accept" filter: iPads don't know the .cbz type and would grey those files out; the app filters by name instead -->
+  <input id="importInput" type="file" multiple hidden>
   <nav id="crumbs"></nav>
   <section id="contWrap" hidden><h2>Continue reading</h2><div id="contRow"></div></section>
   <div id="grid"></div>
@@ -833,9 +834,13 @@ async function removeFromDevice(nodes){
 let pendingImport = [];
 $("importBtn").onclick = () => $("importInput").click();
 $("importInput").onchange = async () => {
-  const files = [...$("importInput").files].filter(f => isComic(f.name));
+  const picked = [...$("importInput").files];
+  const files = picked.filter(f => isComic(f.name));
   $("importInput").value = "";
-  if (!files.length) return;
+  if (!files.length) {
+    if (picked.length) { $("empty").hidden = false; $("empty").textContent = "Those weren't CBZ files. Pick files ending in .cbz (or .zip)."; }
+    return;
+  }
   pendingImport = files;
   const keys = await dbKeys("comics");
   const seriesPub = new Map(), pubs = new Set();
