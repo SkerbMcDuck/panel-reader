@@ -60,6 +60,22 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 .muted{color:var(--muted);font-size:14px;margin:6px 0}
 #impStatus{min-height:20px;margin:14px 0 0}
 .modalBtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+/* series buttons */
+.sheet{max-width:440px;padding:20px}
+.sheetTop{display:flex;gap:16px;align-items:flex-end;margin-bottom:18px}
+#shCover{width:96px;flex:none;font-size:13px;padding:6px}
+.sheetHead{min-width:0}
+#shTitle{margin:0;font:700 28px/1 var(--display);overflow-wrap:anywhere}
+#shSub{margin:8px 0 0}
+#shBtns{display:flex;flex-direction:column;gap:8px}
+.shBtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border-radius:14px;padding:10px 14px 10px 10px;min-height:64px}
+.shBtn .th{width:40px;height:60px;flex:none;border-radius:4px;background:var(--edge) center/cover no-repeat}
+.shBtn .th.none{display:none}
+.shBtn b{display:block;font:600 19px/1.1 var(--display)}
+.shBtn small{display:block;margin-top:3px;color:var(--muted);font-size:13px}
+.shBtn.primary{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
+.shBtn.primary small{color:#4a4020}
+.card.current .cover{outline:3px solid var(--yellow);outline-offset:4px}
 #crumbs{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:22px 0 26px;font:600 22px/1.2 var(--display);color:var(--muted);min-height:26px}
 #crumbs a{color:var(--muted);cursor:pointer;text-decoration:none}
 #crumbs a:hover{color:var(--paper)}
@@ -192,6 +208,16 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
 </main>
 <div id="libToast"></div>
 
+<div id="seriesPanel" class="modal" role="dialog" aria-modal="true" aria-labelledby="shTitle">
+  <div class="modalBox sheet">
+    <div class="sheetTop">
+      <div id="shCover" class="cover"></div>
+      <div class="sheetHead"><h2 id="shTitle"></h2><p id="shSub" class="muted"></p></div>
+    </div>
+    <div id="shBtns"></div>
+  </div>
+</div>
+
 <div id="importPanel" class="modal">
   <div class="modalBox">
     <h2 id="impTitle">Add comics</h2>
@@ -271,8 +297,10 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
         <tr><td>Yellow line under a cover</td><td>How far you are into an issue, or how much of a series you've read</td></tr>
         <tr><td>Dimmed cover</td><td>Finished</td></tr>
         <tr><td>••• on an issue</td><td>Mark read or unread, use as series cover</td></tr>
+        <tr><td>Tap a series</td><td>Continue reading (the issue and page you're on), Next unread, or Open series (scrolls to your current issue)</td></tr>
         <tr><td>••• on a series</td><td>Mark the whole series read or unread</td></tr>
-        <tr><td>Continue reading</td><td>Top of the main shelf: issues you're partway through, plus the next issue after one you finished</td></tr>
+        <tr><td>Your place</td><td>One spot per series. Opening a different issue in that series moves the spot there; half-read issues you leave go back to unread, finished ones stay finished</td></tr>
+        <tr><td>Continue reading</td><td>Top of the main shelf: your 6 most recent series, each at your spot or its next unread issue</td></tr>
         <tr><td><kbd>Backspace</kbd></td><td>Up one folder</td></tr>
       </table>
       <h3>OneDrive and offline reading</h3>
@@ -561,6 +589,34 @@ async function openRoot(node){
   renderLib();
 }
 function progressOf(path){ return store.get("pos:" + path, null); }
+const parentOf = p => p.slice(0, p.lastIndexOf("/"));
+// One reading spot per series: when you're partway through an issue, any other half-read issue
+// in the same series goes back to unread. Finished issues always stay finished.
+function claimSeriesSpot(path){
+  const parent = parentOf(path);
+  for (const p of allProgress()) if (p.path !== path && !p.done && parentOf(p.path) === parent) store.del("pos:" + p.path);
+}
+// Where you are in a series: the issue you're partway through, and the next one you haven't read
+async function seriesState(dir){
+  const cs = await comicsIn(dir);
+  const pos = cs.map(c => progressOf(c.path));
+  let cur = -1, curT = -1;
+  cs.forEach((c, j) => { const p = pos[j]; if (p && !p.done && (p.t || 0) >= curT) { cur = j; curT = p.t || 0; } });
+  let anchor = cur;
+  if (anchor < 0) { let lt = -1; cs.forEach((c, j) => { const p = pos[j]; if (p && p.done && (p.t || 0) >= lt) { lt = p.t || 0; anchor = j; } }); }
+  const unread = j => !(pos[j] && pos[j].done) && j !== cur;
+  let next = -1;
+  for (let j = anchor + 1; j < cs.length; j++) if (unread(j)) { next = j; break; }
+  if (next < 0) for (let j = 0; j < cs.length; j++) if (unread(j)) { next = j; break; } // gaps earlier in the run
+  return {
+    comics: cs,
+    current: cur >= 0 ? {node: cs[cur], pos: pos[cur]} : null,
+    next: next >= 0 ? cs[next] : null,
+    touched: pos.some(Boolean),
+    read: pos.filter(p => p && p.done).length,
+    t: Math.max(0, ...pos.map(p => (p && p.t) || 0))
+  };
+}
 function setRead(path, read, t){
   if (read) { const p = progressOf(path) || {i:0, n:0}; store.set("pos:" + path, {i:p.i, n:p.n, done:true, t: t || Date.now()}); }
   else store.del("pos:" + path);
@@ -614,6 +670,12 @@ async function renderLib(){
   pubs.forEach((c, i) => { c._offset = Math.round(i * ROTATE_MS / pubs.length); });
   fitNames();
   renderContinue();
+  // Open series: scroll to the issue you're on and outline it
+  if (focusPath) {
+    const c = [...grid.querySelectorAll(".card")].find(el => el.dataset.path === focusPath);
+    if (c) { c.classList.add("current"); requestAnimationFrame(() => c.scrollIntoView({block: "center", behavior: "instant"})); }
+    focusPath = null;
+  }
 }
 
 /* ---------- Options menu (•••) on cards ---------- */
@@ -644,33 +706,22 @@ const comicsIn = async dir => (await listNode(dir)).filter(x => x.kind === "file
 
 /* ---------- Continue reading row (main shelf only) ---------- */
 let contTok = 0;
+const CONTINUE_MAX = 6; // how many series the Continue reading row shows
 async function renderContinue(){
   const tok = ++contTok, wrap = $("contWrap"), row = $("contRow");
   if (stack.length !== 1 || !rootNode) { wrap.hidden = true; row.innerHTML = ""; return; }
+  // one card per series, most recently read first: the issue you're partway through, or the next unread one
   const all = allProgress().filter(p => p.path.startsWith(rootNode.path + "/"));
-  const parentOf = p => p.slice(0, p.lastIndexOf("/"));
-  const inProgress = all.filter(p => !p.done);
-  const busySeries = new Set(inProgress.map(p => parentOf(p.path)));
-  // latest finished issue per series, where nothing in that series is mid-read
-  const lastDone = new Map();
-  for (const p of all.filter(p => p.done)) {
-    const s = parentOf(p.path), cur = lastDone.get(s);
-    if (!busySeries.has(s) && (!cur || (p.t || 0) > (cur.t || 0) || ((p.t || 0) === (cur.t || 0) && collator.compare(p.path, cur.path) > 0))) lastDone.set(s, p);
-  }
-  const wanted = [...inProgress.map(p => ({p, kind:"resume"})), ...[...lastDone.values()].map(p => ({p, kind:"next"}))]
-    .sort((a, b) => (b.p.t || 0) - (a.p.t || 0)).slice(0, 12);
+  const lastRead = new Map();
+  for (const p of all) { const s = parentOf(p.path); lastRead.set(s, Math.max(lastRead.get(s) || 0, p.t || 0)); }
   const cards = [];
-  for (const w of wanted) {
+  for (const [s] of [...lastRead.entries()].sort((a, b) => b[1] - a[1])) {
+    if (cards.length >= CONTINUE_MAX) break;
     try {
-      const r = await resolvePath(w.p.path); if (!r) continue;
-      const comics = await comicsIn(r.parent);
-      let node = r.node;
-      if (w.kind === "next") {
-        const idx = comics.findIndex(c => c.path === node.path);
-        node = comics.slice(idx + 1).find(c => { const np = progressOf(c.path); return !(np && np.done); });
-        if (!node) continue;
-      }
-      cards.push(contCard(node, comics, r.parent.name, w.kind));
+      const r = await resolvePath(s); if (!r) continue;
+      const st = await seriesState(r.node);
+      if (st.current) cards.push(contCard(st.current.node, st.comics, r.node.name, "resume"));
+      else if (st.next) cards.push(contCard(st.next, st.comics, r.node.name, "next"));
     } catch {}
     if (tok !== contTok) return;
   }
@@ -699,6 +750,65 @@ function contCard(k, comics, seriesName, kind){
   return card;
 }
 
+/* ---------- Series buttons: Continue reading / Next unread / Open series ---------- */
+let focusPath = null; // issue to scroll to and outline when a series opens
+function openSeries(dir, target){
+  focusPath = target || null;
+  closeSeriesSheet();
+  stack.push(dir); renderLib(); window.scrollTo(0, 0);
+}
+function closeSeriesSheet(){ $("seriesPanel").classList.remove("open"); }
+$("seriesPanel").addEventListener("click", e => { if (e.target.id === "seriesPanel") closeSeriesSheet(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("seriesPanel").classList.contains("open")) closeSeriesSheet(); });
+
+async function openSeriesSheet(dir){
+  let st;
+  try { st = await seriesState(dir); } catch { st = null; }
+  if (!st || !st.comics.length) { openSeries(dir); return; } // not a series folder: just open it
+  const n = st.comics.length;
+  $("shTitle").textContent = dir.name;
+  $("shSub").textContent = st.read === n ? "All " + n + " read" : st.read + " of " + n + " read";
+
+  // big cover: the series cover; hovering a button (PC) swaps in that issue's cover
+  const big = $("shCover"); big.replaceChildren(); big.textContent = "";
+  const bigImg = new Image(); bigImg.alt = ""; bigImg.onload = () => bigImg.classList.add("ok"); big.append(bigImg);
+  let seriesUrl = null;
+  firstComicIn(dir).then(f => f && coverFor(f)).then(u => { if (u) { seriesUrl = u; bigImg.src = u; } }).catch(() => {});
+
+  const label = node => issueNo(node.name) || baseName(node.name);
+  const btn = (title, detail, node, primary, act) => {
+    const b = document.createElement("button"); b.className = "shBtn" + (primary ? " primary" : "");
+    const th = document.createElement("span"); th.className = "th" + (node ? "" : " none");
+    const tx = document.createElement("span"); tx.innerHTML = "<b></b><small></small>";
+    tx.querySelector("b").textContent = title; tx.querySelector("small").textContent = detail;
+    b.append(th, tx);
+    if (node) {
+      coverFor(node).then(u => {
+        th.style.backgroundImage = "url(" + u + ")";
+        b.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") bigImg.src = u; });
+        b.addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && seriesUrl) bigImg.src = seriesUrl; });
+      }).catch(() => {});
+    }
+    b.onclick = act;
+    return b;
+  };
+  const btns = [];
+  if (st.current) {
+    const p = st.current.pos;
+    btns.push(btn("Continue reading", label(st.current.node) + (p && p.n ? " · page " + (p.i + 1) + " of " + p.n : ""), st.current.node, true,
+      () => { closeSeriesSheet(); openComic(st.current.node, st.comics); }));
+  }
+  if (st.next) {
+    btns.push(btn(st.touched ? "Next unread" : "Start reading", label(st.next), st.next, !st.current,
+      () => { closeSeriesSheet(); openComic(st.next, st.comics); }));
+  }
+  const target = st.current ? st.current.node.path : (st.touched && st.next ? st.next.path : null);
+  btns.push(btn("Open series", n + (n === 1 ? " issue" : " issues"), null, false, () => openSeries(dir, target)));
+  $("shBtns").replaceChildren(...btns);
+  $("seriesPanel").classList.add("open");
+  btns[0].focus({preventScroll: true});
+}
+
 // shrink publisher names until every word fits on its panel
 function fitNames(){
   for (const el of document.querySelectorAll(".cover.name")) {
@@ -715,7 +825,7 @@ const ROTATE_MS = 8000; // how long each publisher cover stays before crossfadin
 function hueOf(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
 
 function makeCard(k, comics, atRoot){
-  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0;
+  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0; card.dataset.path = k.path;
   const cover = document.createElement("div"); cover.className = "cover";
   const cap = document.createElement("div"); cap.className = "cap";
   card.title = k.name;
@@ -776,7 +886,7 @@ function makeCard(k, comics, atRoot){
     card.classList.add("dir");
     cover.textContent = k.name; cap.textContent = k.name;
     card._load = async () => { try { const f = await firstComicIn(k); if (f) { img.src = await coverFor(f); cover.append(img); } } catch {} };
-    card.onclick = () => { stack.push(k); renderLib(); window.scrollTo(0, 0); };
+    card.onclick = () => openSeriesSheet(k);
     // "X of Y read" for the series
     const sub = document.createElement("div"); sub.className = "sub"; card.append(sub);
     comicsIn(k).then(cs => {
@@ -1274,7 +1384,9 @@ async function show(i){
   $("slider").value = i + 1;
   $("plabel").textContent = (idx.length === 2 ? (i + 1) + "–" + (i + 2) : (i + 1)) + " of " + n;
   const prevPos = progressOf(R.node.path);
-  store.set("pos:" + R.node.path, {i, n, done: atEnd || !!(prevPos && prevPos.done), t: Date.now()}); // finished stays finished on a re-read
+  const nowDone = atEnd || !!(prevPos && prevPos.done);
+  store.set("pos:" + R.node.path, {i, n, done: nowDone, t: Date.now()}); // finished stays finished on a re-read
+  if (!nowDone && !(prevPos && prevPos.i === i)) claimSeriesSpot(R.node.path); // this issue is now the series' one spot
   for (const [k, p] of R.cache) if (k < i - 6 || k > i + 8) { p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{}); R.cache.delete(k); }
   for (let k = i + idx.length; k < Math.min(n, i + idx.length + 4); k++) page(k).catch(()=>{});
   if (i > 0) page(i - 1).catch(()=>{});
@@ -1309,7 +1421,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 9;
+const APP_VERSION = 10;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
