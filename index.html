@@ -506,7 +506,8 @@ async function listNode(node){
       else if (isComic(name) || isUnsupported(name)) kids.push({name, path: node.path + "/" + name, kind:"file", handle:h});
     }
   } else kids = [...node.children.values()];
-  kids = kids.filter(k => !(k.kind === "dir" && k.name.startsWith("_"))); // _Inbox and other _folders stay off the shelf
+  // _Inbox and other _folders stay off the shelf, and so does the folder Claude saves its files in
+  kids = kids.filter(k => !(k.kind === "dir" && (k.name.startsWith("_") || /^claude[\s_-]*outputs?$/i.test(k.name.trim()))));
   kids.sort((a,b) => (a.kind===b.kind ? collator.compare(a.name,b.name) : a.kind==="dir" ? -1 : 1));
   listCache.set(node.path, kids);
   return kids;
@@ -1421,7 +1422,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 10;
+const APP_VERSION = 11;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
