@@ -114,8 +114,12 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 .menu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:9px 10px;font-size:14px}
 .menu button:hover,.menu button:focus-visible{background:var(--shelf)}
 /* continue reading row */
-#contWrap{margin:0 0 38px}
-#contWrap h2{font:600 24px/1 var(--display);margin:0 0 16px}
+#contWrap{margin:-8px 0 30px}
+#contBtn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px 9px 12px;font:600 15px/1 var(--ui)}
+#contBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#contBtn .chev{width:16px;height:16px;transition:transform .2s}
+#contBtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+#contRow{margin-top:14px}
 #contRow{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:22px;overflow-x:auto;padding:10px 0 12px}
 .upnext{color:var(--yellow)}
 #empty{max-width:520px;margin:48px 0;color:var(--muted);font-size:16px}
@@ -203,7 +207,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   <!-- no "accept" filter: iPads don't know the .cbz type and would grey those files out; the app filters by name instead -->
   <input id="importInput" type="file" multiple hidden>
   <nav id="crumbs"></nav>
-  <section id="contWrap" hidden><h2>Continue reading</h2><div id="contRow"></div></section>
+  <section id="contWrap" hidden><button id="contBtn" aria-expanded="false" aria-controls="contRow"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M13 4h5.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H13z"/></svg>Continue reading<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div id="contRow" hidden></div></section>
   <div id="grid"></div>
   <div id="empty">Choose your comics folder to start: <b>C:\Users\Georg\Comics</b></div>
   <input id="dirInput" type="file" webkitdirectory multiple hidden>
@@ -302,7 +306,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
         <tr><td>Tap a series</td><td>Continue reading (the issue and page you're on), Next unread, or Open series (scrolls to your current issue)</td></tr>
         <tr><td>••• on a series</td><td>Mark the whole series read or unread</td></tr>
         <tr><td>Your place</td><td>One spot per series. Opening a different issue in that series moves the spot there; half-read issues you leave go back to unread, finished ones stay finished</td></tr>
-        <tr><td>Continue reading</td><td>Top of the main shelf: your 6 most recent series, each at your spot or its next unread issue</td></tr>
+        <tr><td>Continue reading</td><td>Button at the top of the main shelf: tap it to pull up your last 3 books, each at your spot or its next unread issue. Tap again to tuck them away</td></tr>
         <tr><td><kbd>Backspace</kbd></td><td>Up one folder</td></tr>
       </table>
       <h3>OneDrive and offline reading</h3>
@@ -715,7 +719,13 @@ const comicsIn = async dir => (await listNode(dir)).filter(x => x.kind === "file
 
 /* ---------- Continue reading row (main shelf only) ---------- */
 let contTok = 0;
-const CONTINUE_MAX = 6; // how many series the Continue reading row shows
+document.getElementById("contBtn").onclick = () => {
+  contOpen = !contOpen;
+  $("contRow").hidden = !contOpen;
+  $("contBtn").setAttribute("aria-expanded", contOpen);
+};
+const CONTINUE_MAX = 3; // how many books the Continue reading button pulls up
+let contOpen = false;    // the row stays tucked away until you tap Continue reading
 async function renderContinue(){
   const tok = ++contTok, wrap = $("contWrap"), row = $("contRow");
   if (stack.length !== 1 || !rootNode) { wrap.hidden = true; row.innerHTML = ""; return; }
@@ -737,6 +747,7 @@ async function renderContinue(){
   if (tok !== contTok || stack.length !== 1) return;
   row.replaceChildren(...cards);
   wrap.hidden = cards.length === 0;
+  row.hidden = !contOpen;
 }
 function contCard(k, comics, seriesName, kind){
   const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0; card.title = k.name;
@@ -1430,7 +1441,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 12;
+const APP_VERSION = 13;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
