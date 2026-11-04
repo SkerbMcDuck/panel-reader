@@ -196,6 +196,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       <button id="importBtn">Import comics</button>
       <button id="cloudBtn">Connect OneDrive</button>
     </div>
+    <button id="overlayBtn" title="Read comics from websites in Panel Reader">Website overlay</button>
   </div>
   <p id="notice" hidden></p>
   <!-- no "accept" filter: iPads don't know the .cbz type and would grey those files out; the app filters by name instead -->
@@ -218,6 +219,22 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   </div>
 </div>
 
+<div id="overlayPanel" class="modal">
+  <div class="modalBox">
+    <h2>Website overlay</h2>
+    <p class="muted">Opens Panel Reader on top of a comic website, using the pages on that site. Nothing gets downloaded, and closing it puts you back on the site.</p>
+    <p id="ovWarn" class="muted" hidden>This only works from the online version of Panel Reader (the one you open on the iPad), not from the file on your PC. Open that version and come back here.</p>
+    <div id="ovBody">
+      <label>iPad (Safari)</label>
+      <p class="muted">1. Tap Copy below. 2. Bookmark any page, then edit that bookmark: name it Panel Reader and paste over its address. 3. On a comic site, tap the bookmark to open the reader. Tap 📖 to open it again.</p>
+      <label>PC</label>
+      <p class="muted">Drag this button to your bookmarks bar: <a id="ovLink" href="#" style="color:var(--yellow);font-weight:600">📖 Panel Reader</a>. Click it on a comic site, or press Alt+P once the 📖 button shows.</p>
+      <p class="muted">Slideshow sites: at the last page, Panel Reader asks the site for its next slide. If that doesn't work, close the reader, hold 📖, then tap the site's own next button once.</p>
+      <textarea id="ovCode" readonly rows="3" style="width:100%;font:12px monospace;color:var(--paper);background:var(--shelf);border:1px solid var(--edge);border-radius:8px;padding:8px;resize:none"></textarea>
+    </div>
+    <div class="modalBtns"><button id="ovClose">Close</button><button id="ovCopy" class="on">Copy bookmarklet</button></div>
+  </div>
+</div>
 <div id="importPanel" class="modal">
   <div class="modalBox">
     <h2 id="impTitle">Add comics</h2>
@@ -333,6 +350,8 @@ const collator = new Intl.Collator(undefined, {numeric:true, sensitivity:"base"}
 const IMG_RE = /\.(jpe?g|png|webp|gif|avif|bmp)$/i;
 const MIME = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",gif:"image/gif",avif:"image/avif",bmp:"image/bmp"};
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+// Opened inside a website by the overlay bookmarklet: pages come from that site, not from a CBZ
+const WEB = new URLSearchParams(location.search).has("overlay") && window.parent !== window;
 
 /* ---------- storage (never fatal) ---------- */
 // Reading progress, pairing fixes and series covers are shared through the PC server when there is one.
@@ -1246,6 +1265,7 @@ function setReopen(h){
   };
 }
 (async () => {
+  if (WEB) return;                 // website overlay: no shelf to load
   // Served from the PC? Then the library comes from the server and there's nothing to choose.
   if (/^https?:$/.test(location.protocol)) {
     try {
@@ -1295,7 +1315,7 @@ function nextIssueNode(){
   const i = R.siblings.findIndex(s => s.path === R.node.path);
   return i >= 0 && i + 1 < R.siblings.length ? R.siblings[i + 1] : null;
 }
-function nextIssue(){ const n = nextIssueNode(); if (n) openComic(n, R.siblings); else toast("That was the last issue in this folder"); }
+function nextIssue(){ if (R.node && R.node.web) return webMore(); const n = nextIssueNode(); if (n) openComic(n, R.siblings); else toast("That was the last issue in this folder"); }
 
 async function openComic(node, siblings){
   enterFs();   // iPad: hide the time/battery bar while reading (must run right at the tap, before any waiting)
@@ -1324,10 +1344,11 @@ async function openComic(node, siblings){
 }
 function freePages(){
   R.tok++;
-  for (const p of R.cache.values()) p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{});
+  for (const p of R.cache.values()) p.then(x => { if (x.url.startsWith("blob:")) URL.revokeObjectURL(x.url); }).catch(()=>{});
   R.cache.clear(); R.pages = []; R.file = null;
 }
 function closeReader(){
+  if (WEB) { $("reader").classList.remove("open"); toggleHelp(false); webWaiting = false; status(""); parent.postMessage({pr:"close"}, "*"); return; }
   freePages();
   $("reader").classList.remove("open");
   toggleHelp(false);
@@ -1342,8 +1363,8 @@ function page(i){
   if (R.cache.has(i)) return R.cache.get(i);
   const file = R.file, e = R.pages[i];
   const pr = (async () => {
-    const url = URL.createObjectURL(await zipRead(file, e));
-    const img = new Image(); img.src = url;
+    const url = e.url || URL.createObjectURL(await zipRead(file, e));
+    const img = new Image(); img.referrerPolicy = "no-referrer"; img.src = url;
     try { await img.decode(); } catch {}
     return {url, w:img.naturalWidth, h:img.naturalHeight};
   })();
@@ -1376,18 +1397,20 @@ async function show(i){
   R.index = i; R.shown = idx.length;
   const pair = document.createElement("div");
   pair.className = "pair" + (idx.length === 2 ? " two" : "");
-  for (const im of imgs) { const el = document.createElement("img"); el.src = im.url; el.alt = ""; el.draggable = false; pair.append(el); }
+  for (const im of imgs) { const el = document.createElement("img"); el.referrerPolicy = "no-referrer"; el.src = im.url; el.alt = ""; el.draggable = false; pair.append(el); }
   $("stage").replaceChildren(pair);
   Z.s = 1; Z.x = 0; Z.y = 0; $("reader").classList.remove("zoomed"); // each new page starts unzoomed
   $("stage").scrollTo({top: 0, behavior: "instant"});                  // fit width: each new page starts at the top (also stops any smooth scroll still running)
   const atEnd = i + idx.length >= n;
   $("slider").value = i + 1;
   $("plabel").textContent = (idx.length === 2 ? (i + 1) + "–" + (i + 2) : (i + 1)) + " of " + n;
-  const prevPos = progressOf(R.node.path);
-  const nowDone = atEnd || !!(prevPos && prevPos.done);
-  store.set("pos:" + R.node.path, {i, n, done: nowDone, t: Date.now()}); // finished stays finished on a re-read
-  if (!nowDone && !(prevPos && prevPos.i === i)) claimSeriesSpot(R.node.path); // this issue is now the series' one spot
-  for (const [k, p] of R.cache) if (k < i - 6 || k > i + 8) { p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{}); R.cache.delete(k); }
+  if (!R.node.web) {
+    const prevPos = progressOf(R.node.path);
+    const nowDone = atEnd || !!(prevPos && prevPos.done);
+    store.set("pos:" + R.node.path, {i, n, done: nowDone, t: Date.now()}); // finished stays finished on a re-read
+    if (!nowDone && !(prevPos && prevPos.i === i)) claimSeriesSpot(R.node.path); // this issue is now the series' one spot
+  }
+  for (const [k, p] of R.cache) if (k < i - 6 || k > i + 8) { p.then(x => { if (x.url.startsWith("blob:")) URL.revokeObjectURL(x.url); }).catch(()=>{}); R.cache.delete(k); }
   for (let k = i + idx.length; k < Math.min(n, i + idx.length + 4); k++) page(k).catch(()=>{});
   if (i > 0) page(i - 1).catch(()=>{});
 }
@@ -1421,7 +1444,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 10;
+const APP_VERSION = 11;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
@@ -1670,6 +1693,86 @@ document.addEventListener("keydown", e => {
   else if (k === "f" || k === "F") toggleFs();
   else if (k === "Escape") closeReader();
 });
+
+/* ---------- Website overlay: Panel Reader opened over a comic site by the bookmarklet ---------- */
+let webWaiting = false, webWaitT;
+function webMore(){
+  if (webWaiting) return;
+  webWaiting = true; status("Loading the next page from the site…");
+  parent.postMessage({pr:"more"}, "*");
+  clearTimeout(webWaitT);
+  webWaitT = setTimeout(() => { if (webWaiting) { webWaiting = false; status(""); toast("That's the last page"); } }, 7000);
+}
+function openWeb(urls, title, start){
+  freePages();
+  R.siblings = [];
+  R.node = {name: title || "Comic", path: "web:" + (title || ""), web: true};
+  R.cover = !store.get("shift:" + R.node.path, false);
+  R.two = wantTwo();
+  $("reader").classList.add("open");
+  $("title").textContent = title || "";
+  $("nextIssueBtn").hidden = true;
+  const lbl = $("closeBtn").querySelector(".lbl"); if (lbl) lbl.textContent = "Close";
+  $("closeBtn").title = "Back to the website (Esc)";
+  $("stage").innerHTML = "";
+  syncButtons(); peekUI();
+  R.pages = urls.map(u => ({url: u}));
+  $("slider").max = Math.max(1, R.pages.length);
+  if (!R.pages.length) { status("No comic pages found on this page yet. Scroll the site so the comic loads, then open the reader again."); return; }
+  status("");
+  show(parityStart(Math.min(start || 0, R.pages.length - 1)));
+}
+function addWebPages(urls){
+  if (!R.node || !R.node.web) return;
+  const have = new Set(R.pages.map(p => p.url));
+  let added = 0;
+  for (const u of urls) if (!have.has(u)) { R.pages.push({url: u}); added++; }
+  if (!added) return;
+  $("slider").max = R.pages.length;
+  if (webWaiting) { webWaiting = false; clearTimeout(webWaitT); status(""); show(R.index + R.shown); }
+  else show(R.index);   // refresh the "x of n" count (and pairing of the last page)
+}
+if (WEB) {
+  const st = document.createElement("style");
+  st.textContent = "#lib,#libToast{display:none!important}html,body{background:var(--room)}";
+  document.head.append(st);
+  addEventListener("message", e => {
+    if (e.source !== parent) return;
+    const d = e.data || {};
+    if (d.pr === "open") openWeb(d.urls || [], d.title, d.start);
+    else if (d.pr === "pages") addWebPages(d.urls || []);
+    else if (d.pr === "nomore") { webWaiting = false; clearTimeout(webWaitT); status(""); toast(d.hint || "That's the last page"); }
+  });
+  parent.postMessage({pr:"ready"}, "*");
+}
+
+/* ---------- Setting up the website overlay bookmarklet (from the shelf) ---------- */
+const OVERLAY_SRC = "!function(){\"use strict\";if(window.__panelOverlay)window.__panelOverlay.toggle();else{var e=\"__READER_URL__\",t=new URL(e).origin,n=\"panelOverlay:\",o=[],a={},r=null,i=!1,l=null,s=!1,c=null,d=!1,u=!1,p=null,h=document.createElement(\"div\");h.style.cssText=\"all:initial;position:fixed;top:0;left:0;width:0;height:0;z-index:2147483646;\";var f=h.attachShadow({mode:\"open\"});f.innerHTML='<style>.fab{position:fixed;right:14px;bottom:14px;width:46px;height:46px;border-radius:23px;border:1px solid #30353f;background:rgba(23,26,32,.82);color:#eee8da;font:21px/44px system-ui;text-align:center;padding:0;box-shadow:0 2px 10px rgba(0,0,0,.45);cursor:pointer;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;display:none}.fab.show{display:block}.toast{position:fixed;left:50%;bottom:72px;transform:translateX(-50%);background:#21252d;color:#eee8da;border:1px solid #30353f;padding:10px 16px;border-radius:999px;font:14px system-ui,-apple-system,sans-serif;display:none;max-width:90vw;text-align:center}.toast.show{display:block}<\/style><button class=\"fab\" title=\"Panel Reader (Alt+P). Hold to set the site\\'s next button\">\ud83d\udcd6<\/button><div class=\"toast\"><\/div>',(document.body||document.documentElement).appendChild(h);var m,g=f.querySelector(\".fab\"),v=f.querySelector(\".toast\");window.addEventListener(\"message\",function(e){if(r&&e.source===r.contentWindow&&e.origin===t){var a=e.data||{};\"ready\"===a.pr?(i=!0,l&&(_(l),l=null)):\"close\"===a.pr?T():\"more\"===a.pr&&function(){if(u)return;if(k())return void _({pr:\"pages\",urls:o.slice()});u=!0;var e=o.length;try{sessionStorage.setItem(n+\"reopen\",String(Date.now()))}catch(e){}d=!0;try{if(c&&document.contains(c))c.click();else{var t={key:\"ArrowRight\",code:\"ArrowRight\",keyCode:39,which:39,bubbles:!0};document.body.dispatchEvent(new KeyboardEvent(\"keydown\",t)),document.body.dispatchEvent(new KeyboardEvent(\"keyup\",t))}}finally{d=!1}var a=0,r=setInterval(function(){if(k(),o.length>e||++a>12){clearInterval(r),u=!1;try{sessionStorage.removeItem(n+\"reopen\")}catch(e){}o.length>e?_({pr:\"pages\",urls:o.slice()}):_({pr:\"nomore\",hint:c?\"That's the last page\":\"Last page. If the site has more, close and hold \ud83d\udcd6 to set its next button\"})}},300)}()}});var b=null,y=!1;g.addEventListener(\"pointerdown\",function(){y=!1,b=setTimeout(function(){y=!0,function(){L('Tap the site\\'s \"next\" button\u2026');var e=function(t){t.composedPath&&-1!==t.composedPath().indexOf(h)||(t.preventDefault(),t.stopPropagation(),c=t.target.closest&&t.target.closest(\"button, a, [role=button]\")||t.target,document.removeEventListener(\"click\",e,!0),L(\"Next button set \u2713\",1600))};document.addEventListener(\"click\",e,!0)}()},550)}),g.addEventListener(\"pointerup\",function(){clearTimeout(b)}),g.addEventListener(\"pointercancel\",function(){clearTimeout(b)}),g.addEventListener(\"contextmenu\",function(e){e.preventDefault()}),g.addEventListener(\"click\",function(){y||R(),y=!1}),window.addEventListener(\"keydown\",function(e){!d&&e.altKey&&\"KeyP\"===e.code&&(e.preventDefault(),M())},!0),setInterval(function(){s?k()&&_({pr:\"pages\",urls:o.slice()}):A()},2e3),window.__panelOverlay={toggle:M,open:R,close:T};var w=0;try{w=parseInt(sessionStorage.getItem(n+\"reopen\")||\"0\",10),sessionStorage.removeItem(n+\"reopen\")}catch(e){}window.__panelOverlayAutoOpen||w&&Date.now()-w<15e3?setTimeout(R,w?600:0):A()}function x(e){var t=e.currentSrc||e.src||\"\",n=0,o=e.getAttribute(\"srcset\")||e.getAttribute(\"data-srcset\");o&&o.split(\",\").forEach(function(e){var o=e.trim().split(/\\s+/),a=parseFloat(o[1])||1;o[0]&&a>n&&(n=a,t=o[0])}),t&&!/^data:image\\/(gif|svg)/.test(t)||(t=e.getAttribute(\"data-src\")||e.getAttribute(\"data-original\")||e.getAttribute(\"data-lazy-src\")||e.getAttribute(\"data-url\")||t);try{return new URL(t,location.href).href}catch(e){return t}}function E(){for(var e=[],t=document.querySelectorAll(\"img\"),n=0;n<t.length;n++){var o=t[n],a=o.complete&&o.naturalWidth>=250&&o.naturalHeight>=250,r=!a&&(o.getAttribute(\"data-src\")||o.getAttribute(\"data-original\")||o.getAttribute(\"data-lazy-src\"));if(r){var i=o.getBoundingClientRect();i.width<120&&i.height<120&&(r=!1)}if(a||r){var l=x(o);l&&!/^(data|blob):/.test(l)&&e.push({url:l,el:o})}}return e}function k(){var e=0;return E().forEach(function(t){a[t.url]||(a[t.url]=!0,o.push(t.url),e++)}),e}function L(e,t){clearTimeout(m),v.textContent=e||\"\",v.classList.toggle(\"show\",!!e),e&&t&&(m=setTimeout(function(){v.classList.remove(\"show\")},t))}function A(){s||g.classList.toggle(\"show\",!!window.__panelOverlayForceFab||E().length>0)}function _(e){i?r.contentWindow.postMessage(e,t):l=e}function R(){k();var t,n,a,i,l=(t=0,n=0,a=innerWidth,i=innerHeight,E().forEach(function(e){var r=e.el.getBoundingClientRect(),l=Math.max(0,Math.min(r.right,a)-Math.max(r.left,0))*Math.max(0,Math.min(r.bottom,i)-Math.max(r.top,0));l>n&&(n=l,t=o.indexOf(e.url))}),Math.max(0,t));!function(){if(!r){var t=new URL(e);t.searchParams.set(\"overlay\",\"1\"),(r=document.createElement(\"iframe\")).src=t.href,r.allow=\"fullscreen\",r.setAttribute(\"allowfullscreen\",\"\"),r.style.cssText=\"all:initial;position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;border:0;margin:0;padding:0;z-index:2147483647;background:#101216;display:none;\",document.documentElement.appendChild(r)}}(),s=!0;var c=document.documentElement;if(p||(p=[c.style.overflow,document.body?document.body.style.overflow:\"\"]),c.style.overflow=\"hidden\",document.body&&(document.body.style.overflow=\"hidden\"),r.style.display=\"block\",g.classList.remove(\"show\"),L(\"\"),matchMedia(\"(pointer: coarse)\").matches)try{var d=r.requestFullscreen||r.webkitRequestFullscreen,u=d&&d.call(r);u&&u.catch&&u.catch(function(){})}catch(e){}_({pr:\"open\",urls:o.slice(),title:(document.title||location.hostname).replace(/\\s*[|\u2013\u2014-]\\s*[^|\u2013\u2014-]*$/,\"\").trim()||location.hostname,start:l}),setTimeout(function(){try{r.focus(),r.contentWindow.focus()}catch(e){}},60)}function T(){if(r){if(s=!1,(document.fullscreenElement||document.webkitFullscreenElement)===r)try{var e=(document.exitFullscreen||document.webkitExitFullscreen).call(document);e&&e.catch&&e.catch(function(){})}catch(e){}r.style.display=\"none\",p&&(document.documentElement.style.overflow=p[0],document.body&&(document.body.style.overflow=p[1]),p=null),A()}}function M(){s?T():R()}}();";
+function overlayBookmarklet(){
+  const readerUrl = location.origin + location.pathname;
+  const code = "window.__panelOverlayAutoOpen=1;window.__panelOverlayForceFab=1;" + OVERLAY_SRC.replace("__READER_URL__", readerUrl) + "void 0";
+  return "javascript:" + encodeURIComponent(code);
+}
+function openOverlaySetup(){
+  const ok = location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1";
+  $("ovWarn").hidden = ok;
+  $("ovBody").hidden = !ok;
+  $("ovCopy").hidden = !ok;
+  if (ok) { const bm = overlayBookmarklet(); $("ovCode").value = bm; $("ovLink").href = bm; }
+  $("overlayPanel").classList.add("open");
+}
+if (!WEB) {
+  $("overlayBtn").onclick = openOverlaySetup;
+  $("ovClose").onclick = () => $("overlayPanel").classList.remove("open");
+  $("overlayPanel").onclick = e => { if (e.target.id === "overlayPanel") $("overlayPanel").classList.remove("open"); };
+  $("ovLink").onclick = e => { e.preventDefault(); libToast("Drag this to your bookmarks bar instead of clicking it"); };
+  $("ovCopy").onclick = async () => {
+    const t = $("ovCode");
+    try { await navigator.clipboard.writeText(t.value); }
+    catch { t.focus(); t.select(); try { document.execCommand("copy"); } catch {} }
+    libToast("Copied");
+  };
+}
 </script>
 </body>
 </html>
