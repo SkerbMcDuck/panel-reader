@@ -123,6 +123,16 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 #contRow{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:22px;overflow-x:auto;padding:10px 0 12px}
 .upnext{color:var(--yellow)}
 #empty{max-width:520px;margin:48px 0;color:var(--muted);font-size:16px}
+/* signed out of OneDrive: just the name and a big sign-in button, centered */
+#signInBtn{display:none}
+body.signedout #lib{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10vh}
+body.signedout #libHead{flex-direction:column;align-items:center;gap:34px}
+body.signedout h1{font-size:clamp(52px,9vw,76px);text-align:center}
+body.signedout #signInBtn{display:inline-flex;align-items:center;gap:12px;font:600 20px/1 var(--ui);padding:18px 34px;background:var(--yellow);border-color:var(--yellow);color:#1a1a1a;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+body.signedout #signInBtn:hover{filter:brightness(1.06)}
+body.signedout #signInBtn svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.signedout #appActions,body.signedout #libActions,body.signedout #crumbs,body.signedout #contWrap,body.signedout #grid,body.signedout #empty{display:none!important}
+body.signedout #notice{text-align:center;margin-top:26px}
 #empty b{color:var(--paper);font-weight:600}
 
 /* ---------- Reader ---------- */
@@ -199,9 +209,9 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
     </div>
     <div id="appActions" hidden>
       <span id="storageUse"></span>
-      <button id="importBtn">Import comics</button>
-      <button id="cloudBtn">Connect OneDrive</button>
+      <button id="cloudBtn">Sign out of OneDrive</button>
     </div>
+    <button id="signInBtn"><svg viewBox="0 0 24 24"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.6 9.1 4.75 4.75 0 0 0 7 18.5z"/></svg>Sign in to OneDrive</button>
   </div>
   <p id="notice" hidden></p>
   <!-- no "accept" filter: iPads don't know the .cbz type and would grey those files out; the app filters by name instead -->
@@ -311,10 +321,9 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       </table>
       <h3>OneDrive and offline reading</h3>
       <table>
-        <tr><td>Connect OneDrive</td><td>Shows the Publisher and Series folders in OneDrive\Apps\Panel Reader\Comics, the only folder Panel Reader can see. Issues stream as you read</td></tr>
+        <tr><td>Sign in to OneDrive</td><td>Shows the Publisher and Series folders in OneDrive\Apps\Panel Reader\Comics, the only folder Panel Reader can see. Issues stream as you read</td></tr>
         <tr><td>••• then Keep on this device</td><td>Saves an issue (or a whole series) for reading offline</td></tr>
         <tr><td>••• then Remove from this device</td><td>Frees up space. The OneDrive copy is untouched</td></tr>
-        <tr><td>Import comics</td><td>Adds CBZ files from the Files app straight to this device</td></tr>
         <tr><td>Progress</td><td>Saved on the device and synced through OneDrive, so every device you sign in on picks up where you left off</td></tr>
       </table>
       <p id="aboutLine" class="muted"></p>
@@ -1034,12 +1043,18 @@ async function appTree(){
   }
   return root;
 }
+function showSignIn(){
+  document.body.classList.add("signedout");
+  rootNode = null; stack = [];
+  $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true;
+}
 async function openAppLibrary(){
+  if (!msAccount) { showSignIn(); return; }     // OneDrive is the only source: signed out means sign in first
+  document.body.classList.remove("signedout");
   const root = await appTree();
   const has = root.children.size > 0;
   $("empty").hidden = has;
-  if (!has) { rootNode = null; stack = []; $("empty").innerHTML = msAccount ? "Nothing saved on this device yet. When you're online your OneDrive shelf shows here, and <b>Keep on this device</b> saves issues for offline reading."
-  : "Nothing here yet. Tap <b>Connect OneDrive</b> to show the comics in OneDrive\\Apps\\Panel Reader\\" + CLOUD_FOLDER + ", or <b>Import comics</b> to add CBZ files from the Files app."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
+  if (!has) { rootNode = null; stack = []; $("empty").innerHTML = "Nothing saved on this device yet. When you're online your OneDrive shelf shows here, and <b>Keep on this device</b> saves issues for offline reading."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
   updateStorageUse();
   if (has) await openRoot(root);
 }
@@ -1058,7 +1073,7 @@ async function removeFromDevice(nodes){
 
 // Import: pick CBZ files in the Files app; series comes from the file name, publisher is asked once for new series
 let pendingImport = [];
-$("importBtn").onclick = () => $("importInput").click();
+
 $("importInput").onchange = async () => {
   const picked = [...$("importInput").files];
   const files = picked.filter(f => isComic(f.name));
@@ -1126,7 +1141,7 @@ async function msalInit(){
   });
   await msalApp.initialize();
   let r = null;
-  try { r = await msalApp.handleRedirectPromise(); } catch (e) { showNotice("Sign-in didn't finish: " + (e.errorCode || e.message) + ". Try Connect OneDrive again."); }
+  try { r = await msalApp.handleRedirectPromise(); } catch (e) { showNotice("Sign-in didn't finish: " + (e.errorCode || e.message) + ". Try signing in again."); }
   msAccount = (r && r.account) || msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null;
   if (msAccount) msalApp.setActiveAccount(msAccount);
 }
@@ -1218,13 +1233,18 @@ function libToast(t, ms = 2200){ const el = $("libToast"); el.textContent = t; e
 function showNotice(t){ const n = $("notice"); n.textContent = t || ""; n.hidden = !t; }
 function updateCloudButton(){
   const b = $("cloudBtn");
-  b.textContent = msAccount ? "Sign out of OneDrive" : "Connect OneDrive";
+  b.textContent = msAccount ? "Sign out of OneDrive" : "Sign in to OneDrive";
   b.title = msAccount ? "Signed in as " + msAccount.username : "Show the comics in OneDrive\\Apps\\Panel Reader\\" + CLOUD_FOLDER;
 }
-$("cloudBtn").onclick = async () => {
+async function signIn(){
   if (window.__PR_TEST) return;
   if (!msalApp) { try { await msalInit(); } catch { showNotice("Couldn't load Microsoft sign-in. Check your connection."); return; } }
-  if (!msAccount) { await msalApp.loginRedirect({scopes: SCOPES, prompt: "select_account"}); return; }
+  if (!msAccount) await msalApp.loginRedirect({scopes: SCOPES, prompt: "select_account"});
+}
+$("signInBtn").onclick = signIn;
+$("cloudBtn").onclick = async () => {
+  if (window.__PR_TEST) return;
+  if (!msAccount) return signIn();
   if (!confirm("Sign out of OneDrive on this device? Comics you saved to this device stay readable.")) return;
   await msalApp.logoutRedirect({account: msAccount, onRedirectNavigate: () => false}); // forget this device's sign-in only
   msAccount = null; CLOUD = false; updateCloudButton(); await openAppLibrary();
@@ -1247,6 +1267,7 @@ async function openCloudLibrary(){
     return false;
   }
   showNotice("");
+  document.body.classList.remove("signedout");
   $("empty").hidden = true;
   cloudSync(true);
   await openRoot(root);
@@ -1441,7 +1462,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 13;
+const APP_VERSION = 14;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
