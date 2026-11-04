@@ -81,6 +81,8 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 #crumbs a:hover{color:var(--paper)}
 #crumbs a:last-child{color:var(--paper);cursor:default}
 #crumbs .sep{opacity:.5}
+#backBtn{align-self:center;display:inline-flex;align-items:center;gap:4px;padding:7px 14px 7px 9px;margin-right:8px;font:600 15px/1 var(--ui)}
+#backBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:30px 22px}
 .card{cursor:pointer;min-width:0;border-radius:6px;outline-offset:6px}
 .cover{position:relative;aspect-ratio:2/3;background:var(--shelf);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:12px;text-align:center;font:600 18px/1.1 var(--display);color:var(--muted)}
@@ -651,6 +653,12 @@ async function renderLib(){
   await refreshState(); // pick up progress made on the other device
   store.set("lastPath", stack.slice(1).map(n => n.name));
   const crumbs = $("crumbs"); crumbs.innerHTML = "";
+  if (stack.length > 1) { // Back: up one folder (the folder names still work too)
+    const b = document.createElement("button"); b.id = "backBtn"; b.setAttribute("aria-label", "Back");
+    b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Back';
+    b.onclick = () => { stack.pop(); renderLib(); };
+    crumbs.append(b);
+  }
   stack.forEach((n, i) => {
     if (i) { const s = document.createElement("span"); s.className = "sep"; s.textContent = "/"; crumbs.append(s); }
     const a = document.createElement("a"); a.textContent = n.name;
@@ -1422,7 +1430,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 11;
+const APP_VERSION = 12;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
