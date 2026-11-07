@@ -2,7 +2,7 @@
 // Your comics live in the app's on-device storage, not here.
 // The app page itself loads fresh whenever you're online (so updates show on the next launch),
 // and falls back to the saved copy when you're offline or the network is slow.
-const CACHE = "panel-reader-v15";
+const CACHE = "panel-reader-v16";
 const CORE = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "msal-browser.min.js"];
 
 self.addEventListener("install", e => {

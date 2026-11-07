@@ -219,7 +219,7 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   <nav id="crumbs"></nav>
   <section id="contWrap" hidden><button id="contBtn" aria-expanded="false" aria-controls="contRow"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M13 4h5.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H13z"/></svg>Continue reading<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div id="contRow" hidden></div></section>
   <div id="grid"></div>
-  <div id="empty">Choose your comics folder to start: <b>C:\Users\Georg\Comics</b></div>
+  <div id="empty">Click <b>Choose library folder</b> and pick your <b>Comics</b> folder (Publisher folders inside, Series folders inside those).</div>
   <input id="dirInput" type="file" webkitdirectory multiple hidden>
 </main>
 <div id="libToast"></div>
@@ -1262,7 +1262,7 @@ async function openCloudLibrary(){
   catch (e) {
     CLOUD = false;
     showNotice(e.message === "NO_COMICS_FOLDER"
-      ? "Connected. Now move your " + CLOUD_FOLDER + " folder into OneDrive\\" + appFolderPath + " (on your PC: C:\\Users\\Georg\\OneDrive\\" + appFolderPath + "), then reopen Panel Reader. That's the only folder Panel Reader can see."
+      ? "Connected. Now move your " + CLOUD_FOLDER + " folder into OneDrive\\" + appFolderPath + " (in the OneDrive folder on your computer), then reopen Panel Reader. That's the only folder Panel Reader can see."
       : e.message + " Showing comics saved on this device.");
     return false;
   }
@@ -1462,7 +1462,7 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 14;
+const APP_VERSION = 15;
 function aboutText(){
   return "Version " + APP_VERSION + ". Full screen on this device: " +
     (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
