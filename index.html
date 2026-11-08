@@ -41,75 +41,21 @@ button.on{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
 #lib{max-width:1240px;margin:0 auto;padding:28px 24px 64px}
 #libHead{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
 h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
-#libActions,#appActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-#storageUse{margin:4px 0 0}
-/* round icon button (account) */
-.round{width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
-.round svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sheetBtns{display:flex;flex-direction:column;gap:8px;margin:16px 0 6px}
-#acTitle,#mpTitle{margin:0;font:700 26px/1.05 var(--display);overflow-wrap:anywhere}
-#acVersion{margin-top:12px;font-size:12px}
-/* touch screens: dialogs become bottom sheets near your thumbs; swipe down or tap outside to close */
-@media (pointer:coarse), (max-width:720px){
-  body .modal{align-items:flex-end;padding:0}
-  body .modal .sheet{max-width:none;max-height:88vh;border-radius:22px 22px 0 0;border-bottom:0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));animation:sheetUp .22s ease-out;touch-action:pan-y}
-  body .modal .sheet::before{content:"";display:block;width:40px;height:5px;border-radius:3px;background:var(--edge);margin:0 auto 16px}
-  .shBtn{min-height:58px}
-}
-@media (pointer:coarse) and (min-width:721px){ body .modal .sheet{max-width:560px;margin:0 auto;border-left:1px solid var(--edge);border-right:1px solid var(--edge)} }
-@keyframes sheetUp{from{transform:translateY(48px);opacity:.3}to{transform:none;opacity:1}}
-/* pull to refresh */
-#pullHint{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-70px);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:9px 16px;font-size:14px;z-index:45;transition:transform .15s;pointer-events:none}
-#pullHint.ready{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
-/* touch: bigger targets, no text selection on long-press */
-@media (pointer:coarse){
-  .more{padding:9px 13px 12px;opacity:.9}
-  .card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-  #slider{height:34px}
-  #backBtn{padding:10px 16px 10px 11px}
-  #lib{padding-bottom:calc(48px + env(safe-area-inset-bottom))}
-}
-@media (prefers-reduced-motion:reduce){ body .modal .sheet{animation:none} }
-#notice{margin:16px 0 0;padding:10px 14px;border:1px solid var(--edge);border-radius:10px;color:var(--paper);background:var(--shelf);font-size:14px;max-width:720px}
-#libToast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:40}
-#libToast.show{opacity:1}
-/* iPad home screen app: keep clear of the status bar */
-#lib{padding-top:max(28px,env(safe-area-inset-top))}
-#top{padding-top:max(14px,env(safe-area-inset-top))}
-#bottom{padding-bottom:max(14px,env(safe-area-inset-bottom))}
-/* import dialog */
-.modal{position:fixed;inset:0;z-index:60;background:rgba(8,9,11,.82);display:none;align-items:center;justify-content:center;padding:16px}
-.modal.open{display:flex}
-.modalBox{background:var(--ink);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;max-width:460px;width:100%;max-height:100%;overflow:auto}
-.modalBox h2{margin:0 0 10px;font:700 30px/1 var(--display)}
-.modalBox label{display:block;font-weight:600;margin:14px 0 6px}
-.modalBox input{width:100%;font:16px var(--ui);color:var(--paper);background:var(--shelf);border:1px solid var(--edge);border-radius:8px;padding:10px 12px}
-.muted{color:var(--muted);font-size:14px;margin:6px 0}
-#impStatus{min-height:20px;margin:14px 0 0}
-.modalBtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
-/* series buttons */
-.sheet{max-width:440px;padding:20px}
-.sheetTop{display:flex;gap:16px;align-items:flex-end;margin-bottom:18px}
-#shCover{width:96px;flex:none;font-size:13px;padding:6px}
-.sheetHead{min-width:0}
-#shTitle{margin:0;font:700 28px/1 var(--display);overflow-wrap:anywhere}
-#shSub{margin:8px 0 0}
-#shBtns{display:flex;flex-direction:column;gap:8px}
-.shBtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border-radius:14px;padding:10px 14px 10px 10px;min-height:64px}
-.shBtn .th{width:40px;height:60px;flex:none;border-radius:4px;background:var(--edge) center/cover no-repeat}
-.shBtn .th.none{display:none}
-.shBtn b{display:block;font:600 19px/1.1 var(--display)}
-.shBtn small{display:block;margin-top:3px;color:var(--muted);font-size:13px}
-.shBtn.primary{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
-.shBtn.primary small{color:#4a4020}
-.card.current .cover{outline:3px solid var(--yellow);outline-offset:4px}
-#crumbs{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;margin:22px 0 26px;font:600 22px/1.2 var(--display);color:var(--muted);min-height:26px}
+#libActions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+#navRow{display:flex;align-items:center;gap:14px;margin:22px 0 26px;min-height:36px}
+#crumbs{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font:600 22px/1.2 var(--display);color:var(--muted);min-width:0}
+#backBtn{flex:none}
+#libHead{position:relative}
+#jumpPop{position:absolute;right:0;top:calc(100% + 10px);z-index:20;background:var(--ink);border:1px solid var(--edge);border-radius:14px;padding:18px 22px 14px;box-shadow:0 18px 50px rgba(0,0,0,.55)}
+#jumpPop h2{font:600 22px/1 var(--display);margin:0 0 14px}
+#jumpRow{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:22px;padding:46px 10px 4px}
+#changeLib{margin:56px 0 0;font-size:13px}
+#changeLib a{color:var(--muted)}
+#changeLib a:hover{color:var(--paper)}
 #crumbs a{color:var(--muted);cursor:pointer;text-decoration:none}
 #crumbs a:hover{color:var(--paper)}
 #crumbs a:last-child{color:var(--paper);cursor:default}
 #crumbs .sep{opacity:.5}
-#backBtn{align-self:center;display:inline-flex;align-items:center;gap:4px;padding:7px 14px 7px 9px;margin-right:8px;font:600 15px/1 var(--ui)}
-#backBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:30px 22px}
 .card{cursor:pointer;min-width:0;border-radius:6px;outline-offset:6px}
 .cover{position:relative;aspect-ratio:2/3;background:var(--shelf);border-radius:4px;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:12px;text-align:center;font:600 18px/1.1 var(--display);color:var(--muted)}
@@ -123,16 +69,81 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 .cover.name::after{content:"";position:absolute;inset:0;border-radius:4px;background:linear-gradient(to top,var(--tint) 12%,transparent 75%);pointer-events:none}
 .cover.name span{position:relative;z-index:1;text-shadow:0 1px 12px rgba(0,0,0,.35)}
 .card:hover .cover{filter:brightness(1.08)}
+.cond{position:absolute;inset:0;pointer-events:none;z-index:1;border-radius:4px}
+/* read = bagged and boarded: clear sleeve with a shine and a flap, the white board showing at the edges */
+.bag{border:2px solid rgba(235,240,255,.55);background:linear-gradient(112deg,transparent 24%,rgba(255,255,255,.26) 34%,rgba(255,255,255,.08) 43%,transparent 50%,transparent 62%,rgba(255,255,255,.14) 69%,transparent 76%),rgba(225,232,255,.07);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),inset -3px -3px 0 0 rgba(250,250,246,.55)}
+/* ---- the comic wall: a wooden rack, a tier of face-out stacks per row ---- */
+#grid.wallMode{display:block}
+.cabinet{position:relative;padding:20px 26px 26px;border-radius:6px 6px 3px 3px;
+  background:linear-gradient(90deg,rgba(0,0,0,.45),rgba(0,0,0,0) 9px,rgba(255,220,170,.10) 13px,rgba(0,0,0,0) 20px,rgba(0,0,0,0) calc(100% - 22px),rgba(255,220,170,.08) calc(100% - 14px),rgba(0,0,0,.5)),var(--woodV,#6b4425);background-size:auto,420px 900px;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 0 1px rgba(0,0,0,.6)}
+.cabinet::before{content:"";position:absolute;left:0;right:0;top:0;height:20px;border-radius:6px 6px 0 0;background:linear-gradient(rgba(255,230,190,.28),rgba(255,230,190,0) 4px,rgba(0,0,0,0) 70%,rgba(0,0,0,.5)),var(--woodH,#7a4f2c);background-size:auto,1200px 300px;box-shadow:0 3px 6px rgba(0,0,0,.6);z-index:4;pointer-events:none}
+.cabinet::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:6;background:radial-gradient(120% 70% at 50% -8%,rgba(255,214,150,.13),rgba(255,214,150,0) 60%),linear-gradient(rgba(0,0,0,0) 70%,rgba(0,0,0,.18))}
+.shelf{position:relative}
+.rail{position:relative;height:40px;display:flex;align-items:center;padding:0 14px;
+  background:linear-gradient(rgba(255,230,190,.22),rgba(255,230,190,0) 3px,rgba(0,0,0,0) 60%,rgba(0,0,0,.45)),var(--woodH,#7a4f2c);background-size:auto,1200px 300px;background-position:0 0,0 -120px;
+  box-shadow:0 4px 8px rgba(0,0,0,.55),inset 0 -1px 0 rgba(0,0,0,.5);z-index:3}
+.shelf + .shelf .rail{margin-top:0}
+/* the publisher on a label-maker strip */
+.shelfName{display:inline-block;margin:0;padding:4px 10px 3px;cursor:pointer;font:700 15px/1 ui-monospace,"Consolas","Courier New",monospace;letter-spacing:.14em;text-transform:uppercase;color:#f4f4f0;
+  background:linear-gradient(rgba(255,255,255,.14),rgba(255,255,255,0) 40%,rgba(0,0,0,.18)),#16181c;border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.7),inset 0 0 0 1px rgba(255,255,255,.05);
+  text-shadow:0 1px 0 rgba(0,0,0,.8),0 -1px 0 rgba(255,255,255,.25)}
+.shelfName:hover{color:var(--yellow)}
+.tier{position:relative;padding:34px 18px 10px;
+  background:linear-gradient(rgba(0,0,0,.86),rgba(0,0,0,.56) 30px,rgba(0,0,0,.50) 70%,rgba(0,0,0,.66)),var(--woodH,#3a2414);background-size:auto,1200px 300px;
+  box-shadow:inset 14px 0 18px -10px rgba(0,0,0,.75),inset -14px 0 18px -10px rgba(0,0,0,.75)}
+.tier:nth-of-type(odd){background-position:0 0,0 -150px}
+.rack{position:relative;display:grid;gap:0 22px}
+/* the front lip of the tier: hides the bottoms of the comics, holds the paper tags */
+.lip{position:absolute;left:0;right:0;bottom:6px;height:52px;z-index:2;pointer-events:none;
+  background:linear-gradient(rgba(255,232,196,.42),rgba(255,232,196,.10) 2px,rgba(255,232,196,0) 7px,rgba(0,0,0,0) 55%,rgba(0,0,0,.32) 92%,rgba(0,0,0,.6)),var(--woodH,#8a5a32);background-size:auto,1200px 300px;background-position:0 0,0 -60px;
+  box-shadow:0 10px 14px -4px rgba(0,0,0,.7),0 -2px 3px rgba(0,0,0,.35);border-top:1px solid rgba(0,0,0,.55)}
+.tier:nth-of-type(even) .lip{background-position:0 0,-300px -200px}
+.card.stack{display:flex;flex-direction:column;outline:none}
+.stackBox{position:relative;margin:0 2px;transform:perspective(900px) rotateX(7deg);transform-origin:50% 100%}
+.stackBox .layer{position:absolute;inset:0;border-radius:3px;overflow:hidden;background:#2a2d33;border:1px solid rgba(0,0,0,.6);
+  transform:translate(calc(var(--j,0) * 1px),calc(var(--i) * -5px));box-shadow:0 -1px 2px rgba(0,0,0,.6)}
+.stackBox .layer img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(calc(.86 - var(--i) * .07))}
+.stackBox .layer::after{content:"";position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.55))}
+.stackBox .layer.bagged{border-color:rgba(230,236,248,.75)}
+.stackBox .layer.bagged::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(rgba(235,240,255,.38),rgba(235,240,255,.12) 12px,rgba(235,240,255,.05))}
+.stackBox > .cover{transition:transform .26s cubic-bezier(.2,.8,.25,1),box-shadow .26s ease;box-shadow:0 -2px 5px rgba(0,0,0,.55),0 4px 10px rgba(0,0,0,.5)}
+.card.stack:hover .stackBox > .cover,.card.stack:focus-visible .stackBox > .cover{transform:translateY(-16px);box-shadow:0 -3px 6px rgba(0,0,0,.5),0 12px 18px rgba(0,0,0,.55)}
+.card.stack:hover .cover{filter:none}
+.card.stack:focus-visible .shelfTag{outline:2px solid var(--yellow);outline-offset:2px}
+/* light on the covers: the lip above throws a shadow, a soft sheen across the paper */
+.lit::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;border-radius:inherit;background:linear-gradient(rgba(0,0,0,.42),rgba(0,0,0,.12) 12%,rgba(0,0,0,0) 26%,rgba(0,0,0,0) 70%,rgba(0,0,0,.25)),linear-gradient(105deg,rgba(255,255,255,0) 40%,rgba(255,250,235,.10) 52%,rgba(255,255,255,0) 64%)}
+/* a little paper price-gun tag on the lip */
+.shelfTag{position:relative;z-index:3;margin:-12px auto 0;width:calc(100% - 14px);height:40px;padding:5px 8px 0;border-radius:2px;color:#23201b;text-align:center;
+  background:linear-gradient(rgba(255,255,255,.5),rgba(255,255,255,0) 30%,rgba(0,0,0,.06)),#efe8d6;box-shadow:0 1px 2px rgba(0,0,0,.6),0 3px 6px rgba(0,0,0,.25);transform:rotate(var(--tilt,0deg))}
+.shelfTag .cap{margin:0;font:700 14px/1.1 var(--display);color:#1d1b17}
+.shelfTag .sub{margin:2px 0 0;font:600 11px/1.1 var(--ui);color:#6c6455;letter-spacing:.01em}
+/* ---- flipping through a stack, zoomed in on the shelf ---- */
+#flip{position:fixed;inset:0;z-index:45;display:flex;flex-direction:column;--fw:min(36vh,310px);
+  background:radial-gradient(55% 55% at 50% 45%,rgba(255,214,150,.14),rgba(0,0,0,0) 72%),linear-gradient(rgba(0,0,0,.82),rgba(0,0,0,.5) 30%,rgba(0,0,0,.5) 70%,rgba(0,0,0,.7)),var(--woodH,#3a2414),#1a120b;background-size:auto,auto,1200px 300px}
+#flipTop{position:relative;z-index:400;display:flex;align-items:center;gap:14px;padding:max(14px,env(safe-area-inset-top)) 18px 10px;background:linear-gradient(rgba(10,8,6,.8),rgba(10,8,6,0))}
+#flipTitle{font:600 26px/1.1 var(--display);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.8)}
+#flipTop .spacer{flex:1}
+#flipStage{position:relative;flex:1;min-height:0;perspective:1300px;perspective-origin:50% 8%;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.fcard{position:absolute;left:50%;bottom:calc(var(--lipH) - 30px);width:var(--fw);margin-left:calc(var(--fw) / -2);transform-origin:50% 100%;transition:transform .42s cubic-bezier(.22,.75,.2,1);cursor:pointer;--dim:1}
+.fcard .cover{font-size:22px;filter:brightness(var(--dim));transition:filter .4s ease,box-shadow .4s ease;box-shadow:0 -3px 8px rgba(0,0,0,.6),0 10px 24px rgba(0,0,0,.5)}
+.fcard.cur .cover{box-shadow:0 -4px 10px rgba(0,0,0,.5),0 22px 40px rgba(0,0,0,.65)}
+.fcard.popped .cover{box-shadow:0 30px 70px rgba(0,0,0,.75),0 0 0 1px rgba(0,0,0,.4)}
+.fcard.gone{visibility:hidden}
+.fcard img{pointer-events:none;-webkit-user-drag:none}
+#flipStage{--lipH:clamp(64px,11vh,104px)}
+.flipLip{position:absolute;left:-2%;right:-2%;bottom:0;height:var(--lipH);z-index:150;pointer-events:none;
+  background:linear-gradient(rgba(255,232,196,.45),rgba(255,232,196,.10) 3px,rgba(255,232,196,0) 12px,rgba(0,0,0,0) 50%,rgba(0,0,0,.45)),var(--woodH,#8a5a32);background-size:auto,1200px 300px;background-position:0 0,-200px -80px;
+  box-shadow:0 -4px 8px rgba(0,0,0,.45);border-top:1px solid rgba(0,0,0,.6)}
+#flipInfo{position:relative;z-index:400;text-align:center;padding:10px 16px max(18px,env(safe-area-inset-bottom));background:#120d09;min-height:118px;box-shadow:0 -1px 0 rgba(255,232,196,.08)}
+#flipCap{font:600 28px/1.1 var(--display)}
+#flipSub{color:var(--muted);font-size:14px;margin:4px 0 12px}
+#flipBtns{display:flex;gap:8px;justify-content:center}
+#flipHint{color:var(--muted);font-size:13px;padding:8px 0 0}
 .cap{margin-top:10px;font:600 19px/1.1 var(--display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sub{font-size:13px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.prog{height:3px;background:var(--edge);border-radius:2px;margin-top:8px;overflow:hidden}
-.prog i{display:block;height:100%;background:var(--yellow)}
 .card.dis{cursor:default;opacity:.45}
 .card{position:relative}
-/* read state: yellow dot = unread, dimmed cover = finished */
-.dot{position:absolute;top:9px;left:9px;width:11px;height:11px;border-radius:50%;background:var(--yellow);box-shadow:0 0 0 2px rgba(16,18,22,.85);z-index:1;pointer-events:none}
-.card.done .cover{filter:brightness(.5) saturate(.7)}
-.card.done:hover .cover{filter:brightness(.7) saturate(.85)}
 /* options menu */
 .more{position:absolute;top:6px;right:6px;z-index:2;padding:4px 9px 7px;font:700 16px/1 var(--ui);letter-spacing:1px;background:rgba(16,18,22,.88);opacity:0;transition:opacity .15s}
 .card:hover .more,.more:focus-visible,.more.open{opacity:1}
@@ -140,26 +151,28 @@ h1{font:700 44px/0.95 var(--display);letter-spacing:-.01em;margin:0}
 .menu{position:absolute;top:40px;right:6px;z-index:5;min-width:190px;background:var(--ink);border:1px solid var(--edge);border-radius:10px;padding:6px;box-shadow:0 10px 30px rgba(0,0,0,.45)}
 .menu button{display:block;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:9px 10px;font-size:14px}
 .menu button:hover,.menu button:focus-visible{background:var(--shelf)}
-/* continue reading row */
-#contWrap{margin:-8px 0 30px}
-#contBtn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px 9px 12px;font:600 15px/1 var(--ui)}
-#contBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#contBtn .chev{width:16px;height:16px;transition:transform .2s}
-#contBtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
-#contRow{margin-top:14px}
-#contRow{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:22px;overflow-x:auto;padding:10px 0 12px}
+/* playlists row */
+#listsWrap h2{font:600 24px/1 var(--display);margin:0 0 16px}
+#listsRow{display:grid;grid-auto-flow:column;grid-auto-columns:150px;gap:22px;overflow-x:auto;padding:46px 10px 12px}
+#listsWrap{margin:0 0 38px}
+#search{font:15px var(--ui);color:var(--paper);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:8px 16px;width:220px;outline-offset:2px}
+#search::placeholder{color:var(--muted)}
+#sortSel{font:500 14px var(--ui);color:var(--paper);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:8px 12px;cursor:pointer}
+.sub.cred{color:var(--paper);opacity:.75}
+#credit{color:var(--muted);font-size:14px;margin-top:-6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#credit:empty{display:none}
+#search:focus{border-color:var(--muted)}
+/* cover wheel: covers on a turning wheel, the middle one faces you */
+#grid.wheel{display:block;position:relative;height:calc(min(34vh,270px) * 1.5 + 150px);perspective:1400px;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#grid.wheel .card{position:absolute;left:50%;top:50px;width:min(34vh,270px);margin-left:calc(min(34vh,270px) / -2);transition:transform .35s ease,opacity .35s ease}
+#grid.wheel .card:not(.center){cursor:pointer}
+#grid.wheel .card:not(.center) .cap,#grid.wheel .card:not(.center) .sub,#grid.wheel .card:not(.center) .more{visibility:hidden}
+#grid.wheel .card .cap{font-size:24px;text-align:center}
+#grid.wheel .card .sub{text-align:center}
+#grid.wheel img{pointer-events:none;-webkit-user-drag:none}
 .upnext{color:var(--yellow)}
+.cloudOnly{display:none}
 #empty{max-width:520px;margin:48px 0;color:var(--muted);font-size:16px}
-/* signed out of OneDrive: just the name and a big sign-in button, centered */
-#signInBtn{display:none}
-body.signedout #lib{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10vh}
-body.signedout #libHead{flex-direction:column;align-items:center;gap:34px}
-body.signedout h1{font-size:clamp(52px,9vw,76px);text-align:center}
-body.signedout #signInBtn{display:inline-flex;align-items:center;gap:12px;font:600 20px/1 var(--ui);padding:18px 34px;background:var(--yellow);border-color:var(--yellow);color:#1a1a1a;box-shadow:0 6px 24px rgba(0,0,0,.35)}
-body.signedout #signInBtn:hover{filter:brightness(1.06)}
-body.signedout #signInBtn svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-body.signedout #appActions,body.signedout #libActions,body.signedout #crumbs,body.signedout #contWrap,body.signedout #grid,body.signedout #empty{display:none!important}
-body.signedout #notice{text-align:center;margin-top:26px}
 #empty b{color:var(--paper);font-weight:600}
 
 /* ---------- Reader ---------- */
@@ -178,10 +191,11 @@ body.signedout #notice{text-align:center;margin-top:26px}
 #top{top:0;background:linear-gradient(rgba(10,11,14,.92),rgba(10,11,14,.6) 70%,transparent)}
 #bottom{bottom:0;background:linear-gradient(transparent,rgba(10,11,14,.6) 30%,rgba(10,11,14,.92));padding-top:26px}
 #reader.hideui .bar{opacity:0;pointer-events:none}
-/* icon buttons: icon + label on wide screens, icon only on phones */
+/* icon buttons: icon + label on wide screens, icon only on narrow windows */
 .ib{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;padding:9px 13px}
 .ib svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #top .spacer{flex:1}
+#listBtn .lbl{max-width:240px;overflow:hidden;text-overflow:ellipsis}
 @media (max-width:720px){ .ib .lbl{display:none} .ib{width:42px;padding:0} #top{gap:6px} }
 #bottom{flex-direction:column;align-items:stretch;gap:10px}
 .binfo{display:flex;align-items:baseline;gap:14px;min-width:0}
@@ -192,21 +206,15 @@ body.signedout #notice{text-align:center;margin-top:26px}
 #reader.fitw #stage{display:block;overflow-y:auto;overflow-x:hidden;touch-action:pan-y;overscroll-behavior:contain}
 #reader.fitw .pair{display:flex;flex-direction:column;justify-content:center;min-height:100%}
 #reader.fitw .pair img{width:100vw;max-width:none;max-height:none;height:auto}
-/* iPad: start the page just below the time/battery bar so it sits on the dark strip, not over the art */
-#reader.padtop #stage{top:env(safe-area-inset-top)}
-#reader.padtop .pair img{max-height:calc(100vh - env(safe-area-inset-top));max-height:calc(100dvh - env(safe-area-inset-top))}
-#reader.padtop.fitw .pair img{max-height:none}
 #reader.fitw.zoomed #stage{overflow-x:auto;touch-action:pan-x pan-y}
 #reader.fitw.zoomed .pair{align-items:flex-start;width:max-content}
-/* feel like an app, not a web page */
-html{-webkit-tap-highlight-color:transparent}
 html,body{overscroll-behavior:none}
-#reader img,.cover img{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+#reader img,.cover img{-webkit-user-select:none;user-select:none}
 #toast{position:absolute;left:50%;bottom:90px;transform:translateX(-50%);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:3}
 #toast.show{opacity:1}
 
 /* Controls panel */
-#helpPanel{position:fixed;inset:0;background:rgba(8,9,11,.82);display:none;align-items:center;justify-content:center;padding:16px;z-index:70}
+#helpPanel{position:absolute;inset:0;background:rgba(8,9,11,.82);display:none;align-items:center;justify-content:center;padding:16px;z-index:4}
 #helpPanel.open{display:flex}
 #helpBox{background:var(--ink);border:1px solid var(--edge);border-radius:14px;padding:22px 26px;max-width:540px;width:100%;max-height:100%;overflow:auto}
 #helpBox h2{margin:0 0 4px;font:700 30px/1 var(--display)}
@@ -222,7 +230,91 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   #grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:24px 16px}
   .bar{flex-wrap:wrap}
 }
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ---------- Phones and iPads ---------- */
+/* keep clear of the status bar and the home bar in the Home Screen app */
+#lib{padding-top:max(28px,env(safe-area-inset-top));padding-left:max(24px,env(safe-area-inset-left));padding-right:max(24px,env(safe-area-inset-right))}
+#top{padding-top:max(14px,env(safe-area-inset-top))}
+#bottom{padding-bottom:max(14px,env(safe-area-inset-bottom))}
+/* iPad: the page starts just below the time/battery bar, on the dark strip, not under it */
+#reader.padtop #stage{top:env(safe-area-inset-top)}
+#reader.padtop .pair img{max-height:calc(100vh - env(safe-area-inset-top));max-height:calc(100dvh - env(safe-area-inset-top))}
+#reader.padtop.fitw .pair img{max-height:none}
+html{-webkit-tap-highlight-color:transparent}
+#reader img,.cover img{-webkit-touch-callout:none}
+/* the Controls list opens from the shelf too, so it sits above everything */
+#helpPanel{position:fixed;z-index:70}
+/* hover effects only where there's a mouse (on touch they'd stick after a tap) */
+@media (hover:none){
+  .card:hover .cover{filter:none}
+  .card.stack:hover .stackBox > .cover{transform:none;box-shadow:0 -2px 5px rgba(0,0,0,.55),0 4px 10px rgba(0,0,0,.5)}
+}
+/* round icon button (account) */
+.round{width:44px;height:44px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.round svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* sheets: dialogs that rise from the bottom on touch screens; swipe down or tap outside to close */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(8,9,11,.82);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modalBox{background:var(--ink);border:1px solid var(--edge);border-radius:14px;padding:22px 24px;max-width:440px;width:100%;max-height:100%;overflow:auto}
+.muted{color:var(--muted);font-size:14px;margin:6px 0}
+.sheetBtns{display:flex;flex-direction:column;gap:8px;margin:16px 0 6px}
+#acTitle,#mpTitle{margin:0;font:700 26px/1.05 var(--display);overflow-wrap:anywhere}
+#acVersion{margin-top:12px;font-size:12px}
+.shBtn{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border-radius:14px;padding:10px 16px;min-height:56px;white-space:normal}
+.shBtn b{display:block;font:600 19px/1.1 var(--display)}
+.shBtn small{display:block;margin-top:3px;color:var(--muted);font-size:13px}
+@media (pointer:coarse), (max-width:720px){
+  body .modal{align-items:flex-end;padding:0}
+  body .modal .modalBox{max-width:none;max-height:88vh;border-radius:22px 22px 0 0;border-bottom:0;padding:10px 20px calc(22px + env(safe-area-inset-bottom));animation:sheetUp .22s ease-out;touch-action:pan-y}
+  body .modal .modalBox::before{content:"";display:block;width:40px;height:5px;border-radius:3px;background:var(--edge);margin:0 auto 16px}
+  .shBtn{min-height:58px}
+}
+@media (pointer:coarse) and (min-width:721px){ body .modal .modalBox{max-width:560px;margin:0 auto;border-left:1px solid var(--edge);border-right:1px solid var(--edge)} }
+@keyframes sheetUp{from{transform:translateY(48px);opacity:.3}to{transform:none;opacity:1}}
+/* pull down at the top of the shelf to refresh */
+#pullHint{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translate(-50%,-70px);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:9px 16px;font-size:14px;z-index:45;transition:transform .15s;pointer-events:none}
+#pullHint.ready{background:var(--yellow);border-color:var(--yellow);color:#1a1a1a}
+#notice{margin:16px 0 0;padding:10px 14px;border:1px solid var(--edge);border-radius:10px;color:var(--paper);background:var(--shelf);font-size:14px;max-width:720px}
+#libToast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--shelf);border:1px solid var(--edge);border-radius:999px;padding:10px 18px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:80;max-width:calc(100vw - 32px);text-align:center}
+#libToast.show{opacity:1}
+/* touch: bigger targets, no text selection or callouts on long-press */
+@media (pointer:coarse){
+  .more{padding:9px 13px 12px;opacity:.9}
+  .card{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  #slider{height:34px}
+  #backBtn{padding:10px 16px}
+  #lib{padding-bottom:calc(48px + env(safe-area-inset-bottom))}
+}
+/* phones: smaller stacks so three fit across the rack */
+@media (max-width:600px){
+  #lib{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right))}
+  #libHead{gap:12px}
+  #search{width:100%;flex:1 1 160px}
+  .cabinet{padding:16px 12px 18px}
+  .tier{padding:26px 10px 8px}
+  .rack{gap:0 14px}
+  .lip{height:44px}
+  .shelfTag{height:36px;padding:4px 4px 0;width:calc(100% - 4px)}
+  .shelfTag .cap{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shelfTag .sub{font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shelfName{font-size:12px}
+  .stackBox .layer{transform:translate(calc(var(--j,0) * 1px),calc(var(--i) * -3.5px))}
+  #jumpPop{left:0;right:0;padding:14px 12px 10px}
+  #jumpRow{grid-auto-columns:104px;gap:14px;overflow-x:auto;padding:40px 4px 4px}
+  #listsRow{grid-auto-columns:110px;gap:16px}
+  #flip{--fw:min(30vh,58vw)}
+  #flipCap{font-size:24px}
+}
+/* signed out of OneDrive: just the name and a big sign-in button, centered */
+#signInBtn{display:none}
+body.signedout #lib{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:10vh}
+body.signedout #libHead{flex-direction:column;align-items:center;gap:34px}
+body.signedout h1{font-size:clamp(52px,9vw,76px);text-align:center}
+body.signedout #signInBtn{display:inline-flex;align-items:center;gap:12px;font:600 20px/1 var(--ui);padding:18px 34px;background:var(--yellow);border-color:var(--yellow);color:#1a1a1a;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+body.signedout #signInBtn svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+body.signedout #libActions,body.signedout #navRow,body.signedout #listsWrap,body.signedout #grid,body.signedout #empty,body.signedout #changeLib,body.signedout #jumpPop{display:none!important}
+body.signedout #notice{text-align:center;margin-top:26px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important} body .modal .modalBox{animation:none}}
 </style>
 </head>
 <body>
@@ -231,27 +323,33 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
   <div id="libHead">
     <h1>Panel Reader</h1>
     <div id="libActions">
+      <button id="jumpBtn" class="on" title="The last books you were reading (J)" hidden>Jump back in</button>
+      <input id="search" type="search" placeholder="Search  ( / )" autocomplete="off" spellcheck="false" aria-label="Search comics" hidden>
+      <select id="sortSel" title="Order issues by" aria-label="Sort issues" hidden>
+        <option value="name">Sort: Issue</option><option value="writer">Sort: Writer</option>
+        <option value="artist">Sort: Artist</option><option value="date">Sort: Cover date</option>
+      </select>
+      <button id="viewBtn" title="Switch between the grid and the cover wheel" hidden></button>
       <button id="reopenBtn" hidden></button>
       <button id="openBtn">Choose library folder</button>
-    </div>
-    <div id="appActions" hidden>
-      <button id="acctBtn" class="round" aria-label="Account and help" title="Account and help"><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 19.6c1.3-3.3 4-4.9 7.2-4.9s5.9 1.6 7.2 4.9"/></svg></button>
+      <button id="acctBtn" class="round" aria-label="Account and help" title="Account and help" hidden><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 19.6c1.3-3.3 4-4.9 7.2-4.9s5.9 1.6 7.2 4.9"/></svg></button>
     </div>
     <button id="signInBtn"><svg viewBox="0 0 24 24"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.6 9.1 4.75 4.75 0 0 0 7 18.5z"/></svg>Sign in to OneDrive</button>
+    <div id="jumpPop" hidden><h2>Jump back in</h2><div id="jumpRow"></div></div>
   </div>
   <p id="notice" hidden></p>
-  <!-- no "accept" filter: iPads don't know the .cbz type and would grey those files out; the app filters by name instead -->
-  <input id="importInput" type="file" multiple hidden>
-  <nav id="crumbs"></nav>
-  <section id="contWrap" hidden><button id="contBtn" aria-expanded="false" aria-controls="contRow"><svg viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M13 4h5.5A1.5 1.5 0 0 1 20 5.5v13a1.5 1.5 0 0 1-1.5 1.5H13z"/></svg>Continue reading<svg class="chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button><div id="contRow" hidden></div></section>
+  <div id="navRow"><button id="backBtn" title="Back (Backspace, or your mouse's back button)" hidden>&lsaquo; Back</button><nav id="crumbs"></nav></div>
+  <section id="listsWrap" hidden><h2>Playlists</h2><div id="listsRow"></div></section>
   <div id="grid"></div>
-  <div id="empty">Click <b>Choose library folder</b> and pick your <b>Comics</b> folder (Publisher folders inside, Series folders inside those).</div>
+  <div id="empty">Click <b>Choose library folder</b> and pick the folder your comics are in.</div>
+  <p id="changeLib" hidden><a href="#" id="changeLibLink">Change library folder</a></p>
   <input id="dirInput" type="file" webkitdirectory multiple hidden>
 </main>
 <div id="libToast"></div>
+<div id="pullHint" aria-hidden="true">Pull to refresh</div>
 
 <div id="acctPanel" class="modal" role="dialog" aria-modal="true" aria-labelledby="acTitle">
-  <div class="modalBox sheet">
+  <div class="modalBox">
     <h2 id="acTitle">Panel Reader</h2>
     <p id="acWho" class="muted"></p>
     <p id="storageUse" class="muted"></p>
@@ -263,36 +361,14 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
     <p id="acVersion" class="muted"></p>
   </div>
 </div>
-
 <div id="menuPanel" class="modal" role="dialog" aria-modal="true" aria-labelledby="mpTitle">
-  <div class="modalBox sheet"><h2 id="mpTitle"></h2><div id="mpBtns" class="sheetBtns"></div></div>
+  <div class="modalBox"><h2 id="mpTitle"></h2><div id="mpBtns" class="sheetBtns"></div></div>
 </div>
 
-<div id="pullHint" aria-hidden="true">Pull to refresh</div>
-
-<div id="seriesPanel" class="modal" role="dialog" aria-modal="true" aria-labelledby="shTitle">
-  <div class="modalBox sheet">
-    <div class="sheetTop">
-      <div id="shCover" class="cover"></div>
-      <div class="sheetHead"><h2 id="shTitle"></h2><p id="shSub" class="muted"></p></div>
-    </div>
-    <div id="shBtns"></div>
-  </div>
-</div>
-
-<div id="importPanel" class="modal">
-  <div class="modalBox">
-    <h2 id="impTitle">Add comics</h2>
-    <p id="impKnown" class="muted"></p>
-    <div id="impPubWrap">
-      <label for="impPub">Publisher for the new series</label>
-      <input id="impPub" list="impPubList" autocomplete="off" placeholder="e.g. Marvel">
-      <datalist id="impPubList"></datalist>
-      <p id="impSeries" class="muted"></p>
-    </div>
-    <p id="impStatus"></p>
-    <div class="modalBtns"><button id="impCancel">Cancel</button><button id="impGo" class="on">Add to library</button></div>
-  </div>
+<div id="flip" hidden>
+  <div id="flipTop"><button id="flipClose" class="ib" title="Back to the wall (Esc)">&lsaquo; Back</button><div id="flipTitle"></div><div class="spacer"></div><button id="flipAll" title="Every issue in this series as a grid">All issues</button></div>
+  <div id="flipStage"></div>
+  <div id="flipInfo"><div id="flipCap"></div><div id="flipSub"></div><div id="flipBtns" hidden><button id="flipRead" class="on">Read</button><button id="flipMark"></button><button id="flipBack">Put it back</button></div><div id="flipHint">Scroll, drag, or use the arrow keys to flip through &middot; click the front copy to pull it out</div></div>
 </div>
 
 <div id="reader" class="hideui">
@@ -304,12 +380,14 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
     <button id="layoutBtn" class="ib" title="Layout (D)"></button>
     <button id="fitBtn" class="ib" title="Fit width: fill the screen's width and scroll (W)" aria-label="Fit width"><svg viewBox="0 0 24 24"><path d="M3 4v16M21 4v16M6.5 12h11M9 9l-2.5 3L9 15M15 9l2.5 3-2.5 3"/></svg><span class="lbl">Fit width</span></button>
     <button id="shiftBtn" class="ib" title="Fix split two-page art in this issue (S)" aria-label="Shift pairing"><svg viewBox="0 0 24 24"><path d="M5 7h14M16 4l3 3-3 3M19 17H5M8 14l-3 3 3 3"/></svg><span class="lbl">Shift pairing</span></button>
+    <button id="listBtn" class="ib" aria-label="Which list Next issue follows" hidden><svg viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01"/></svg><span class="lbl"></span></button>
     <button id="nextIssueBtn" class="ib" title="Next issue (N)" aria-label="Next issue"><svg viewBox="0 0 24 24"><path d="M6 5l9 7-9 7z"/><path d="M18 5v14"/></svg><span class="lbl">Next issue</span></button>
     <button id="fsBtn" class="ib" title="Fullscreen (F)" aria-label="Fullscreen"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><span class="lbl">Fullscreen</span></button>
     <button id="helpBtn" class="ib" title="Controls (H)" aria-label="Controls"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.4M12 17h.01"/></svg><span class="lbl">Controls</span></button>
   </div>
   <div id="bottom" class="bar">
     <div class="binfo"><div id="title"></div><div id="plabel"></div></div>
+    <div id="credit"></div>
     <input id="slider" type="range" min="1" max="1" value="1" aria-label="Page">
   </div>
   <div id="toast"></div>
@@ -320,68 +398,75 @@ kbd{background:var(--shelf);border:1px solid var(--edge);border-radius:5px;paddi
       <table>
         <tr><td><kbd>&rarr;</kbd> <kbd>Space</kbd> <kbd>Page Down</kbd></td><td>Next page</td></tr>
         <tr><td><kbd>&larr;</kbd> <kbd>Page Up</kbd></td><td>Previous page</td></tr>
-        <tr><td>Tap the right quarter of the page</td><td>Next page</td></tr>
-        <tr><td>Tap the left quarter of the page</td><td>Previous page</td></tr>
+        <tr><td>Click the right quarter of the page</td><td>Next page</td></tr>
+        <tr><td>Click the left quarter of the page</td><td>Previous page</td></tr>
         <tr><td>Mouse wheel</td><td>Down for next, up for previous</td></tr>
-        <tr><td>Swipe (touch)</td><td>Left for next, right for previous</td></tr>
+        <tr><td>Swipe (touchscreen)</td><td>Left for next, right for previous</td></tr>
         <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>First / last page</td></tr>
         <tr><td>Page slider</td><td>Jump to any page</td></tr>
       </table>
       <h3>Zoom</h3>
       <table>
-        <tr><td>Pinch (touch)</td><td>Zoom in and out</td></tr>
-        <tr><td>Double-tap (touch)</td><td>Zoom in on that spot, double-tap again to zoom out</td></tr>
         <tr><td><kbd>Ctrl</kbd> + scroll wheel, or trackpad pinch</td><td>Zoom where the mouse is</td></tr>
         <tr><td><kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></td><td>Zoom in / zoom out / back to full page</td></tr>
+        <tr><td>Pinch or double-tap (touchscreen)</td><td>Zoom in and out</td></tr>
         <tr><td>Drag, or scroll, while zoomed</td><td>Move around the page</td></tr>
-        <tr><td>Swipe past the page's edge while zoomed</td><td>Turns the page. Taps on the sides don't, so you can't flip away from a panel by accident</td></tr>
+        <tr><td>Clicks on the sides while zoomed</td><td>Don't turn the page, so you can't flip away from a panel by accident</td></tr>
         <tr><td>Turning the page</td><td>Goes back to full page</td></tr>
       </table>
       <h3>Issues</h3>
       <table>
-        <tr><td><kbd>N</kbd> or Next issue</td><td>Open the next issue in this folder</td></tr>
+        <tr><td><kbd>N</kbd> or Next issue</td><td>Open the next issue in the list you're following</td></tr>
+        <tr><td>Previous page on the first page</td><td>Opens the previous issue at its last page</td></tr>
+        <tr><td><kbd>L</kbd> or Next from</td><td>Shows when a book is in a playlist: choose whether Next issue follows its series or one of its playlists</td></tr>
         <tr><td>Next page on the last page</td><td>Also opens the next issue</td></tr>
         <tr><td><kbd>Esc</kbd> or Library</td><td>Back to your shelf</td></tr>
       </table>
       <h3>View</h3>
       <table>
-        <tr><td><kbd>D</kbd> or layout button</td><td>Auto, one page, or two pages. Auto shows two on wide screens, one on tall ones</td></tr>
-        <tr><td><kbd>W</kbd> or Fit width</td><td>One page across the full width; scroll up and down. Side taps and left/right swipes still turn pages; <kbd>Space</kbd> scrolls, then turns at the bottom. Pinch or double-tap still zooms in further</td></tr>
+        <tr><td><kbd>D</kbd> or layout button</td><td>Auto, one page, or two pages. Auto shows two on wide windows, one on tall ones</td></tr>
+        <tr><td><kbd>W</kbd> or Fit width</td><td>One page across the full width; scroll up and down. Side clicks still turn pages; <kbd>Space</kbd> scrolls, then turns at the bottom</td></tr>
         <tr><td><kbd>S</kbd> or Shift pairing</td><td>Fix split two-page art in this issue only</td></tr>
-        <tr><td>Full screen</td><td>On iPad it's automatic: opening an issue hides the time and battery bar, going back to the shelf brings it back. On PC use <kbd>F</kbd> or the Fullscreen button</td></tr>
+        <tr><td><kbd>F</kbd> or Fullscreen</td><td>Fill the whole screen</td></tr>
         <tr><td>Mouse to top or bottom edge</td><td>Show the controls</td></tr>
-        <tr><td>Tap the middle, or near the top or bottom edge</td><td>Show or hide the controls</td></tr>
+        <tr><td>Click the middle, or near the top or bottom edge</td><td>Show or hide the controls</td></tr>
         <tr><td><kbd>H</kbd></td><td>Show or hide this list</td></tr>
       </table>
       <h3>Shelf</h3>
       <table>
-        <tr><td>Yellow dot</td><td>Unread issue</td></tr>
-        <tr><td>Yellow line under a cover</td><td>How far you are into an issue, or how much of a series you've read</td></tr>
-        <tr><td>Dimmed cover</td><td>Finished</td></tr>
-        <tr><td>••• on an issue</td><td>Mark read or unread, use as series cover</td></tr>
-        <tr><td>Tap a series</td><td>Continue reading (the issue and page you're on), Next unread, or Open series (scrolls to your current issue)</td></tr>
-        <tr><td>••• on a series</td><td>Mark the whole series read or unread</td></tr>
+        <tr><td>The wall</td><td>The main rack: a section per publisher, every series a stack. The cover on top is the next one to read; read issues are bagged and boarded at the back. Hover a stack and the top copy pokes up. Click a publisher label for its grid</td></tr>
+        <tr><td>Click a stack</td><td>Zooms in on it. Thumb through with the mouse wheel, a drag, or the arrow keys. Click the front copy (or Enter) to pull it out, then Read. Esc puts it back, Esc again goes back to the wall. All issues shows the series as a grid</td></tr>
+        <tr><td>Bagged and boarded</td><td>Read issues, everywhere. Unread ones show the bare cover</td></tr>
+        <tr><td><kbd>J</kbd> or Jump back in</td><td>The last 3 books you were reading (or what's up next)</td></tr>
+        <tr><td><kbd>/</kbd> or the search box</td><td>Find series and issues by title. <kbd>Esc</kbd> clears it</td></tr>
+        <tr><td>Sort</td><td>Order the issues you're looking at by issue, writer, artist or cover date (writer, artist and date need tagged comics)</td></tr>
+        <tr><td>••• on an issue</td><td>Mark read or unread, use as series cover, add to a playlist</td></tr>
+        <tr><td>••• on a series</td><td>Mark the whole series read or unread, add it to a playlist</td></tr>
+        <tr><td>Playlists</td><td>Top of the main shelf. Your own reading order across any series; Next issue follows the playlist. ••• inside one moves or removes issues</td></tr>
+        <tr><td>Wheel / Grid button</td><td>Cover wheel: spin it with the mouse wheel, <kbd>&larr;</kbd> <kbd>&rarr;</kbd> or a drag; click the middle cover (or <kbd>Enter</kbd>) to open it</td></tr>
         <tr><td>Your place</td><td>One spot per series. Opening a different issue in that series moves the spot there; half-read issues you leave go back to unread, finished ones stay finished</td></tr>
-        <tr><td>Continue reading</td><td>Button at the top of the main shelf: tap it to pull up your last 3 books, each at your spot or its next unread issue. Tap again to tuck them away</td></tr>
-        <tr><td><kbd>Backspace</kbd></td><td>Up one folder</td></tr>
+        <tr><td>Back, <kbd>Backspace</kbd>, or your mouse's back button</td><td>Back one step: up a folder, out of a search, or out of the reader</td></tr>
       </table>
-      <h3>OneDrive and offline reading</h3>
-      <table>
+      <h3 class="cloudOnly">OneDrive and offline reading</h3>
+      <table class="cloudOnly">
         <tr><td>Sign in to OneDrive</td><td>Shows the Publisher and Series folders in OneDrive\Apps\Panel Reader\Comics, the only folder Panel Reader can see. Issues stream as you read</td></tr>
         <tr><td>••• then Keep on this device</td><td>Saves an issue (or a whole series) for reading offline</td></tr>
         <tr><td>••• then Remove from this device</td><td>Frees up space. The OneDrive copy is untouched</td></tr>
-        <tr><td>Progress</td><td>Saved on the device and synced through OneDrive, so every device you sign in on picks up where you left off</td></tr>
+        <tr><td>Progress and playlists</td><td>Saved on the device and synced through OneDrive, so every device you sign in on picks up where you left off</td></tr>
       </table>
-      <p id="aboutLine" class="muted"></p>
+      <p id="aboutLine" class="sub"></p>
       <button id="helpClose">Close</button>
     </div>
   </div>
 </div>
 
 <script>
-// Plain old-style script on purpose: if anything below fails (even on an older iPad), say what on screen.
+// Plain old-style script on purpose: if anything below fails, say what on screen.
 (function(){
-  function show(m){ var d = document.getElementById("empty"); if (!d) return;
+  function show(m){
+    var r = document.getElementById("reader"), s = document.getElementById("status");
+    if (r && s && r.classList.contains("open")) { s.textContent = "Something went wrong: " + m; return; } // reading: say it over the page
+    var d = document.getElementById("empty"); if (!d) return;
     d.hidden = false; d.style.color = "#ffb4a8"; d.textContent = "Something went wrong: " + m; }
   window.addEventListener("error", function(e){ show((e.message || "unknown error") + (e.lineno ? " (line " + e.lineno + ")" : "")); });
   window.addEventListener("unhandledrejection", function(e){ var r = e.reason; show(String(r && r.message || r)); });
@@ -394,87 +479,137 @@ const collator = new Intl.Collator(undefined, {numeric:true, sensitivity:"base"}
 const IMG_RE = /\.(jpe?g|png|webp|gif|avif|bmp)$/i;
 const MIME = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",gif:"image/gif",avif:"image/avif",bmp:"image/bmp"};
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+const APP_VERSION = 22;
+
+/* Two ways in, same reader:
+   - The app (the GitHub address, on iPhone, iPad or PC): the library is the Comics folder in Panel Reader's own
+     OneDrive folder. Progress and playlists sync through OneDrive, so every device picks up where you left off.
+   - This file opened straight from the computer: you choose the Comics folder; progress is kept in a file in it. */
+const APP = location.protocol === "https:" || !!window.__PR_TEST;
+let CLOUD = false; // signed in and showing the OneDrive shelf
 
 /* ---------- storage (never fatal) ---------- */
-// Reading progress, pairing fixes and series covers are shared through the PC server when there is one.
-// Per-device settings (layout, last folder) always stay on this device.
-const SYNC = /^(pos|shift|seriesCover):/;
-let SERVER = false, serverState = {};
-const pendingSaves = new Set();
-function postState(key, value){
-  const p = fetch("api/state", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({key, value}), keepalive:true})
-    .catch(()=>{}).finally(() => pendingSaves.delete(p));
-  pendingSaves.add(p);
-}
-async function refreshState(force){
-  if (APP) return cloudSync(force);
-  if (!SERVER) return;
-  if (pendingSaves.size) await Promise.all([...pendingSaves]); // don't overwrite saves still on their way to the PC
-  try { const r = await fetch("api/state", {cache:"no-store"}); if (r.ok) serverState = await r.json(); } catch {}
-}
-
-/* App (iPad/iPhone/PC from the GitHub address): progress lives on the device and syncs through
-   OneDrive's private app folder whenever signed in and online. Changes made offline are marked
-   "dirty" and win over the OneDrive copy at the next sync; everything else takes OneDrive's version. */
-let APP = false, CLOUD = false;
+// App: progress, pairing fixes and series covers live on the device and sync through OneDrive. Changes are marked
+// "dirty" until they're uploaded and win over the OneDrive copy; everything else takes OneDrive's version.
+// Per-device settings (layout, last folder, view) always stay on this device.
+let appState = {};
 const dirty = new Set();
 function loadAppState(){
-  try { const j = JSON.parse(localStorage.getItem("pr:appState") || "{}"); serverState = j.state || {}; (j.dirty || []).forEach(k => dirty.add(k)); } catch { serverState = {}; }
+  try { const j = JSON.parse(localStorage.getItem("pr:appState") || "{}"); appState = j.state || {}; (j.dirty || []).forEach(k => dirty.add(k)); } catch { appState = {}; }
 }
-function saveAppState(){ try { localStorage.setItem("pr:appState", JSON.stringify({state: serverState, dirty: [...dirty]})); } catch {} }
-let uploadT = null, lastSync = 0, syncing = null;
-function scheduleUpload(){ clearTimeout(uploadT); uploadT = setTimeout(() => cloudSync(true), 2500); }
-document.addEventListener("visibilitychange", () => { if (document.hidden && dirty.size) cloudSync(true); });
-async function cloudSync(force){
-  if (!CLOUD || !msAccount || navigator.onLine === false) return;
-  if (!force && Date.now() - lastSync < 20000) return;
-  if (syncing) return syncing;
-  syncing = (async () => {
-    try {
-      const remote = await cloudReadState();
-      const merged = {...remote};
-      for (const k of dirty) { if (k in serverState) merged[k] = serverState[k]; else delete merged[k]; }
-      serverState = merged;
-      if (dirty.size) { await cloudWriteState(merged); dirty.clear(); }
-      saveAppState(); lastSync = Date.now();
-    } catch (e) { console.warn("sync", e); }
-  })();
-  try { await syncing; } finally { syncing = null; }
-}
-
+function saveAppState(){ try { localStorage.setItem("pr:appState", JSON.stringify({state: appState, dirty: [...dirty]})); } catch {} }
+if (APP) loadAppState();
 const store = {
   get(k, d){
-    if ((SERVER || APP) && SYNC.test(k)) return k in serverState ? serverState[k] : d;
+    if (APP && SYNC_RE.test(k)) return k in appState ? appState[k] : d;
     try{ const v = localStorage.getItem("pr:"+k); return v===null ? d : JSON.parse(v); }catch{ return d; }
   },
   set(k, v){
-    if (SERVER && SYNC.test(k)) { serverState[k] = v; postState(k, v); return; }
-    if (APP && SYNC.test(k)) { serverState[k] = v; dirty.add(k); saveAppState(); scheduleUpload(); return; }
-    try{ localStorage.setItem("pr:"+k, JSON.stringify(v)); }catch{}
+    if (APP && SYNC_RE.test(k)) { appState[k] = v; dirty.add(k); saveAppState(); scheduleUpload(); return; }
+    try{ localStorage.setItem("pr:"+k, JSON.stringify(v)); }catch{} if (SYNC_RE.test(k)) stateChanged(k);
   },
   del(k){
-    if (SERVER && SYNC.test(k)) { delete serverState[k]; postState(k, null); return; }
-    if (APP && SYNC.test(k)) { delete serverState[k]; dirty.add(k); saveAppState(); scheduleUpload(); return; }
-    try{ localStorage.removeItem("pr:"+k); }catch{}
+    if (APP && SYNC_RE.test(k)) { delete appState[k]; dirty.add(k); saveAppState(); scheduleUpload(); return; }
+    try{ localStorage.removeItem("pr:"+k); }catch{} if (SYNC_RE.test(k)) stateChanged(k);
   }
 };
+
+/* ---------- Progress is also kept in the Comics folder, so a browser reset or another browser doesn't lose it ---------- */
+// What's kept: where you are in each issue (pos), Shift pairing fixes (shift), chosen series covers (seriesCover).
+// Whichever copy (this browser's or the folder's) was changed last wins.
+const SYNC_RE = /^(pos|shift|seriesCover):/;
+const ST_FILE = "Panel Reader progress.json";
+let stateT = null, stateLoading = false;
+const stampKey = () => "pr:stateSaved:" + rootNode.path;
+function stateChanged(k){
+  if (stateLoading || !rootNode || !k.slice(k.indexOf(":") + 1).startsWith(rootNode.path + "/")) return;
+  try { localStorage.setItem(stampKey(), String(Date.now())); } catch {}
+  clearTimeout(stateT); stateT = setTimeout(saveState, 1500);
+}
+function localState(){ // this library's entries, with paths relative to the library folder
+  const pre = rootNode.path + "/", out = {};
+  try {
+    for (let j = 0; j < localStorage.length; j++) {
+      const k = localStorage.key(j), m = k && k.match(/^pr:(pos|shift|seriesCover):(.*)$/);
+      if (!m || !m[2].startsWith(pre)) continue;
+      let v; try { v = JSON.parse(localStorage.getItem(k)); } catch { continue; }
+      if (m[1] === "seriesCover" && typeof v === "string" && v.startsWith(pre)) v = v.slice(pre.length);
+      out[m[1] + ":" + m[2].slice(pre.length)] = v;
+    }
+  } catch {}
+  return out;
+}
+async function saveState(){
+  clearTimeout(stateT); stateT = null;
+  const h = rootNode && rootNode.handle; if (!h) return;
+  try {
+    if ((await h.queryPermission({mode:"readwrite"})) !== "granted") return; // never interrupts reading with a prompt
+    const saved = Number(localStorage.getItem(stampKey())) || Date.now();
+    const w = await (await h.getFileHandle(ST_FILE, {create:true})).createWritable();
+    await w.write(JSON.stringify({saved, state: localState()})); await w.close();
+  } catch (e) { console.warn("progress file", e); }
+}
+async function loadState(){
+  const h = rootNode && rootNode.handle; if (!h) return;
+  let file = null;
+  try { file = JSON.parse(await (await (await h.getFileHandle(ST_FILE)).getFile()).text()); } catch {}
+  let mine = Number(localStorage.getItem(stampKey())) || 0;
+  if (!mine && !file && Object.keys(localState()).length) { mine = Date.now(); localStorage.setItem(stampKey(), String(mine)); } // first run: keep what this browser has
+  if (file && file.state && (file.saved || 0) > mine) {
+    stateLoading = true; // the folder's copy is newer: use it
+    try {
+      const pre = rootNode.path + "/";
+      for (const k of Object.keys(localState())) { const i = k.indexOf(":"); localStorage.removeItem("pr:" + k.slice(0, i + 1) + pre + k.slice(i + 1)); }
+      for (const [k, v] of Object.entries(file.state)) {
+        const i = k.indexOf(":"), kind = k.slice(0, i);
+        store.set(kind + ":" + pre + k.slice(i + 1), kind === "seriesCover" && typeof v === "string" ? pre + v : v);
+      }
+      localStorage.setItem(stampKey(), String(file.saved));
+    } finally { stateLoading = false; }
+  } else if (mine && (!file || (file.saved || 0) < mine)) await saveState(); // this browser is ahead: bring the file up to date
+}
+addEventListener("pagehide", () => { if (stateT) saveState(); });
+document.addEventListener("visibilitychange", () => { if (document.hidden && stateT) saveState(); });
 let dbP = null;
 function idb(){
   return dbP ||= new Promise((res,rej)=>{
-    const r = indexedDB.open("panel-reader", 3);
+    const r = indexedDB.open("panel-reader", 4);
     r.onupgradeneeded = () => { const db = r.result;
       if (!db.objectStoreNames.contains("kv")) db.createObjectStore("kv");
       if (!db.objectStoreNames.contains("thumbs")) db.createObjectStore("thumbs");
-      if (!db.objectStoreNames.contains("comics")) db.createObjectStore("comics"); }; // iPad app: imported CBZ files
+      if (!db.objectStoreNames.contains("comics")) db.createObjectStore("comics"); }; // app: issues kept on this device for offline reading
     r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
   });
 }
 async function dbGet(s,k){ const db=await idb(); return new Promise((res,rej)=>{ const q=db.transaction(s).objectStore(s).get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
 async function dbPut(s,k,v){ const db=await idb(); return new Promise((res,rej)=>{ const t=db.transaction(s,"readwrite"); t.objectStore(s).put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); }
+async function dbKeys(s){ const db=await idb(); return new Promise((res,rej)=>{ const q=db.transaction(s).objectStore(s).getAllKeys(); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }
+async function dbDel(s, k){ return dbDelMany(s, [k]); }
+async function dbDelMany(s, keys){ const db=await idb(); return new Promise((res,rej)=>{ const t=db.transaction(s,"readwrite"), o=t.objectStore(s); for (const k of keys) o.delete(k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); }); }
+
+/* ---------- Cache cleanup: covers and comic info for files that are gone or have changed ---------- */
+async function cleanCaches(root){
+  await sleep(4000); // after the shelf is up
+  if (rootNode !== root) return;
+  const valid = new Set();
+  const walk = async (node, depth) => {
+    for (const k of await listNode(node)) {
+      if (k.kind === "dir") { if (depth < 6) await walk(k, depth + 1); }
+      else if (isComic(k.name)) { const f = await fileOf(k); valid.add(k.path + "|" + f.size + "|" + f.lastModified); }
+    }
+  };
+  try { await walk(root, 0); } catch { return; } // couldn't see the whole library: delete nothing
+  if (rootNode !== root) return;
+  const pre = root.path + "/";
+  try {
+    await dbDelMany("thumbs", (await dbKeys("thumbs")).filter(k => typeof k === "string" && k.startsWith(pre) && !valid.has(k)));
+    await dbDelMany("kv", (await dbKeys("kv")).filter(k => typeof k === "string" && k.startsWith("ci:" + pre) && !valid.has(k.slice(3))));
+  } catch {}
+}
 
 /* ---------- ZIP / CBZ reading (reads only the parts it needs) ---------- */
 /*ZIP-START*/
-// A local File slices itself; a file on the PC server fetches just the bytes asked for.
+// A file on this device slices itself; a OneDrive file downloads just the bytes asked for.
 async function readRange(file, start, end){ return file.remote ? file.range(start, end) : file.slice(start, end); }
 async function zipEntries(file){
   const size = file.size;
@@ -483,10 +618,19 @@ async function zipEntries(file){
   let eo = -1;
   for (let i = tailLen - 22; i >= 0; i--) { if (tail.getUint32(i, true) === 0x06054b50) { eo = i; break; } }
   if (eo < 0) throw new Error("This file isn't a valid CBZ/ZIP archive.");
-  const count = tail.getUint16(eo + 10, true);
-  const cdSize = tail.getUint32(eo + 12, true);
-  const cdOff = tail.getUint32(eo + 16, true);
-  if (count === 0xFFFF || cdOff === 0xFFFFFFFF || cdSize === 0xFFFFFFFF) throw new Error("This archive uses ZIP64, which isn't supported yet.");
+  let count = tail.getUint16(eo + 10, true);
+  let cdSize = tail.getUint32(eo + 12, true);
+  let cdOff = tail.getUint32(eo + 16, true);
+  if (count === 0xFFFF || cdOff === 0xFFFFFFFF || cdSize === 0xFFFFFFFF) {
+    // ZIP64 (files over 4 GB, or more than 65,535 entries): the real numbers are in a second end record
+    const locAt = size - tailLen + eo - 20;
+    const loc = new DataView(await (await readRange(file, locAt, locAt + 20)).arrayBuffer());
+    if (locAt < 0 || loc.getUint32(0, true) !== 0x07064b50) throw new Error("The archive's directory is damaged.");
+    const e64At = Number(loc.getBigUint64(8, true));
+    const e64 = new DataView(await (await readRange(file, e64At, e64At + 56)).arrayBuffer());
+    if (e64.getUint32(0, true) !== 0x06064b50) throw new Error("The archive's directory is damaged.");
+    count = Number(e64.getBigUint64(32, true)); cdSize = Number(e64.getBigUint64(40, true)); cdOff = Number(e64.getBigUint64(48, true));
+  }
   const cd = new DataView(await (await readRange(file, cdOff, cdOff + cdSize)).arrayBuffer());
   const dec = new TextDecoder();
   const out = [];
@@ -494,10 +638,24 @@ async function zipEntries(file){
   for (let n = 0; n < count; n++) {
     if (cd.getUint32(p, true) !== 0x02014b50) throw new Error("The archive's directory is damaged.");
     const flags = cd.getUint16(p + 8, true), method = cd.getUint16(p + 10, true);
-    const csize = cd.getUint32(p + 20, true);
+    let csize = cd.getUint32(p + 20, true), usize = cd.getUint32(p + 24, true);
     const nlen = cd.getUint16(p + 28, true), xlen = cd.getUint16(p + 30, true), clen = cd.getUint16(p + 32, true);
-    const loff = cd.getUint32(p + 42, true);
+    let loff = cd.getUint32(p + 42, true);
     const name = dec.decode(new Uint8Array(cd.buffer, cd.byteOffset + p + 46, nlen));
+    if (csize === 0xFFFFFFFF || usize === 0xFFFFFFFF || loff === 0xFFFFFFFF) {
+      // ZIP64 entry: big sizes and offsets sit in its extra field (id 1), in this order, only the ones that overflowed
+      for (let x = p + 46 + nlen, end = x + xlen; x + 4 <= end;) {
+        const id = cd.getUint16(x, true), len = cd.getUint16(x + 2, true);
+        if (id === 1) {
+          let q = x + 4;
+          if (usize === 0xFFFFFFFF) { usize = Number(cd.getBigUint64(q, true)); q += 8; }
+          if (csize === 0xFFFFFFFF) { csize = Number(cd.getBigUint64(q, true)); q += 8; }
+          if (loff === 0xFFFFFFFF) { loff = Number(cd.getBigUint64(q, true)); }
+          break;
+        }
+        x += 4 + len;
+      }
+    }
     out.push({name, flags, method, csize, loff});
     p += 46 + nlen + xlen + clen;
   }
@@ -505,7 +663,6 @@ async function zipEntries(file){
 }
 async function zipRead(file, e){
   if (e.flags & 1) throw new Error("This archive is password protected.");
-  if (e.csize === 0xFFFFFFFF || e.loff === 0xFFFFFFFF) throw new Error("This archive uses ZIP64, which isn't supported yet.");
   // grab header + data in one read (with room for the header's variable-length fields)
   const chunk = await readRange(file, e.loff, Math.min(file.size, e.loff + 30 + e.csize + 1024));
   const lh = new DataView(await chunk.slice(0, 30).arrayBuffer());
@@ -521,6 +678,48 @@ async function zipRead(file, e){
     return new Blob([await new Response(stream).blob()], {type});
   }
   throw new Error("Unsupported compression (method " + e.method + ") in " + e.name);
+}
+// Width and height of a page, read from the first bytes of the image instead of loading all of it
+async function headBytes(file, e, want = file.remote ? 24576 : 65536){ // OneDrive: a smaller bite, it's a download per page
+  const chunk = await readRange(file, e.loff, Math.min(file.size, e.loff + 30 + 1024 + want));
+  const lh = new DataView(await chunk.slice(0, 30).arrayBuffer());
+  if (lh.getUint32(0, true) !== 0x04034b50) return null;
+  const off = 30 + lh.getUint16(26, true) + lh.getUint16(28, true);
+  const raw = chunk.slice(off, Math.min(chunk.size, off + Math.min(e.csize, want)));
+  if (e.method === 0) return new Uint8Array(await raw.arrayBuffer());
+  if (e.method !== 8) return null;
+  // partly decompress: the start of the stream is enough; the cut-off end throws, which is expected
+  const rd = raw.stream().pipeThrough(new DecompressionStream("deflate-raw")).getReader();
+  const parts = []; let got = 0;
+  try { while (got < want) { const {done, value} = await rd.read(); if (done) break; parts.push(value); got += value.length; } } catch {}
+  rd.cancel().catch(()=>{});
+  const out = new Uint8Array(got); let p = 0; for (const v of parts) { out.set(v, p); p += v.length; }
+  return out;
+}
+function imgSize(b){
+  if (!b || b.length < 30) return null;
+  const be16 = i => (b[i] << 8) | b[i + 1], le16 = i => b[i] | (b[i + 1] << 8), le24 = i => b[i] | (b[i + 1] << 8) | (b[i + 2] << 16);
+  const tag = (i, s) => String.fromCharCode(...b.subarray(i, i + s.length)) === s;
+  if (b[0] === 0x89 && tag(1, "PNG")) return {w: (be16(16) << 16 | be16(18)) >>> 0, h: (be16(20) << 16 | be16(22)) >>> 0};
+  if (tag(0, "GIF")) return {w: le16(6), h: le16(8)};
+  if (tag(0, "BM")) return {w: le16(18) | le16(20) << 16, h: Math.abs((le16(22) | le16(24) << 16) << 0)};
+  if (tag(0, "RIFF") && tag(8, "WEBP")) {
+    if (tag(12, "VP8 ")) return {w: le16(26) & 0x3fff, h: le16(28) & 0x3fff};
+    if (tag(12, "VP8L")) return {w: 1 + (((b[22] & 0x3f) << 8) | b[21]), h: 1 + (((b[24] & 0xf) << 10) | (b[23] << 2) | ((b[22] & 0xc0) >> 6))};
+    if (tag(12, "VP8X")) return {w: 1 + le24(24), h: 1 + le24(27)};
+    return null;
+  }
+  if (b[0] === 0xff && b[1] === 0xd8) { // JPEG: walk the markers to the frame header
+    let i = 2;
+    while (i + 9 < b.length) {
+      if (b[i] !== 0xff) { i++; continue; }
+      const m = b[i + 1];
+      if (m === 0xff || m === 0x01 || (m >= 0xd0 && m <= 0xd9)) { i += m === 0xff ? 1 : 2; continue; }
+      if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return {h: be16(i + 5), w: be16(i + 7)};
+      i += 2 + be16(i + 2);
+    }
+  }
+  return null;
 }
 function pageEntries(entries){
   return entries
@@ -538,28 +737,32 @@ const issueNo = n => { const m = baseName(n).match(/#\s*0*(\d+(?:\.\d+)?)/); ret
 
 const listCache = new Map();
 async function listNode(node){
+  if (node.playlist) { // a playlist: its issues in your order, wherever they live
+    const out = [];
+    for (const rel of node.playlist.items) { try { const r = await resolvePath(rootNode.path + "/" + rel); if (r) out.push(r.node); } catch {} }
+    return out;
+  }
   if (listCache.has(node.path)) return listCache.get(node.path);
+  const p = readFolder(node); // kept as a promise, so the shelf asking twice at once only reads once
+  listCache.set(node.path, p);
+  p.catch(() => { if (listCache.get(node.path) === p) listCache.delete(node.path); });
+  return p;
+}
+async function readFolder(node){
   let kids = [];
   if (node.cloud) {
     for (const x of await cloudChildren(node.rel)) {
       if (x.name.startsWith(".")) continue;
       const kind = x.folder ? "dir" : "file";
       if (kind === "file" && !(isComic(x.name) || isUnsupported(x.name))) continue;
+      if (kind === "dir" && x.folder.childCount === 0) continue; // empty folders stay off the shelf
       const rel = node.rel ? node.rel + "/" + x.name : x.name;
       kids.push({name:x.name, path:node.path + "/" + x.name, kind, cloud:true, rel, appKey:rel, id:x.id,
                  size:x.size, mtime:Date.parse(x.lastModifiedDateTime) || 0, dl:x["@microsoft.graph.downloadUrl"]});
     }
-    // comics imported on this device that aren't in OneDrive still show up in the same place
+    // issues kept on this device that aren't in OneDrive anymore still show up in the same place
     const local = findLocal(node.rel);
     if (local && local.children) for (const [name, ln] of local.children) if (!kids.some(k => k.name === name)) kids.push(ln);
-  } else if (node.remote) {
-    const r = await fetch("api/list?path=" + encodeURIComponent(node.rel), {cache:"no-store"});
-    if (!r.ok) throw new Error("the PC server couldn't read this folder");
-    for (const x of await r.json()) {
-      if (x.name.startsWith(".")) continue;
-      kids.push({name:x.name, path:node.path + "/" + x.name, kind:x.kind, remote:true,
-                 rel: node.rel ? node.rel + "/" + x.name : x.name, size:x.size, mtime:x.mtime});
-    }
   } else if (node.handle) {
     for await (const [name, h] of node.handle.entries()) {
       if (name.startsWith(".")) continue;
@@ -567,34 +770,25 @@ async function listNode(node){
       else if (isComic(name) || isUnsupported(name)) kids.push({name, path: node.path + "/" + name, kind:"file", handle:h});
     }
   } else kids = [...node.children.values()];
-  // _Inbox and other _folders stay off the shelf, and so does the folder Claude saves its files in
+  // _Inbox and other _folders stay off the shelf, and so does the folder the Claude app saves its files in
   kids = kids.filter(k => !(k.kind === "dir" && (k.name.startsWith("_") || /^claude[\s_-]*outputs?$/i.test(k.name.trim()))));
+  // folders with no comics or subfolders in them (like the app's "Claude outputs") stay off the shelf too
+  const keep = await Promise.all(kids.map(k => k.kind !== "dir" || !k.handle ? true : (async () => {
+    try { for await (const [n, c] of k.handle.entries()) if (!n.startsWith(".") && (c.kind === "directory" ? !n.startsWith("_") : isComic(n) || isUnsupported(n))) return true; } catch {}
+    return false;
+  })()));
+  kids = kids.filter((k, i) => keep[i]);
   kids.sort((a,b) => (a.kind===b.kind ? collator.compare(a.name,b.name) : a.kind==="dir" ? -1 : 1));
-  listCache.set(node.path, kids);
   return kids;
 }
 async function fileOf(node){
-  if (node.remote) return remoteFile(node);
   if (node.appKey) {
     const b = await dbGet("comics", node.appKey).catch(() => null);
-    if (b) return b;                       // saved on this device: fastest, works offline
+    if (b) return new File([b], node.name, {lastModified: node.mtime || 0}); // kept on this device: fastest, works offline
     if (!node.cloud) throw new Error("This comic is no longer on this device.");
   }
   if (node.cloud) return cloudFile(node);
   return node.handle ? node.handle.getFile() : node.file;
-}
-function remoteFile(node){
-  const url = "api/file?path=" + encodeURIComponent(node.rel);
-  return {
-    remote:true, size:node.size, lastModified:node.mtime, name:node.name,
-    async range(start, end){
-      if (end <= start) return new Blob([]);
-      const r = await fetch(url, {headers:{Range:"bytes=" + start + "-" + (end - 1)}});
-      if (r.status === 206) return r.blob();
-      if (r.ok) return (await r.blob()).slice(start, end); // server ignored the range
-      throw new Error("Lost connection to the PC (is the server still running?)");
-    }
-  };
 }
 
 /* ---------- Covers (first page, cached between visits) ---------- */
@@ -627,6 +821,54 @@ function coverFor(fileNode){
   p.catch(() => coverMem.delete(fileNode.path));
   return p;
 }
+/* ---------- Comic info (ComicInfo.xml added by Tag Comics): writer, artists, title, date ---------- */
+const INFO_TAGS = ["Title","Series","Number","Year","Month","Writer","Penciller","Inker","Colorist","Letterer","CoverArtist","Editor","Publisher","Summary","StoryArc"];
+const infoMem = new Map();
+function comicInfo(node){
+  if (infoMem.has(node.path)) return infoMem.get(node.path);
+  const p = (async () => {
+    const f = await fileOf(node);
+    const key = "ci:" + node.path + "|" + f.size + "|" + f.lastModified; // re-read when the file changes (e.g. after tagging)
+    try { const c = await dbGet("kv", key); if (c) return c; } catch {}
+    const info = {};
+    try {
+      const e = (await zipEntries(f)).find(x => /(^|\/)comicinfo\.xml$/i.test(x.name));
+      if (e) {
+        const doc = new DOMParser().parseFromString(await (await zipRead(f, e)).text(), "application/xml");
+        for (const t of INFO_TAGS) { const el = doc.getElementsByTagName(t)[0]; if (el && el.textContent.trim()) info[t] = el.textContent.trim(); }
+      }
+    } catch {}
+    dbPut("kv", key, info).catch(()=>{});
+    return info;
+  })();
+  infoMem.set(node.path, p);
+  p.catch(() => infoMem.delete(node.path));
+  return p;
+}
+const firstNames = (s, n = 2) => (s || "").split(",").map(x => x.trim()).filter(Boolean).slice(0, n).join(", ");
+const artistOf = ci => ci.Penciller || ci.Inker || ci.CoverArtist || "";
+function creditLine(ci){ return [firstNames(ci.Writer), firstNames(artistOf(ci))].filter(Boolean).join(" · "); }
+
+/* ---------- Sort: the issues on screen by writer, artist or cover date (series folders stay first) ---------- */
+const SORT_KEY = {
+  writer: ci => (ci.Writer || "").toLowerCase(),
+  artist: ci => artistOf(ci).toLowerCase(),
+  date:   ci => ci.Year ? ci.Year + "-" + String(ci.Month || 1).padStart(2, "0") : ""
+};
+async function orderCards(isCurrent){
+  const how = $("sortSel").value, keyOf = SORT_KEY[how];
+  const grid = $("grid"), cards = [...grid.children];
+  if (!keyOf) return;
+  const issues = cards.filter(c => c._node), others = cards.filter(c => !c._node);
+  const keys = new Map();
+  await Promise.all(issues.map(async c => { try { keys.set(c, keyOf(await comicInfo(c._node))); } catch { keys.set(c, ""); } }));
+  if (!isCurrent()) return;
+  issues.sort((a, b) => { const x = keys.get(a), y = keys.get(b);
+    if (!x !== !y) return x ? -1 : 1;                   // untagged issues go last
+    return collator.compare(x, y) || collator.compare(a._node.name, b._node.name); });
+  grid.replaceChildren(...others, ...issues);
+}
+
 async function firstComicIn(dir, depth = 0){
   const kids = await listNode(dir);
   const chosen = store.get("seriesCover:" + dir.path, null);
@@ -642,43 +884,31 @@ const seen = new IntersectionObserver(entries => {
 
 /* ---------- Library view ---------- */
 async function openRoot(node){
-  rootNode = node; stack = [node]; listCache.clear();
-  // return to the folder you were last in
+  rootNode = node; stack = [node]; listCache.clear(); searchIdx = null;
+  $("search").hidden = $("viewBtn").hidden = $("sortSel").hidden = false;
+  $("sortSel").value = store.get("sort", "name");
+  await loadState();
+  await loadPlaylists();
+  if (!APP || CLOUD) cleanCaches(node); // offline the app sees only what's on the device: delete nothing then
+  $("openBtn").hidden = $("reopenBtn").hidden = true; $("changeLib").hidden = APP; // connected: the folder buttons step aside
+  // return to the folder you were last in, one Back step per level
+  history.replaceState({p: [], i: 0}, "");
   const last = store.get("lastPath", []);
   for (const name of last) {
-    try { const kids = await listNode(stack[stack.length - 1]); const d = kids.find(k => k.kind === "dir" && k.name === name); if (!d) break; stack.push(d); } catch { break; }
+    try { const kids = await listNode(stack[stack.length - 1]); const d = kids.find(k => k.kind === "dir" && k.name === name); if (!d) break; stack.push(d); pushPlace(); } catch { break; }
   }
   renderLib();
 }
 function progressOf(path){ return store.get("pos:" + path, null); }
-const parentOf = p => p.slice(0, p.lastIndexOf("/"));
-// One reading spot per series: when you're partway through an issue, any other half-read issue
-// in the same series goes back to unread. Finished issues always stay finished.
-function claimSeriesSpot(path){
-  const parent = parentOf(path);
-  for (const p of allProgress()) if (p.path !== path && !p.done && parentOf(p.path) === parent) store.del("pos:" + p.path);
+// how far into an issue: 0 = unread, up to 1 = finished
+function readFrac(path){ const p = progressOf(path); if (!p) return 0; if (p.done) return 1; return p.n ? Math.min(0.97, (p.i + 1) / p.n) : 0.05; }
+/* ---------- Read books are bagged and boarded; unread ones show the bare cover ---------- */
+function setBag(cover, bagged){
+  for (const el of cover.querySelectorAll(".cond")) el.remove();
+  if (bagged) { const b = document.createElement("div"); b.className = "cond bag"; cover.append(b); }
 }
-// Where you are in a series: the issue you're partway through, and the next one you haven't read
-async function seriesState(dir){
-  const cs = await comicsIn(dir);
-  const pos = cs.map(c => progressOf(c.path));
-  let cur = -1, curT = -1;
-  cs.forEach((c, j) => { const p = pos[j]; if (p && !p.done && (p.t || 0) >= curT) { cur = j; curT = p.t || 0; } });
-  let anchor = cur;
-  if (anchor < 0) { let lt = -1; cs.forEach((c, j) => { const p = pos[j]; if (p && p.done && (p.t || 0) >= lt) { lt = p.t || 0; anchor = j; } }); }
-  const unread = j => !(pos[j] && pos[j].done) && j !== cur;
-  let next = -1;
-  for (let j = anchor + 1; j < cs.length; j++) if (unread(j)) { next = j; break; }
-  if (next < 0) for (let j = 0; j < cs.length; j++) if (unread(j)) { next = j; break; } // gaps earlier in the run
-  return {
-    comics: cs,
-    current: cur >= 0 ? {node: cs[cur], pos: pos[cur]} : null,
-    next: next >= 0 ? cs[next] : null,
-    touched: pos.some(Boolean),
-    read: pos.filter(p => p && p.done).length,
-    t: Math.max(0, ...pos.map(p => (p && p.t) || 0))
-  };
-}
+const allRead = nodes => nodes.length > 0 && nodes.every(c => readFrac(c.path) >= 1);
+const pct = f => f >= 1 ? "Read" : f > 0 ? Math.max(1, Math.round(f * 100)) + "% read" : "Unread";
 function setRead(path, read, t){
   if (read) { const p = progressOf(path) || {i:0, n:0}; store.set("pos:" + path, {i:p.i, n:p.n, done:true, t: t || Date.now()}); }
   else store.del("pos:" + path);
@@ -686,12 +916,17 @@ function setRead(path, read, t){
 // every saved progress entry: [{path, i, n, done, t}]
 function allProgress(){
   const out = [];
-  if (SERVER || APP) { for (const [k, v] of Object.entries(serverState)) if (k.startsWith("pos:") && v) out.push({path:k.slice(4), ...v}); }
-  else {
-    try { for (let j = 0; j < localStorage.length; j++) { const k = localStorage.key(j);
-      if (k && k.startsWith("pr:pos:")) { const v = JSON.parse(localStorage.getItem(k)); if (v) out.push({path:k.slice(7), ...v}); } } } catch {}
-  }
+  if (APP) { for (const [k, v] of Object.entries(appState)) if (k.startsWith("pos:") && v) out.push({path:k.slice(4), ...v}); return out; }
+  try { for (let j = 0; j < localStorage.length; j++) { const k = localStorage.key(j);
+    if (k && k.startsWith("pr:pos:")) { const v = JSON.parse(localStorage.getItem(k)); if (v) out.push({path:k.slice(7), ...v}); } } } catch {}
   return out;
+}
+// One reading spot per series: when you're partway through an issue, any other half-read issue
+// in the same folder goes back to unread. Finished issues always stay finished.
+const parentPath = p => p.slice(0, p.lastIndexOf("/"));
+function claimSeriesSpot(path){
+  const parent = parentPath(path);
+  for (const p of allProgress()) if (p.path !== path && !p.done && parentPath(p.path) === parent) store.del("pos:" + p.path);
 }
 // find a library item from its saved path
 async function resolvePath(path){
@@ -706,70 +941,350 @@ async function resolvePath(path){
   return {node, parent};
 }
 
+/* ---------- Going in and back: the Back button, Backspace, the mouse's back button and the browser's Back all work ---------- */
+// Each place you go is a step in the browser's history, holding the folder names (or playlist) that lead there.
+const stateOf = extra => Object.assign({p: stack.slice(1).map(n => n.playlist ? {pl: n.name} : n.name), i: ((history.state && history.state.i) || 0) + 1}, extra);
+function pushPlace(extra){ history.pushState(stateOf(extra), ""); }
+function goInto(node){ stack.push(node); pushPlace(); renderLib(); window.scrollTo(0, 0); }
+function goTo(newStack){ stack = newStack; pushPlace(); renderLib(); window.scrollTo(0, 0); }
+function goBack(){
+  if ($("search").value.trim()) { $("search").value = ""; renderLib(); return; }
+  if (history.state && history.state.i > 0) history.back();
+  else if (stack.length > 1) { stack.pop(); history.replaceState(Object.assign(stateOf(), {i: 0}), ""); renderLib(); }
+}
+async function stackFromState(s){
+  const st = [rootNode];
+  for (const name of (s && s.p) || []) {
+    if (name && name.pl) { const pl = playlists.find(x => x.name === name.pl); if (pl) st.push({name:pl.name, path:"playlist:" + pl.name, kind:"dir", playlist:pl}); break; }
+    try { const d = (await listNode(st[st.length - 1])).find(k => k.kind === "dir" && k.name === name); if (!d) break; st.push(d); } catch { break; }
+  }
+  return st;
+}
+addEventListener("popstate", async e => {
+  if (!rootNode) return;
+  const s = e.state || {};
+  if ($("reader").classList.contains("open") && !s.reader) closeReader(true);
+  if (flipOpen() && !s.flip && !s.reader) closeFlip(true);
+  stack = await stackFromState(s);
+  if (flipOpen()) { refreshFlip(); return; } // back from reading: still flipping, with what you just read updated
+  renderLib();
+});
+$("backBtn").onclick = goBack;
+
+let renderTok = 0;
 async function renderLib(){
   if (!stack.length) return;
+  if ($("search").value.trim()) return renderSearch();
+  const tok = ++renderTok;
+  if (CLOUD) { await cloudSync(); if (tok !== renderTok) return; } // pick up progress made on your other devices
   const node = stack[stack.length - 1];
-  await refreshState(); // pick up progress made on the other device
-  store.set("lastPath", stack.slice(1).map(n => n.name));
+  if (!node.playlist) store.set("lastPath", stack.slice(1).map(n => n.name));
   const crumbs = $("crumbs"); crumbs.innerHTML = "";
-  if (stack.length > 1) { // Back: up one folder (the folder names still work too)
-    const b = document.createElement("button"); b.id = "backBtn"; b.setAttribute("aria-label", "Back");
-    b.innerHTML = '<svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>Back';
-    b.onclick = () => { stack.pop(); renderLib(); };
-    crumbs.append(b);
-  }
   stack.forEach((n, i) => {
     if (i) { const s = document.createElement("span"); s.className = "sep"; s.textContent = "/"; crumbs.append(s); }
     const a = document.createElement("a"); a.textContent = n.name;
-    if (i < stack.length - 1) a.onclick = () => { stack = stack.slice(0, i + 1); renderLib(); };
+    if (i < stack.length - 1) a.onclick = () => goTo(stack.slice(0, i + 1));
     crumbs.append(a);
   });
-  const grid = $("grid"); grid.innerHTML = "";
+  $("backBtn").hidden = stack.length < 2;
   let kids;
   try { kids = await listNode(node); }
   catch (err) { $("empty").hidden = false; $("empty").textContent = "Couldn't read this folder: " + err.message; return; }
+  if (tok !== renderTok) return; // a newer view took over
+  const grid = $("grid"); grid.innerHTML = "";
+  // the main shelf is the comic wall; folders, playlists and searches stay a grid
+  const isWall = stack.length === 1 && !node.playlist;
+  grid.classList.toggle("wallMode", isWall);
+  $("viewBtn").hidden = $("sortSel").hidden = isWall;
+  if (isWall) {
+    gridEl.classList.remove("wheel");
+    $("empty").hidden = kids.length > 0;
+    if (!kids.length) $("empty").textContent = "This folder has no comics or subfolders yet.";
+    await renderWall(kids, tok);
+    if (tok !== renderTok) return;
+    updateJump(); renderPlaylists();
+    return;
+  }
   $("empty").hidden = kids.length > 0;
-  if (!kids.length) $("empty").textContent = "This folder has no comics or subfolders yet.";
+  if (!kids.length) $("empty").textContent = node.playlist ? "This playlist is empty. Add issues with the ••• menu on any cover." : "This folder has no comics or subfolders yet.";
   const comics = kids.filter(k => k.kind === "file" && isComic(k.name));
   const atRoot = stack.length === 1; // folders here are publishers
   for (const k of kids) grid.append(makeCard(k, comics, atRoot));
   // stagger publisher panels so they change one at a time
   const pubs = [...grid.querySelectorAll(".card.pub")];
   pubs.forEach((c, i) => { c._offset = Math.round(i * ROTATE_MS / pubs.length); });
+  if (!node.playlist) await orderCards(() => tok === renderTok); // a playlist keeps your order
+  if (tok !== renderTok) return;
+  setView();
   fitNames();
-  renderContinue();
-  // Open series: scroll to the issue you're on and outline it
-  if (focusPath) {
-    const c = [...grid.querySelectorAll(".card")].find(el => el.dataset.path === focusPath);
-    if (c) { c.classList.add("current"); requestAnimationFrame(() => c.scrollIntoView({block: "center", behavior: "instant"})); }
-    focusPath = null;
+  updateJump();
+  renderPlaylists();
+}
+
+/* ---------- The comic wall: a wooden rack, a tier of face-out stacks per row, a section per publisher ---------- */
+// Wood for the rack, grown once from noise and kept as an image: long grain for the boards, upright grain for the posts.
+function woodTexture(w, h, freq, seed, tone){
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '"><filter id="f" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">'
+    + '<feTurbulence type="fractalNoise" baseFrequency="' + freq + '" numOctaves="5" seed="' + seed + '" stitchTiles="stitch"/>'
+    + '<feComponentTransfer><feFuncR type="table" tableValues="0 .55 .25 .8 .4 .95 .5 1"/></feComponentTransfer>'
+    + '<feColorMatrix type="matrix" values="' + tone + '"/></filter><rect width="100%" height="100%" filter="url(#f)"/></svg>';
+  const raw = "url(\"data:image/svg+xml," + encodeURIComponent(svg) + "\")";
+  return new Promise(res => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement("canvas"); c.width = w; c.height = h;
+        c.getContext("2d").drawImage(img, 0, 0);
+        c.toBlob(b => res(b ? "url(" + URL.createObjectURL(b) + ")" : raw), "image/webp", .9);
+      } catch { res(raw); }
+    };
+    img.onerror = () => res(raw);
+    img.src = "data:image/svg+xml," + encodeURIComponent(svg);
+  });
+}
+let woodReady = null;
+function makeWood(){
+  if (woodReady) return woodReady;
+  const tone = ".50 0 0 0 .17  .32 0 0 0 .095  .19 0 0 0 .045  0 0 0 0 1";
+  woodReady = Promise.all([woodTexture(1200, 300, "0.0016 0.09", 7, tone), woodTexture(420, 900, "0.09 0.0016", 3, tone)])
+    .then(([hz, vt]) => { document.documentElement.style.setProperty("--woodH", hz); document.documentElement.style.setProperty("--woodV", vt); });
+  return woodReady;
+}
+makeWood();
+
+// A stack, front to back: the next issue to read, the rest of the unread in order, then the read ones (bagged) in order.
+function stackOrder(comics){ return [...comics.filter(c => readFrac(c.path) < 1), ...comics.filter(c => readFrac(c.path) >= 1)]; }
+let wallShelves = null, wallCols = 0;
+function rackCols(){ // how many stacks fit across a tier at the current width
+  const w = $("grid").clientWidth || 1000;
+  if (innerWidth <= 600) return Math.max(2, Math.floor((w - 24 - 20 + 14) / (96 + 14))); // phones: smaller stacks (matches the CSS)
+  return Math.max(1, Math.floor((w - 52 - 36 + 22) / (150 + 22)));
+}
+async function renderWall(kids, tok){
+  // every publisher and series folder is read at the same time (OneDrive keeps it to a few at once)
+  const parts = await Promise.all(kids.map(async k => {
+    if (k.kind !== "dir") return isComic(k.name) ? {other: [{series: null, comics: [k]}]} : null;
+    const inside = await listNode(k).catch(() => []);
+    const subdirs = inside.filter(x => x.kind === "dir"), loose = inside.filter(x => x.kind === "file" && isComic(x.name));
+    if (!subdirs.length) return loose.length ? {other: [{series: k, comics: loose}]} : null; // a series sitting at the top level
+    const stacks = (await Promise.all(subdirs.map(async d => { const cs = await comicsIn(d).catch(() => []); return cs.length ? {series: d, pub: k, comics: cs} : null; }))).filter(Boolean);
+    for (const c of loose) stacks.push({series: null, pub: k, comics: [c]}); // one-shots right in the publisher folder
+    return stacks.length ? {shelf: {pub: k, stacks}} : null;
+  }));
+  if (tok !== renderTok) return;
+  const shelves = [], other = [];
+  for (const p of parts) { if (!p) continue; if (p.shelf) shelves.push(p.shelf); if (p.other) other.push(...p.other); }
+  if (other.length) shelves.push({pub: null, stacks: other});
+  wallShelves = shelves;
+  buildWall();
+}
+function buildWall(){
+  wallCols = rackCols();
+  const cab = document.createElement("div"); cab.className = "cabinet";
+  cab.append(...wallShelves.map(shelfEl));
+  $("grid").replaceChildren(cab);
+}
+addEventListener("resize", () => { // re-cut the tiers when a different number of stacks fits across
+  if (!wallShelves || !$("grid").classList.contains("wallMode") || flipOpen()) return;
+  if (rackCols() !== wallCols) buildWall();
+});
+function shelfEl({pub, stacks}){
+  const sec = document.createElement("section"); sec.className = "shelf";
+  const rail = document.createElement("div"); rail.className = "rail";
+  const h = document.createElement("h2"); h.className = "shelfName"; h.textContent = pub ? pub.name : "Other";
+  if (pub) { h.title = "Everything from " + pub.name + " as a grid"; h.onclick = () => goInto(pub); }
+  rail.append(h); sec.append(rail);
+  for (let i = 0; i < stacks.length; i += wallCols) {
+    const tier = document.createElement("div"); tier.className = "tier";
+    const rack = document.createElement("div"); rack.className = "rack";
+    rack.style.gridTemplateColumns = "repeat(" + wallCols + ",minmax(0,1fr))";
+    rack.append(...stacks.slice(i, i + wallCols).map(stackEl));
+    const lip = document.createElement("div"); lip.className = "lip";
+    tier.append(rack, lip); sec.append(tier);
+  }
+  return sec;
+}
+const hashOf = s => { let h = 7; for (const ch of s) h = (h * 31 + ch.charCodeAt(0)) | 0; return h; };
+function stackEl(st){
+  const order = stackOrder(st.comics), top = order[0], n = order.length;
+  const unread = order.filter(c => readFrac(c.path) < 1).length;
+  const name = st.series ? st.series.name : baseName(top.name);
+  const card = document.createElement("div"); card.className = "card stack"; card.tabIndex = 0; card.title = name;
+  const box = document.createElement("div"); box.className = "stackBox";
+  const depth = Math.min(n - 1, 6), layers = []; // the copies peeking out behind: their own covers, bagged once read
+  for (let i = depth; i >= 1; i--) {
+    const c = order[depth === n - 1 ? i : Math.round(i * (n - 1) / depth)];
+    const l = document.createElement("div"); l.className = "layer" + (readFrac(c.path) >= 1 ? " bagged" : "");
+    l.style.setProperty("--i", i); l.style.setProperty("--j", (((hashOf(c.path) % 5) + 5) % 5) - 2);
+    box.append(l); layers.push([l, c]);
+  }
+  const cover = document.createElement("div"); cover.className = "cover lit"; cover.textContent = baseName(top.name);
+  setBag(cover, readFrac(top.path) >= 1);
+  box.append(cover);
+  const tag = document.createElement("div"); tag.className = "shelfTag";
+  tag.style.setProperty("--tilt", ((hashOf(name) % 9) / 10).toFixed(1) + "deg");
+  const cap = document.createElement("div"); cap.className = "cap"; cap.textContent = name;
+  const sub = document.createElement("div"); sub.className = "sub";
+  sub.textContent = !unread ? (n === 1 ? "Read" : "All " + n + " read")
+    : n - unread ? unread + " unread  ·  " + (n - unread) + " read"
+    : n === 1 ? "Unread" : n + " unread";
+  tag.append(cap, sub);
+  card.append(box, tag);
+  const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
+  card._load = async () => {
+    try { img.src = await coverFor(top); cover.append(img); } catch {}
+    for (const [l, c] of layers.slice().reverse()) { // nearest first
+      try { const li = new Image(); li.alt = ""; li.src = await coverFor(c); l.append(li); } catch {}
+    }
+  };
+  card.onclick = () => openFlip(st, card);
+  card.onkeydown = e => { if (e.key === "Enter") card.click(); };
+  seen.observe(card);
+  return card;
+}
+
+/* ---------- Flip through a stack: zoomed in on the shelf, thumb forward through the copies, pull one out ---------- */
+const F = {st: null, order: [], at: 0, cards: [], dragged: false, popped: false};
+const flipOpen = () => !$("flip").hidden;
+function openFlip(st, fromCard){
+  closeMenu(); closeJump();
+  F.st = st; F.order = stackOrder(st.comics); F.at = 0; F.popped = false;
+  $("flipTitle").textContent = st.series ? st.series.name : baseName(F.order[0].name);
+  $("flipAll").hidden = !st.series;
+  const stage = $("flipStage");
+  const lip = document.createElement("div"); lip.className = "flipLip";
+  F.cards = F.order.map((k, i) => {
+    const c = document.createElement("div"); c.className = "fcard";
+    const cv = document.createElement("div"); cv.className = "cover lit"; cv.textContent = baseName(k.name);
+    setBag(cv, readFrac(k.path) >= 1);
+    c.append(cv); c._k = k;
+    c.onclick = e => {
+      e.stopPropagation(); if (F.dragged) return;
+      if (i !== F.at) { F.at = i; F.popped = false; layoutFlip(); } // flip to the one you clicked
+      else if (!F.popped) popFlip(true);                             // pull it out
+      else readFromFlip();                                           // already in your hands: read it
+    };
+    return c;
+  });
+  stage.replaceChildren(lip, ...F.cards);
+  $("flip").hidden = false;
+  if (!(history.state && history.state.flip)) pushPlace({flip: true}); // Back closes it
+  layoutFlip();
+  // the front copy comes up off the wall: start it where the stack sits, then zoom in onto the shelf
+  const front = F.cards[0], from = fromCard && fromCard.querySelector(".stackBox > .cover");
+  if (front && from && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    const a = from.getBoundingClientRect(), b = front.getBoundingClientRect();
+    const dx = a.left + a.width / 2 - (b.left + b.width / 2), dy = a.top + a.height / 2 - (b.top + b.height / 2), s = a.width / b.width;
+    const fl = $("flip");
+    for (const c of F.cards) c.style.transition = "none";
+    const final = front.style.transform;
+    front.style.transform = "translate(" + dx + "px," + dy + "px) scale(" + s + ")";
+    fl.style.transition = "none"; fl.style.opacity = 0;
+    front.getBoundingClientRect();
+    requestAnimationFrame(() => {
+      for (const c of F.cards) c.style.transition = "";
+      fl.style.transition = "opacity .3s ease"; fl.style.opacity = "";
+      front.style.transform = final;
+      setTimeout(() => { fl.style.transition = ""; }, 350);
+    });
   }
 }
+function layoutFlip(){
+  F.at = Math.max(0, Math.min(F.order.length - 1, F.at));
+  const H = (F.cards[0] && F.cards[0].offsetHeight) || 450;
+  F.cards.forEach((c, i) => {
+    const d = i - F.at;
+    let t, z, dim = 1, gone = false;
+    const jx = ((((hashOf(c._k.path) % 7) + 7) % 7) - 3) * 1.2; // copies never sit perfectly square
+    if (d === 0 && F.popped) { t = "translateY(" + (-0.34 * H) + "px) translateZ(150px) rotateX(-5deg) rotateZ(-1.2deg)"; z = 300; }   // pulled out, in your hands
+    else if (d === 0) { t = "translateY(-18px) rotateX(5deg)"; z = 100; }                                            // poking up, the one you're on
+    else if (d > 0) {                                                                                                   // still in the stack, leaning back
+      t = "translateX(" + jx + "px) translateY(" + (-d * 10) + "px) translateZ(" + (-d * 16) + "px) rotateX(" + (6 + Math.min(d, 6) * 0.6) + "deg)"; z = 100 - d;
+      dim = Math.max(0.35, 0.8 - d * 0.08); gone = d > 12;
+    } else {                                                                                                            // thumbed past, tipped forward toward you
+      const a = -66 - Math.min(3, -d - 1) * 9;
+      t = "translateX(" + jx + "px) translateY(4px) translateZ(" + (14 + -d * 8) + "px) rotateX(" + a + "deg)"; z = 200 + d;
+      dim = 0.62 - (-d - 1) * 0.14; gone = d < -2;
+    }
+    c.style.transform = t; c.style.zIndex = z; c.style.setProperty("--dim", dim.toFixed(2));
+    c.classList.toggle("gone", gone); c.classList.toggle("cur", d === 0); c.classList.toggle("popped", d === 0 && F.popped);
+    if (Math.abs(d) <= 12 && !c._loaded) {
+      c._loaded = true;
+      const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
+      coverFor(c._k).then(u => { img.src = u; c.querySelector(".cover").append(img); }).catch(() => {});
+    }
+  });
+  const k = F.order[F.at]; if (!k) return;
+  const fr = readFrac(k.path);
+  $("flipCap").textContent = issueNo(k.name) || baseName(k.name);
+  $("flipSub").textContent = (F.at + 1) + " of " + F.order.length + "  ·  " + pct(fr);
+  $("flipMark").textContent = fr >= 1 ? "Mark unread" : "Mark read";
+  $("flipRead").textContent = fr >= 1 ? "Read again" : fr > 0 ? "Keep reading" : "Read";
+  $("flipBtns").hidden = !F.popped; $("flipHint").hidden = F.popped;
+}
+function popFlip(on){ F.popped = on; layoutFlip(); }
+function flipStep(n){ const was = F.at; F.at += n; F.popped = false; layoutFlip(); return F.at !== was; }
+function readFromFlip(){ const k = F.order[F.at]; if (k) openComic(k, F.st.comics); } // Next issue follows the series in issue order
+function refreshFlip(){ // after reading or marking: bags and the info line catch up, the order stays put
+  F.cards.forEach(c => setBag(c.querySelector(".cover"), readFrac(c._k.path) >= 1));
+  layoutFlip();
+}
+function closeFlip(fromBack){
+  if (!flipOpen()) return;
+  if (fromBack !== true && history.state && history.state.flip) { history.back(); return; }
+  $("flip").hidden = true; $("flipStage").replaceChildren(); F.cards = []; F.popped = false;
+  renderLib(); // the wall catches up with what you read
+}
+$("flipClose").onclick = () => closeFlip();
+$("flipAll").onclick = () => { // the series as a grid, under its publisher
+  const st = F.st; if (!st || !st.series) return;
+  $("flip").hidden = true; $("flipStage").replaceChildren(); F.cards = []; F.popped = false;
+  history.replaceState(stateOf({i: (history.state && history.state.i) || 0}), "");
+  goTo([rootNode, ...(st.pub ? [st.pub] : []), st.series]);
+};
+$("flipRead").onclick = readFromFlip;
+$("flipBack").onclick = () => popFlip(false);
+$("flipMark").onclick = () => { const k = F.order[F.at]; if (!k) return; setRead(k.path, readFrac(k.path) < 1); refreshFlip(); };
+$("flipStage").addEventListener("click", () => { if (!F.dragged && F.popped) popFlip(false); }); // click the shelf to put it back
+let fAcc = 0, fLock = 0, fDrag = null;
+$("flipStage").addEventListener("wheel", e => {
+  e.preventDefault();
+  const now = performance.now(); if (now < fLock) return;
+  fAcc += Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+  if (Math.abs(fAcc) > 35) { flipStep(Math.sign(fAcc)); fAcc = 0; fLock = now + 120; }
+}, {passive: false});
+$("flipStage").addEventListener("pointerdown", e => { fDrag = {x: e.clientX, y: e.clientY}; F.dragged = false; });
+addEventListener("pointermove", e => {
+  if (!fDrag || !flipOpen()) return;
+  const dx = e.clientX - fDrag.x, dy = e.clientY - fDrag.y, big = Math.abs(dy) >= Math.abs(dx) ? dy : -dx;
+  if (Math.abs(big) > 55) { flipStep(big > 0 ? 1 : -1); fDrag = {x: e.clientX, y: e.clientY}; F.dragged = true; } // pull down (or drag left) to tip the front one toward you
+});
+addEventListener("pointerup", () => { fDrag = null; setTimeout(() => { F.dragged = false; }, 0); });
+document.addEventListener("keydown", e => { // while flipping (and not reading), the keys flip
+  if (!flipOpen() || $("reader").classList.contains("open") || e.target.tagName === "INPUT") return;
+  const k = e.key; let used = true;
+  if (k === "ArrowDown" || k === "ArrowRight" || k === "PageDown" || k === " ") flipStep(1);
+  else if (k === "ArrowUp" || k === "ArrowLeft" || k === "PageUp") flipStep(-1);
+  else if (k === "Home") { F.at = 0; F.popped = false; layoutFlip(); }
+  else if (k === "End") { F.at = F.order.length - 1; F.popped = false; layoutFlip(); }
+  else if (k === "Enter") { if (F.popped) readFromFlip(); else popFlip(true); }
+  else if (k === "Escape" || k === "Backspace") { if (F.popped) popFlip(false); else closeFlip(); }
+  else used = false;
+  if (used) { e.preventDefault(); e.stopImmediatePropagation(); }
+}, true);
 
 /* ---------- Options menu (•••) on cards ---------- */
 let openMenuEl = null;
 function closeMenu(){ if (openMenuEl) { openMenuEl.remove(); openMenuEl = null; document.querySelectorAll(".more.open").forEach(b => b.classList.remove("open")); } }
 document.addEventListener("click", closeMenu);
-document.addEventListener("keydown", e => { if (e.key === "Escape") closeMenu(); });
-const touchUI = matchMedia("(pointer: coarse)").matches;
-// Touch: the options open as a bottom sheet with big buttons
-function openMenuSheet(title, items){
-  $("mpTitle").textContent = title;
-  $("mpBtns").replaceChildren(...items.map(it => {
-    const b = document.createElement("button"); b.className = "shBtn";
-    const s = document.createElement("span"); const bb = document.createElement("b"); bb.textContent = it.label; s.append(bb); b.append(s);
-    b.onclick = async () => { closeSheet("menuPanel"); await it.act(); renderLib(); };
-    return b;
-  }));
-  openSheet("menuPanel");
-}
+document.addEventListener("keydown", e => { if (e.key === "Escape") { closeMenu(); closeJump(); } });
 function attachMenu(card, getItems){
   card._menu = getItems;   // long-press a cover opens the same options
   const b = document.createElement("button");
   b.className = "more"; b.textContent = "•••"; b.title = "Options"; b.setAttribute("aria-label", "Options");
   b.onclick = e => {
     e.stopPropagation();
-    if (touchUI) { closeMenu(); openMenuSheet(card.title.replace(/\.[^.]+$/, ""), getItems()); return; }
+    if (touchUI) { closeMenu(); openMenuSheet(card.title.split("\n")[0].replace(/\.[^.]+$/, ""), getItems()); return; }
     const wasOpen = b.classList.contains("open");
     closeMenu();
     if (wasOpen) return;
@@ -786,189 +1301,75 @@ function attachMenu(card, getItems){
 }
 const comicsIn = async dir => (await listNode(dir)).filter(x => x.kind === "file" && isComic(x.name));
 
-/* ---------- Sheets: open, close, tap outside, swipe down ---------- */
-function openSheet(id){ $(id).classList.add("open"); }
-function closeSheet(id){ $(id).classList.remove("open"); }
-const anySheetOpen = () => !!document.querySelector(".modal.open");
-for (const m of document.querySelectorAll(".modal")) {
-  if (m.id !== "importPanel") m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); });
-  const box = m.querySelector(".sheet"); if (!box) continue;
-  let y0 = null, dy = 0;
-  box.addEventListener("touchstart", e => { y0 = box.scrollTop <= 0 ? e.touches[0].clientY : null; dy = 0; }, {passive:true});
-  box.addEventListener("touchmove", e => {
-    if (y0 === null) return;
-    dy = Math.max(0, e.touches[0].clientY - y0);
-    box.style.transform = dy ? "translateY(" + dy + "px)" : "";
-  }, {passive:true});
-  box.addEventListener("touchend", () => {
-    box.style.transform = "";
-    if (y0 !== null && dy > 90) m.classList.remove("open");
-    y0 = null; dy = 0;
-  });
-}
-document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".modal.open").forEach(m => { if (m.id !== "importPanel") m.classList.remove("open"); }); });
-
-/* ---------- Shelf gestures: long-press a cover, swipe from the left edge to go back, pull down to refresh ---------- */
-let lp = null, swallowClick = false;
-document.addEventListener("click", e => { if (swallowClick) { swallowClick = false; e.preventDefault(); e.stopPropagation(); } }, true);
-document.addEventListener("touchstart", e => {
-  if ($("reader").classList.contains("open") || anySheetOpen()) return;
-  const t = e.touches[0], card = e.target.closest && e.target.closest(".card");
-  lp = null;
-  if (card && card._menu && !e.target.closest(".more")) {
-    lp = {x: t.clientX, y: t.clientY, timer: setTimeout(() => {
-      swallowClick = true; closeMenu();
-      openMenuSheet(card.title.replace(/\.[^.]+$/, ""), card._menu());
-    }, 480)};
-  }
-}, {passive:true});
-document.addEventListener("touchmove", e => {
-  if (lp) { const t = e.touches[0]; if (Math.hypot(t.clientX - lp.x, t.clientY - lp.y) > 10) { clearTimeout(lp.timer); lp = null; } }
-}, {passive:true});
-document.addEventListener("touchend", () => { if (lp) { clearTimeout(lp.timer); lp = null; } setTimeout(() => { swallowClick = false; }, 400); });
-
-let edge = null, pull = null;
-document.addEventListener("touchstart", e => {
-  if ($("reader").classList.contains("open") || anySheetOpen() || document.body.classList.contains("signedout")) return;
-  const t = e.touches[0];
-  edge = t.clientX < 28 && stack.length > 1 ? {x: t.clientX, y: t.clientY} : null;
-  pull = !edge && window.scrollY <= 0 ? {y: t.clientY, x: t.clientX, d: 0} : null;
-}, {passive:true});
-document.addEventListener("touchmove", e => {
-  const t = e.touches[0];
-  if (pull) {
-    pull.d = t.clientY - pull.y;
-    if (Math.abs(t.clientX - pull.x) > Math.abs(pull.d)) { pull = null; $("pullHint").style.transform = ""; return; }
-    const d = Math.max(0, Math.min(140, pull.d)), h = $("pullHint");
-    h.style.transform = "translate(-50%," + (d - 70) + "px)";
-    h.classList.toggle("ready", d > 90); h.textContent = d > 90 ? "Release to refresh" : "Pull to refresh";
-  }
-}, {passive:true});
-document.addEventListener("touchend", e => {
-  const t = e.changedTouches[0];
-  if (edge) { const dx = t.clientX - edge.x, dy = Math.abs(t.clientY - edge.y); if (dx > 70 && dy < 60) { stack.pop(); renderLib(); window.scrollTo(0, 0); } }
-  if (pull) { const go = pull.d > 90; $("pullHint").style.transform = ""; $("pullHint").classList.remove("ready"); if (go) refreshLibrary(); }
-  edge = null; pull = null;
-});
-async function refreshLibrary(){
-  libToast("Refreshing…", 0);
-  listCache.clear();
-  try { if (CLOUD) await refreshLocal(); await refreshState(true); } catch {}
-  await renderLib();
-  libToast("Library up to date");
-}
-
-/* ---------- Continue reading row (main shelf only) ---------- */
-let contTok = 0;
-document.getElementById("contBtn").onclick = () => {
-  contOpen = !contOpen;
-  $("contRow").hidden = !contOpen;
-  $("contBtn").setAttribute("aria-expanded", contOpen);
-};
-const CONTINUE_MAX = 3; // how many books the Continue reading button pulls up
-let contOpen = false;    // the row stays tucked away until you tap Continue reading
-async function renderContinue(){
-  const tok = ++contTok, wrap = $("contWrap"), row = $("contRow");
-  if (stack.length !== 1 || !rootNode) { wrap.hidden = true; row.innerHTML = ""; return; }
-  // one card per series, most recently read first: the issue you're partway through, or the next unread one
+/* ---------- Jump back in: the last 3 books you were reading ---------- */
+// Books you're partway through, newest first; if there are fewer than 3, the next issue after one you finished.
+async function jumpList(){
+  if (!rootNode) return [];
   const all = allProgress().filter(p => p.path.startsWith(rootNode.path + "/"));
-  const lastRead = new Map();
-  for (const p of all) { const s = parentOf(p.path); lastRead.set(s, Math.max(lastRead.get(s) || 0, p.t || 0)); }
-  const cards = [];
-  for (const [s] of [...lastRead.entries()].sort((a, b) => b[1] - a[1])) {
-    if (cards.length >= CONTINUE_MAX) break;
-    try {
-      const r = await resolvePath(s); if (!r) continue;
-      const st = await seriesState(r.node);
-      if (st.current) cards.push(contCard(st.current.node, st.comics, r.node.name, "resume"));
-      else if (st.next) cards.push(contCard(st.next, st.comics, r.node.name, "next"));
-    } catch {}
-    if (tok !== contTok) return;
+  const parentOf = p => p.slice(0, p.lastIndexOf("/"));
+  const inProgress = all.filter(p => !p.done);
+  const busySeries = new Set(inProgress.map(p => parentOf(p.path)));
+  // latest finished issue per series, where nothing in that series is mid-read
+  const lastDone = new Map();
+  for (const p of all.filter(p => p.done)) {
+    const s = parentOf(p.path), cur = lastDone.get(s);
+    if (!busySeries.has(s) && (!cur || (p.t || 0) > (cur.t || 0) || ((p.t || 0) === (cur.t || 0) && collator.compare(p.path, cur.path) > 0))) lastDone.set(s, p);
   }
-  if (tok !== contTok || stack.length !== 1) return;
-  row.replaceChildren(...cards);
-  wrap.hidden = cards.length === 0;
-  row.hidden = !contOpen;
+  const byTime = (a, b) => (b.t || 0) - (a.t || 0);
+  const wanted = [...inProgress.sort(byTime).map(p => ({p, kind:"resume"})), ...[...lastDone.values()].sort(byTime).map(p => ({p, kind:"next"}))];
+  const out = [];
+  for (const w of wanted) {
+    if (out.length >= 3) break;
+    try {
+      const r = await resolvePath(w.p.path); if (!r) continue;
+      const comics = await comicsIn(r.parent);
+      let node = r.node;
+      if (w.kind === "next") {
+        const idx = comics.findIndex(c => c.path === node.path);
+        node = comics.slice(idx + 1).find(c => readFrac(c.path) < 1);
+        if (!node) continue;
+      }
+      out.push({node, comics, series: r.parent.name, kind: w.kind});
+    } catch {}
+  }
+  return out;
 }
-function contCard(k, comics, seriesName, kind){
-  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0; card.title = k.name;
+let jumpTok = 0;
+async function updateJump(){ // the button only shows when there's something to jump back into
+  const tok = ++jumpTok, list = await jumpList();
+  if (tok === jumpTok) $("jumpBtn").hidden = !list.length;
+}
+async function openJump(){
+  const pop = $("jumpPop");
+  if (!pop.hidden) { pop.hidden = true; return; }
+  const list = await jumpList();
+  if (!list.length) return;
+  $("jumpRow").replaceChildren(...list.map(j => jumpCard(j)));
+  pop.hidden = false;
+  const first = $("jumpRow").querySelector(".card"); if (first) first.focus();
+}
+function closeJump(){ $("jumpPop").hidden = true; }
+function jumpCard({node: k, comics, series, kind}){
+  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0;
   const cover = document.createElement("div"); cover.className = "cover"; cover.textContent = baseName(k.name);
   const cap = document.createElement("div"); cap.className = "cap"; cap.textContent = issueNo(k.name) || baseName(k.name);
-  const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = seriesName;
-  card.append(cover, cap, sub);
-  const pos = progressOf(k.path);
-  if (kind === "next") { const u = document.createElement("div"); u.className = "sub upnext"; u.textContent = "Up next"; card.append(u); }
-  else if (pos && pos.n) {
-    const bar = document.createElement("div"); bar.className = "prog";
-    const fill = document.createElement("i"); fill.style.width = Math.max(4, Math.round((pos.i + 1) / pos.n * 100)) + "%";
-    bar.append(fill); card.append(bar);
-  }
+  const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = series;
+  const state = document.createElement("div"); state.className = "sub upnext";
+  const f = readFrac(k.path);
+  state.textContent = kind === "next" ? "Up next" : pct(f);
+  card.append(cover, cap, sub, state);
+  card.title = k.name;
+  setBag(cover, readFrac(k.path) >= 1);
   const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
-  card._load = async () => { try { img.src = await coverFor(k); cover.append(img); } catch {} };
-  card.onclick = () => openComic(k, comics);
+  coverFor(k).then(u => { img.src = u; cover.append(img); }).catch(()=>{});
+  card.onclick = e => { e.stopPropagation(); closeJump(); openComic(k, comics); };
   card.onkeydown = e => { if (e.key === "Enter") card.click(); };
-  seen.observe(card);
   return card;
 }
-
-/* ---------- Series buttons: Continue reading / Next unread / Open series ---------- */
-let focusPath = null; // issue to scroll to and outline when a series opens
-function openSeries(dir, target){
-  focusPath = target || null;
-  closeSeriesSheet();
-  stack.push(dir); renderLib(); window.scrollTo(0, 0);
-}
-function closeSeriesSheet(){ $("seriesPanel").classList.remove("open"); }
-$("seriesPanel").addEventListener("click", e => { if (e.target.id === "seriesPanel") closeSeriesSheet(); });
-document.addEventListener("keydown", e => { if (e.key === "Escape" && $("seriesPanel").classList.contains("open")) closeSeriesSheet(); });
-
-async function openSeriesSheet(dir){
-  let st;
-  try { st = await seriesState(dir); } catch { st = null; }
-  if (!st || !st.comics.length) { openSeries(dir); return; } // not a series folder: just open it
-  const n = st.comics.length;
-  $("shTitle").textContent = dir.name;
-  $("shSub").textContent = st.read === n ? "All " + n + " read" : st.read + " of " + n + " read";
-
-  // big cover: the series cover; hovering a button (PC) swaps in that issue's cover
-  const big = $("shCover"); big.replaceChildren(); big.textContent = "";
-  const bigImg = new Image(); bigImg.alt = ""; bigImg.onload = () => bigImg.classList.add("ok"); big.append(bigImg);
-  let seriesUrl = null;
-  firstComicIn(dir).then(f => f && coverFor(f)).then(u => { if (u) { seriesUrl = u; bigImg.src = u; } }).catch(() => {});
-
-  const label = node => issueNo(node.name) || baseName(node.name);
-  const btn = (title, detail, node, primary, act) => {
-    const b = document.createElement("button"); b.className = "shBtn" + (primary ? " primary" : "");
-    const th = document.createElement("span"); th.className = "th" + (node ? "" : " none");
-    const tx = document.createElement("span"); tx.innerHTML = "<b></b><small></small>";
-    tx.querySelector("b").textContent = title; tx.querySelector("small").textContent = detail;
-    b.append(th, tx);
-    if (node) {
-      coverFor(node).then(u => {
-        th.style.backgroundImage = "url(" + u + ")";
-        b.addEventListener("pointerenter", e => { if (e.pointerType === "mouse") bigImg.src = u; });
-        b.addEventListener("pointerleave", e => { if (e.pointerType === "mouse" && seriesUrl) bigImg.src = seriesUrl; });
-      }).catch(() => {});
-    }
-    b.onclick = act;
-    return b;
-  };
-  const btns = [];
-  if (st.current) {
-    const p = st.current.pos;
-    btns.push(btn("Continue reading", label(st.current.node) + (p && p.n ? " · page " + (p.i + 1) + " of " + p.n : ""), st.current.node, true,
-      () => { closeSeriesSheet(); openComic(st.current.node, st.comics); }));
-  }
-  if (st.next) {
-    btns.push(btn(st.touched ? "Next unread" : "Start reading", label(st.next), st.next, !st.current,
-      () => { closeSeriesSheet(); openComic(st.next, st.comics); }));
-  }
-  const target = st.current ? st.current.node.path : (st.touched && st.next ? st.next.path : null);
-  btns.push(btn("Open series", n + (n === 1 ? " issue" : " issues"), null, false, () => openSeries(dir, target)));
-  $("shBtns").replaceChildren(...btns);
-  $("seriesPanel").classList.add("open");
-  btns[0].focus({preventScroll: true});
-}
+$("jumpBtn").onclick = e => { e.stopPropagation(); openJump(); };
+$("changeLibLink").onclick = e => { e.preventDefault(); $("openBtn").onclick(); };
+$("jumpPop").onclick = e => e.stopPropagation();
+document.addEventListener("click", closeJump);
 
 // shrink publisher names until every word fits on its panel
 function fitNames(){
@@ -986,7 +1387,7 @@ const ROTATE_MS = 8000; // how long each publisher cover stays before crossfadin
 function hueOf(s){ let h = 0; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
 
 function makeCard(k, comics, atRoot){
-  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0; card.dataset.path = k.path;
+  const card = document.createElement("div"); card.className = "card"; card.tabIndex = 0;
   const cover = document.createElement("div"); cover.className = "cover";
   const cap = document.createElement("div"); cap.className = "cap";
   card.title = k.name;
@@ -994,12 +1395,11 @@ function makeCard(k, comics, atRoot){
   const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
   if (k.kind === "dir" && atRoot) {
     // publisher: name panel instead of a comic cover
-    card.classList.add("dir");
+    card.classList.add("dir", "pub");
     cover.classList.add("name");
     cover.style.setProperty("--tint", "hsl(" + hueOf(k.name) + " 32% 26%)");
     const nm = document.createElement("span"); nm.textContent = k.name; cover.append(nm);
     // faded random covers from this publisher, crossfading in turn
-    card.classList.add("pub");
     const layers = [img, new Image()];
     for (const l of layers) { l.alt = ""; l.onload = null; }
     let front = 0, curPath = null;
@@ -1041,36 +1441,26 @@ function makeCard(k, comics, atRoot){
     };
     cap.className = "sub"; cap.style.marginTop = "10px";
     listNode(k).then(ks => { const n = ks.filter(x => x.kind === "dir").length, f = ks.filter(x => x.kind === "file").length;
-      cap.textContent = n ? n + (n === 1 ? " series" : " series") : f ? f + (f === 1 ? " issue" : " issues") : "Empty"; }).catch(()=>{});
-    card.onclick = () => { stack.push(k); renderLib(); window.scrollTo(0, 0); };
+      cap.textContent = n ? n + " series" : f ? f + (f === 1 ? " issue" : " issues") : "Empty"; }).catch(()=>{});
+    card.onclick = () => goInto(k);
   } else if (k.kind === "dir") {
     card.classList.add("dir");
     cover.textContent = k.name; cap.textContent = k.name;
     card._load = async () => { try { const f = await firstComicIn(k); if (f) { img.src = await coverFor(f); cover.append(img); } } catch {} };
-    card.onclick = () => openSeriesSheet(k);
-    // "X of Y read" for the series
+    card.onclick = () => goInto(k);
+    // "X of Y read", and the series glows by how much of it you've read
     const sub = document.createElement("div"); sub.className = "sub"; card.append(sub);
     comicsIn(k).then(cs => {
       if (!cs.length) return;
-      const read = cs.filter(c => { const p = progressOf(c.path); return p && p.done; }).length;
+      const read = cs.filter(c => readFrac(c.path) >= 1).length;
       sub.textContent = read === cs.length ? "All " + cs.length + " read" : read + " of " + cs.length + " read";
-      if (read) {
-        const bar = document.createElement("div"); bar.className = "prog";
-        const fill = document.createElement("i"); fill.style.width = Math.round(read / cs.length * 100) + "%";
-        bar.append(fill); card.append(bar);
-      }
+      setBag(cover, allRead(cs));
     }).catch(()=>{});
     attachMenu(card, () => [
       {label:"Mark series as read", act: async () => { const t = Date.now(); (await comicsIn(k)).forEach((c, j) => setRead(c.path, true, t + j)); }},
       {label:"Mark series as unread", act: async () => { (await comicsIn(k)).forEach(c => setRead(c.path, false)); }},
-      ...(CLOUD ? [{label:"Keep series on this device", act: async () => {
-        try { await keepOnDevice(await comicsIn(k)); } catch (e) { libToast(e.message, 4000); }
-      }}] : []),
-      ...(APP ? [{label:"Remove series from this device", act: async () => {
-        const cs = (await comicsIn(k)).filter(c => localKeys.has(c.appKey) || !c.cloud);
-        if (!cs.length) { libToast("None of this series is saved on this device"); return; }
-        if (confirm("Remove " + cs.length + " saved issue" + (cs.length === 1 ? "" : "s") + " of " + k.name + " from this device?" + (CLOUD ? " OneDrive copies aren't affected." : ""))) await removeFromDevice(cs);
-      }}] : [])
+      ...addToPlaylistItems(async () => (await comicsIn(k)).map(c => c.path)),
+      ...deviceItems(k)
     ]);
   } else if (isUnsupported(k.name)) {
     card.classList.add("dis");
@@ -1082,40 +1472,41 @@ function makeCard(k, comics, atRoot){
     cover.textContent = baseName(k.name);
     cap.textContent = no || baseName(k.name);
     if (no) { const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = baseName(k.name).replace(/\s*#\s*\d+(\.\d+)?\s*$/, ""); card.append(sub); }
-    if (CLOUD && localKeys.has(k.appKey)) { const s = document.createElement("div"); s.className = "sub"; s.textContent = "On this device"; card.append(s); }
-    const pos = progressOf(k.path);
-    if (!pos) { const d = document.createElement("span"); d.className = "dot"; d.title = "Unread"; card.append(d); }
-    else if (pos.done) card.classList.add("done");
-    else if (pos.n) {
-      const bar = document.createElement("div"); bar.className = "prog";
-      const fill = document.createElement("i"); fill.style.width = Math.max(4, Math.round((pos.i + 1) / pos.n * 100)) + "%";
-      bar.append(fill); card.append(bar);
-    }
-    card._load = async () => { try { img.src = await coverFor(k); cover.append(img); } catch {} };
+    const f = readFrac(k.path);
+    setBag(cover, readFrac(k.path) >= 1);
+    card.title = k.name + "\n" + pct(readFrac(k.path));
+    card._node = k;
+    card._load = async () => {
+      try { img.src = await coverFor(k); cover.append(img); } catch {}
+      try { // tagged comics: who made it, under the title
+        const ci = await comicInfo(k), line = creditLine(ci);
+        if (line && card.isConnected) {
+          const s = document.createElement("div"); s.className = "sub cred"; s.textContent = line;
+          (card.querySelector(".sub") || cap).after(s); // below the series name
+          card.title = k.name + (ci.Title ? "\n" + ci.Title : "") + "\n" + line + "\n" + pct(readFrac(k.path)); }
+      } catch {}
+    };
     card.onclick = () => openComic(k, comics);
-    const seriesPath = stack[stack.length - 1].path;
+    const seriesPath = k.path.slice(0, k.path.lastIndexOf("/")); // the folder it lives in (also from search and playlists)
+    const inList = !$("search").value.trim() && stack[stack.length - 1].playlist; // looking at a playlist right now
     attachMenu(card, () => {
       const p = progressOf(k.path), items = [];
       if (!p || !p.done) items.push({label:"Mark as read", act: () => setRead(k.path, true)});
       if (p) items.push({label: p.done ? "Mark as unread" : "Mark as unread (clear progress)", act: () => setRead(k.path, false)});
-      if (stack.length > 1) {
+      if (rootNode && seriesPath !== rootNode.path) {
         const chosen = store.get("seriesCover:" + seriesPath, null);
         items.push(chosen === k.path
           ? {label:"Use first issue as series cover", act: () => store.del("seriesCover:" + seriesPath)}
           : {label:"Use as series cover", act: () => store.set("seriesCover:" + seriesPath, k.path)});
       }
-      if (SERVER) items.push({label:"Download to this device", act: () => {
-        const a = document.createElement("a");
-        a.href = "api/file?download=1&path=" + encodeURIComponent(k.rel); a.download = k.name;
-        document.body.append(a); a.click(); a.remove();
-      }});
-      const onDevice = APP && (localKeys.has(k.appKey) || !k.cloud);
-      if (CLOUD && k.cloud && !onDevice) items.push({label:"Keep on this device", act: async () => {
-        try { await keepOnDevice([k]); } catch (e) { libToast(e.message, 4000); }
-      }});
-      if (onDevice) items.push({label:"Remove from this device", act: async () => {
-        if (confirm("Remove " + baseName(k.name) + " from this device?" + (k.cloud ? " The OneDrive copy isn't affected." : ""))) await removeFromDevice([k]);
-      }});
+      if (inList) {
+        const it = inList.items, at = it.indexOf(relOf(k.path));
+        const move = d => async () => { [it[at], it[at + d]] = [it[at + d], it[at]]; await savePlaylists(); };
+        if (at > 0) items.push({label:"Move earlier", act: move(-1)});
+        if (at >= 0 && at < it.length - 1) items.push({label:"Move later", act: move(1)});
+        items.push({label:"Remove from this playlist", act: async () => { it.splice(at, 1); await savePlaylists(); }});
+      } else items.push(...addToPlaylistItems(async () => [k.path]));
+      items.push(...deviceItems(k));
       return items;
     });
   }
@@ -1124,11 +1515,187 @@ function makeCard(k, comics, atRoot){
   return card;
 }
 
+/* ---------- Search: series and issues by title ---------- */
+let searchIdx = null, searchTok = 0, searchT;
+const norm = s => s.toLowerCase().replace(/[^a-z0-9#]+/g, " ").trim();
+async function buildIndex(){
+  const out = [];
+  const add = (h, title) => { const t = norm(title); h.text = t + " " + t.replace(/ /g, ""); out.push(h); }; // "spiderman" finds "Spider-Man" too
+  const walk = async (node, chain) => {
+    const kids = await listNode(node);
+    const comics = kids.filter(k => k.kind === "file" && isComic(k.name));
+    if (chain.length && comics.length) add({k: node, chain, dir: 1}, node.name);  // a series: a folder with issues in it
+    for (const k of kids) {
+      if (k.kind === "dir") { if (chain.length < 4) await walk(k, [...chain, k]); }
+      else if (isComic(k.name)) add({k, comics, dir: 0}, baseName(k.name));
+    }
+  };
+  await walk(rootNode, []);
+  return out;
+}
+async function renderSearch(){
+  const raw = $("search").value.trim(), tok = ++searchTok; renderTok++;
+  if (!raw) { renderLib(); return; }
+  if (!rootNode) return;
+  searchIdx ||= buildIndex();
+  let idx; try { idx = await searchIdx; } catch { searchIdx = null; return; }
+  if (tok !== searchTok) return;
+  const words = norm(raw).split(" ").filter(Boolean);
+  const hits = idx.filter(h => words.every(w => h.text.includes(w))).sort((a, b) => b.dir - a.dir).slice(0, 150);
+  $("crumbs").textContent = hits.length ? "Search: " + raw : "";
+  $("listsWrap").hidden = true; $("backBtn").hidden = false; // Back clears the search
+  $("empty").hidden = hits.length > 0;
+  if (!hits.length) $("empty").textContent = "Nothing matches “" + raw + "”.";
+  $("grid").replaceChildren(...hits.map(h => {
+    const card = makeCard(h.k, h.comics || [], false);
+    if (h.dir) card.onclick = () => { $("search").value = ""; goTo([rootNode, ...h.chain]); };
+    return card;
+  }));
+  await orderCards(() => tok === searchTok);
+  setView(); fitNames();
+}
+$("search").addEventListener("input", () => { clearTimeout(searchT); searchT = setTimeout(renderSearch, 120); });
+$("search").addEventListener("keydown", e => {
+  if (e.key === "Escape") { e.stopPropagation(); e.target.value = ""; e.target.blur(); renderLib(); }
+  else if (e.key === "Enter") { const c = $("grid").querySelector(".card.center") || $("grid").querySelector(".card"); if (c) c.click(); } // open the top hit
+});
+
+/* ---------- Playlists: your own reading order across any series ---------- */
+// Saved as a file in the library folder (so they stay with your comics, and in OneDrive they sync to every device)
+// and on this device as a backup. Whichever copy was saved last wins.
+const PL_FILE = "Panel Reader playlists.json";
+let playlists = [];
+const relOf = path => rootNode ? path.slice(rootNode.path.length + 1) : path;
+const plKey = () => "playlists:" + (rootNode ? rootNode.name : "");
+async function loadPlaylists(){
+  let best = store.get(plKey(), {saved:0, playlists:[]});
+  if (rootNode && rootNode.handle) {
+    try {
+      const j = JSON.parse(await (await (await rootNode.handle.getFileHandle(PL_FILE)).getFile()).text());
+      if (Array.isArray(j.playlists) && (j.saved || 0) >= (best.saved || 0)) best = j;
+    } catch {}
+  } else if (CLOUD) {
+    try {
+      const j = await cloudReadJson(CLOUD_FOLDER + "/" + PL_FILE);
+      if (j && Array.isArray(j.playlists) && (j.saved || 0) > (best.saved || 0)) best = j;
+      else if (best.playlists.length && (!j || (j.saved || 0) < (best.saved || 0))) cloudWriteJson(CLOUD_FOLDER + "/" + PL_FILE, best).catch(() => {}); // this device is ahead
+    } catch (e) { console.warn("playlists", e); }
+  }
+  playlists = (best.playlists || []).filter(p => p && p.name && Array.isArray(p.items));
+}
+async function savePlaylists(){
+  const data = {saved: Date.now(), playlists};
+  store.set(plKey(), data);
+  if (CLOUD) { try { await cloudWriteJson(CLOUD_FOLDER + "/" + PL_FILE, data); } catch (e) { libToast("Couldn't save the playlist to OneDrive. It's saved on this device."); } return; }
+  const h = rootNode && rootNode.handle;
+  if (!h) return;
+  try {
+    // the folder was opened read-only; Chrome asks once to allow saving the playlist file in it
+    if ((await h.queryPermission({mode:"readwrite"})) !== "granted" && (await h.requestPermission({mode:"readwrite"})) !== "granted") return;
+    const w = await (await h.getFileHandle(PL_FILE, {create:true})).createWritable();
+    await w.write(JSON.stringify(data, null, 2)); await w.close();
+  } catch (e) { console.warn("playlist file", e); }
+}
+function addToPlaylistItems(getPaths){
+  const add = async pl => { for (const p of await getPaths()) { const r = relOf(p); if (!pl.items.includes(r)) pl.items.push(r); } await savePlaylists(); };
+  return [
+    ...playlists.map(pl => ({label:"Add to “" + pl.name + "”", act: () => add(pl)})),
+    {label:"Add to a new playlist…", act: async () => {
+      const name = (prompt("Name the new playlist") || "").trim(); if (!name) return;
+      let pl = playlists.find(x => x.name === name);
+      if (!pl) { pl = {name, items:[]}; playlists.push(pl); }
+      await add(pl);
+    }}
+  ];
+}
+function renderPlaylists(){
+  const wrap = $("listsWrap"), row = $("listsRow");
+  if (stack.length !== 1 || !rootNode || !playlists.length) { wrap.hidden = true; row.innerHTML = ""; return; }
+  row.replaceChildren(...playlists.map(listCard));
+  wrap.hidden = false;
+}
+function listCard(pl){
+  const node = {name:pl.name, path:"playlist:" + pl.name, kind:"dir", playlist:pl};
+  const card = document.createElement("div"); card.className = "card dir"; card.tabIndex = 0; card.title = pl.name;
+  const cover = document.createElement("div"); cover.className = "cover"; cover.textContent = pl.name;
+  const cap = document.createElement("div"); cap.className = "cap"; cap.textContent = pl.name;
+  const sub = document.createElement("div"); sub.className = "sub"; sub.textContent = pl.items.length + (pl.items.length === 1 ? " issue" : " issues");
+  card.append(cover, cap, sub);
+  const img = new Image(); img.alt = ""; img.onload = () => img.classList.add("ok");
+  card._load = async () => {
+    try {
+      const items = await listNode(node);
+      const read = items.filter(c => readFrac(c.path) >= 1).length;
+      if (items.length) sub.textContent = read === items.length ? "All " + items.length + " read" : read + " of " + items.length + " read";
+      if (items.length) setBag(cover, allRead(items));
+      const first = items.find(c => { const p = progressOf(c.path); return !(p && p.done); }) || items[0]; // cover: the next one up
+      if (first) { img.src = await coverFor(first); cover.append(img); }
+    } catch {}
+  };
+  card.onclick = () => goInto(node);
+  card.onkeydown = e => { if (e.key === "Enter") card.click(); };
+  attachMenu(card, () => [
+    {label:"Rename playlist", act: async () => { const n = (prompt("Rename the playlist", pl.name) || "").trim(); if (n && n !== pl.name) { pl.name = n; await savePlaylists(); } }},
+    {label:"Delete playlist", act: async () => { if (confirm("Delete the playlist “" + pl.name + "”? Your comics aren't touched.")) { playlists.splice(playlists.indexOf(pl), 1); await savePlaylists(); } }}
+  ]);
+  seen.observe(card);
+  return card;
+}
+
+/* ---------- Cover wheel: an optional way to browse any shelf ---------- */
+const wheelPos = new Map(); let wheelAt = 0;
+const gridEl = $("grid");
+const wheelOn = () => gridEl.classList.contains("wheel");
+const viewKey = () => $("search").value.trim() ? "search" : (stack.length ? stack[stack.length - 1].path : "");
+function setView(){
+  const on = store.get("view", "grid") === "wheel";
+  $("viewBtn").textContent = on ? "Grid" : "Wheel";
+  gridEl.classList.toggle("wheel", on);
+  if (on) { wheelAt = wheelPos.get(viewKey()) || 0; layoutWheel(); }
+  else for (const c of gridEl.children) { c.style.transform = c.style.zIndex = c.style.opacity = c.style.pointerEvents = ""; c.classList.remove("center"); }
+}
+function layoutWheel(){
+  const cards = [...gridEl.children]; if (!cards.length) return;
+  wheelAt = Math.max(0, Math.min(cards.length - 1, wheelAt));
+  wheelPos.set(viewKey(), wheelAt);
+  const w = cards[0].offsetWidth || 200;
+  cards.forEach((c, i) => {
+    const d = i - wheelAt, a = Math.abs(d), s = Math.sign(d);
+    c.classList.toggle("center", d === 0);
+    c.style.transform = d === 0 ? "translateZ(60px)"
+      : "translateX(" + s * (w * 0.7 + (a - 1) * w * 0.32) + "px) translateZ(" + (-80 - a * 40) + "px) rotateY(" + (-s * 50) + "deg)";
+    c.style.zIndex = 100 - a;
+    c.style.opacity = a > 6 ? 0 : 1;
+    c.style.pointerEvents = a > 6 ? "none" : "";
+  });
+}
+function spinWheel(step){ wheelAt += step; layoutWheel(); }
+$("sortSel").onchange = () => { store.set("sort", $("sortSel").value); renderLib(); };
+$("viewBtn").onclick = () => { store.set("view", wheelOn() ? "grid" : "wheel"); setView(); };
+let wAcc = 0, wLock = 0, drag = null;
+gridEl.addEventListener("wheel", e => {
+  if (!wheelOn()) return;
+  e.preventDefault();
+  const now = performance.now(); if (now < wLock) return;
+  wAcc += Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  if (Math.abs(wAcc) > 30) { spinWheel(Math.sign(wAcc)); wAcc = 0; wLock = now + 90; }
+}, {passive:false});
+gridEl.addEventListener("pointerdown", e => { if (wheelOn() && !e.target.closest(".more,.menu")) drag = {x:e.clientX, moved:false}; });
+addEventListener("pointermove", e => { if (!drag) return; const dx = e.clientX - drag.x; if (Math.abs(dx) > 60) { spinWheel(dx < 0 ? 1 : -1); drag.x = e.clientX; drag.moved = true; } });
+addEventListener("pointerup", () => setTimeout(() => { drag = null; }, 0));
+gridEl.addEventListener("click", e => { // a click on a side cover brings it to the middle; on the middle one, opens it
+  if (!wheelOn() || e.target.closest(".more,.menu")) return;
+  if (drag && drag.moved) { e.stopPropagation(); return; }
+  const c = e.target.closest(".card");
+  if (c && !c.classList.contains("center")) { e.stopPropagation(); wheelAt = [...gridEl.children].indexOf(c); layoutWheel(); }
+}, true);
+
 /* ---------- Opening the library ---------- */
 $("openBtn").onclick = async () => {
   if (window.showDirectoryPicker) {
     try {
-      const h = await window.showDirectoryPicker({id:"comics", mode:"read"});
+      // read and write: Panel Reader only ever writes its own two files there (progress and playlists), never your comics
+      const h = await window.showDirectoryPicker({id:"comics", mode:"readwrite"});
       try { await dbPut("kv", "root", h); } catch {}
       if (!rootNode || rootNode.name !== h.name) store.set("lastPath", []);
       setReopen(h);
@@ -1136,6 +1703,7 @@ $("openBtn").onclick = async () => {
     } catch (err) { if (err.name !== "AbortError") { $("empty").hidden = false; $("empty").textContent = "Couldn't open that folder: " + err.message; } }
   } else $("dirInput").click();
 };
+// Browsers without the folder picker (Firefox): read the folder as a one-time upload
 $("dirInput").onchange = () => {
   const files = [...$("dirInput").files];
   if (!files.length) return;
@@ -1154,106 +1722,35 @@ $("dirInput").onchange = () => {
   }
   openRoot(root);
 };
-/* ---------- iPad app mode: comics imported into on-device storage ---------- */
-const APP_ROOT = "Comics";
-async function dbKeys(s){ const db = await idb(); return new Promise((res, rej) => { const q = db.transaction(s).objectStore(s).getAllKeys(); q.onsuccess = () => res(q.result); q.onerror = () => rej(q.error); }); }
-async function dbDel(s, k){ const db = await idb(); return new Promise((res, rej) => { const t = db.transaction(s, "readwrite"); t.objectStore(s).delete(k); t.oncomplete = () => res(); t.onerror = () => rej(t.error); }); }
-const seriesFromName = n => baseName(n).replace(/\s*#\s*\d+(\.\d+)?.*$/, "").trim() || baseName(n);
-
-// Build the shelf tree from stored keys like "Marvel/Daredevil (2019)/Daredevil (2019) #001.cbz".
-// Comic data is loaded only when an issue (or its cover) is opened.
-async function appTree(){
-  const root = {name:APP_ROOT, path:APP_ROOT, kind:"dir", children:new Map()};
-  for (const key of await dbKeys("comics")) {
-    const parts = key.split("/"); let cur = root;
-    for (let i = 0; i < parts.length - 1; i++) {
-      if (!cur.children.has(parts[i])) cur.children.set(parts[i], {name:parts[i], path:cur.path + "/" + parts[i], kind:"dir", children:new Map()});
-      cur = cur.children.get(parts[i]);
+function setReopen(h){
+  const b = $("reopenBtn");
+  b.textContent = "Open " + h.name; b.hidden = false;
+  b.onclick = async () => {
+    try {
+      let perm = await h.queryPermission({mode:"readwrite"});
+      if (perm !== "granted") perm = await h.requestPermission({mode:"readwrite"});
+      if (perm !== "granted") perm = await h.requestPermission({mode:"read"}); // reading still works; progress then stays in this browser
+      if (perm === "granted") { b.hidden = true; await openRoot({name:h.name, path:h.name, kind:"dir", handle:h}); }
+      else { $("empty").textContent = "Access wasn't allowed. Use Choose library folder instead."; }
+    } catch (err) { $("empty").textContent = "Couldn't open it: " + err.message + ". Use Choose library folder instead."; }
+  };
+}
+(async () => {
+  if (APP) { Promise.resolve().then(startApp); return; } // the app: OneDrive (once the whole script has loaded)
+  if (!window.showDirectoryPicker) return;
+  try {
+    const h = await dbGet("kv", "root");
+    if (h) {
+      setReopen(h);
+      // Chrome/Edge sometimes keep access between visits; open straight away when they do
+      if ((await h.queryPermission({mode:"readwrite"})) === "granted") { $("reopenBtn").hidden = true; openRoot({name:h.name, path:h.name, kind:"dir", handle:h}); }
+      else $("empty").innerHTML = "Click <b>Open " + h.name.replace(/[<&]/g, "") + "</b> to return to your shelf.";
     }
-    const fname = parts[parts.length - 1];
-    cur.children.set(fname, {name:fname, path:cur.path + "/" + fname, kind:"file", appKey:key});
-  }
-  return root;
-}
-function showSignIn(){
-  document.body.classList.add("signedout");
-  rootNode = null; stack = [];
-  $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true;
-}
-async function openAppLibrary(){
-  if (!msAccount) { showSignIn(); return; }     // OneDrive is the only source: signed out means sign in first
-  document.body.classList.remove("signedout");
-  const root = await appTree();
-  const has = root.children.size > 0;
-  $("empty").hidden = has;
-  if (!has) { rootNode = null; stack = []; $("empty").innerHTML = "Nothing saved on this device yet. When you're online your OneDrive shelf shows here, and <b>Keep on this device</b> saves issues for offline reading."; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("contWrap").hidden = true; }
-  updateStorageUse();
-  if (has) await openRoot(root);
-}
-async function updateStorageUse(){
-  try { const e = await navigator.storage.estimate(); const gb = e.usage / 1e9;
-    $("storageUse").textContent = (gb >= 1 ? gb.toFixed(1) + " GB" : e.usage < 1e6 ? "Under 1 MB" : Math.round(e.usage / 1e6) + " MB") + " on this device"; } catch {}
-}
-async function removeFromDevice(nodes){
-  for (const n of nodes) if (n.appKey) {
-    await dbDel("comics", n.appKey);
-    if (!n.cloud) store.del("pos:" + n.path); // a OneDrive comic keeps its progress; only the device copy goes
-  }
-  if (CLOUD) { await refreshLocal(); libToast("Removed from this device"); }
-  else await openAppLibrary();
-}
+  } catch {}
+})();
 
-// Import: pick CBZ files in the Files app; series comes from the file name, publisher is asked once for new series
-let pendingImport = [];
-
-$("importInput").onchange = async () => {
-  const picked = [...$("importInput").files];
-  const files = picked.filter(f => isComic(f.name));
-  $("importInput").value = "";
-  if (!files.length) {
-    if (picked.length) { $("empty").hidden = false; $("empty").textContent = "Those weren't CBZ files. Pick files ending in .cbz (or .zip)."; }
-    return;
-  }
-  pendingImport = files;
-  const keys = await dbKeys("comics");
-  const seriesPub = new Map(), pubs = new Set();
-  for (const k of keys) { const p = k.split("/"); if (p.length >= 3) { seriesPub.set(p[1], p[0]); pubs.add(p[0]); } }
-  const known = files.filter(f => seriesPub.has(seriesFromName(f.name)));
-  const fresh = [...new Set(files.filter(f => !seriesPub.has(seriesFromName(f.name))).map(f => seriesFromName(f.name)))];
-  $("impTitle").textContent = "Add " + files.length + (files.length === 1 ? " comic" : " comics");
-  $("impKnown").textContent = known.length ? known.length + " will go into series you already have." : "";
-  $("impPubWrap").hidden = fresh.length === 0;
-  $("impSeries").textContent = fresh.length ? "New series: " + fresh.join(", ") : "";
-  $("impPubList").innerHTML = ""; for (const p of [...pubs].sort(collator.compare)) { const o = document.createElement("option"); o.value = p; $("impPubList").append(o); }
-  $("impPub").value = store.get("lastPublisher", "");
-  $("impStatus").textContent = ""; $("impGo").disabled = false;
-  $("importPanel").classList.add("open");
-  if (fresh.length) $("impPub").focus();
-};
-$("impCancel").onclick = () => { pendingImport = []; $("importPanel").classList.remove("open"); };
-$("impGo").onclick = async () => {
-  const pub = $("impPub").value.trim().replace(/[\/\\]/g, "-");
-  if (!$("impPubWrap").hidden && !pub) { $("impStatus").textContent = "Type a publisher name first."; $("impPub").focus(); return; }
-  if (pub) store.set("lastPublisher", pub);
-  $("impGo").disabled = true;
-  const seriesPub = new Map();
-  for (const k of await dbKeys("comics")) { const p = k.split("/"); if (p.length >= 3) seriesPub.set(p[1], p[0]); }
-  try { if (navigator.storage && navigator.storage.persist) await navigator.storage.persist(); } catch {}
-  let n = 0;
-  for (const f of pendingImport) {
-    n++; $("impStatus").textContent = "Copying " + n + " of " + pendingImport.length + "…";
-    const series = seriesFromName(f.name);
-    const key = (seriesPub.get(series) || pub) + "/" + series + "/" + f.name;
-    try { await dbPut("comics", key, new Blob([await f.arrayBuffer()], {type:"application/zip"})); }
-    catch (err) { $("impStatus").textContent = "Couldn't copy " + f.name + ": " + (err.message || err) + ". The device may be out of space."; $("impGo").disabled = false; return; }
-  }
-  pendingImport = [];
-  $("importPanel").classList.remove("open");
-  if (CLOUD) { await refreshLocal(); await renderLib(); libToast("Added to this device"); }
-  else await openAppLibrary();
-};
-
-/* ---------- OneDrive library (app mode) ---------- */
+/* ---------- The app: your library in OneDrive ---------- */
+const APP_ROOT = "Comics";
 const MS_CLIENT_ID = "0e68c45f-e424-49c5-8b42-2b04b7fe7f9f";   // Panel Reader's app registration (an ID, not a secret)
 const CLOUD_FOLDER = "Comics";                                   // folder inside Panel Reader's app folder holding Publisher/Series
 const GRAPH = "https://graph.microsoft.com/v1.0";
@@ -1286,6 +1783,13 @@ async function msToken(){
     return new Promise(() => {});
   }
 }
+// a few OneDrive requests at a time: the wall reads every series folder at once
+let cloudActive = 0; const cloudWaiting = [];
+async function cloudSlot(fn){
+  while (cloudActive >= 6) await new Promise(r => cloudWaiting.push(r));
+  cloudActive++;
+  try { return await fn(); } finally { cloudActive--; const next = cloudWaiting.shift(); if (next) next(); }
+}
 async function graph(path, opts = {}){
   const token = await msToken();
   return fetch(path.startsWith("http") ? path : GRAPH + path, {...opts, headers: {...(opts.headers || {}), Authorization: "Bearer " + token}});
@@ -1295,27 +1799,68 @@ async function cloudChildren(rel){
   let url = "/me/drive/special/approot:/" + encPath(CLOUD_FOLDER + (rel ? "/" + rel : "")) + ":/children?$top=999";
   const out = [];
   while (url) {
-    const r = await graph(url);
+    const r = await cloudSlot(() => graph(url));
     if (r.status === 404) throw new Error(rel ? "That folder isn't in your OneDrive anymore." : "NO_COMICS_FOLDER");
     if (!r.ok) throw new Error("OneDrive didn't respond (error " + r.status + ").");
     const j = await r.json(); out.push(...j.value); url = j["@odata.nextLink"] || null;
   }
   return out;
 }
-// progress file in OneDrive's private "Apps/Panel Reader" folder
-async function cloudReadState(){
-  const r = await graph("/me/drive/special/approot:/" + STATE_FILE);
-  if (r.status === 404) return {};
-  if (!r.ok) throw new Error("state " + r.status);
+// small files Panel Reader keeps in its own OneDrive folder: progress, playlists
+async function cloudReadJson(path){
+  const r = await cloudSlot(() => graph("/me/drive/special/approot:/" + encPath(path)));
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error("read " + r.status);
   const dl = (await r.json())["@microsoft.graph.downloadUrl"];
   const d = await fetch(dl, {cache:"no-store"});
-  if (!d.ok) throw new Error("state download " + d.status);
-  try { return await d.json(); } catch { return {}; }
+  if (!d.ok) throw new Error("download " + d.status);
+  try { return await d.json(); } catch { return null; }
 }
-async function cloudWriteState(state){
-  const r = await graph("/me/drive/special/approot:/" + STATE_FILE + ":/content", {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify(state)});
-  if (!r.ok) throw new Error("state upload " + r.status);
+async function cloudWriteJson(path, data){
+  const r = await cloudSlot(() => graph("/me/drive/special/approot:/" + encPath(path) + ":/content", {method:"PUT", headers:{"Content-Type":"application/json"}, body: JSON.stringify(data)}));
+  if (!r.ok) throw new Error("upload " + r.status);
 }
+
+/* Progress sync: on the device first, through OneDrive whenever signed in and online */
+let uploadT = null, lastSync = 0, syncing = null, desktopChecked = false;
+function scheduleUpload(){ clearTimeout(uploadT); uploadT = setTimeout(() => cloudSync(true), 2500); }
+document.addEventListener("visibilitychange", () => { if (APP && document.hidden && dirty.size) cloudSync(true); });
+async function cloudSync(force){
+  if (!CLOUD || !msAccount || navigator.onLine === false) return;
+  if (!force && Date.now() - lastSync < 20000) return;
+  if (syncing) return syncing;
+  syncing = (async () => {
+    try {
+      const remote = (await cloudReadJson(STATE_FILE)) || {};
+      const merged = {...remote};
+      for (const k of dirty) { if (k in appState) merged[k] = appState[k]; else delete merged[k]; }
+      appState = merged;
+      if (!desktopChecked) { desktopChecked = true; await importDesktopProgress(); }
+      if (dirty.size) { await cloudWriteJson(STATE_FILE, merged); dirty.clear(); }
+      saveAppState(); lastSync = Date.now();
+    } catch (e) { console.warn("sync", e); }
+  })();
+  try { await syncing; } finally { syncing = null; }
+}
+// Reading done in the reader opened straight from the PC's Comics folder is saved in a file there
+// ("Panel Reader progress.json"). The app picks up anything newer from it, so nothing read there is lost.
+async function importDesktopProgress(){
+  let f = null;
+  try { f = await cloudReadJson(CLOUD_FOLDER + "/" + ST_FILE); } catch { return; }
+  if (!f || !f.state) return;
+  let seen = 0; try { seen = Number(localStorage.getItem("pr:desktopSeen")) || 0; } catch {}
+  if ((f.saved || 0) <= seen) return; // nothing new since last time
+  const pre = APP_ROOT + "/";
+  for (const [k, v] of Object.entries(f.state)) {
+    const i = k.indexOf(":"), kind = k.slice(0, i), key = kind + ":" + pre + k.slice(i + 1);
+    if (!SYNC_RE.test(key)) continue;
+    const val = kind === "seriesCover" && typeof v === "string" ? pre + v : v, cur = appState[key];
+    const take = kind === "pos" ? !cur || ((v && v.t) || 0) > ((cur && cur.t) || 0) : cur === undefined;
+    if (take) { appState[key] = val; dirty.add(key); }
+  }
+  try { localStorage.setItem("pr:desktopSeen", String(f.saved || 0)); } catch {}
+}
+
 // a OneDrive comic, read in pieces like a local file (falls back to one full download if needed)
 function cloudFile(node){
   let dl = node.dl, whole = null;
@@ -1341,12 +1886,28 @@ function cloudFile(node){
     }
   };
 }
-async function refreshLocal(){ localTree = await appTree(); localKeys = new Set(await dbKeys("comics")); listCache.clear(); updateStorageUse(); }
+
+/* Issues kept on this device for offline reading, stored as "Marvel/Daredevil (2019)/Daredevil (2019) #001.cbz" */
+async function appTree(){
+  const root = {name:APP_ROOT, path:APP_ROOT, kind:"dir", children:new Map()};
+  for (const key of await dbKeys("comics")) {
+    const parts = key.split("/"); let cur = root;
+    for (let i = 0; i < parts.length - 1; i++) {
+      if (!cur.children.has(parts[i])) cur.children.set(parts[i], {name:parts[i], path:cur.path + "/" + parts[i], kind:"dir", children:new Map()});
+      cur = cur.children.get(parts[i]);
+    }
+    const fname = parts[parts.length - 1];
+    cur.children.set(fname, {name:fname, path:cur.path + "/" + fname, kind:"file", appKey:key});
+  }
+  return root;
+}
+async function refreshLocal(){ localTree = await appTree(); localKeys = new Set(await dbKeys("comics")); listCache.clear(); searchIdx = null; updateStorageUse(); }
 function findLocal(rel){
   let n = localTree; if (!n) return null;
   for (const part of rel ? rel.split("/") : []) { n = n.children && n.children.get(part); if (!n) return null; }
   return n;
 }
+const onDevice = k => APP && !!k.appKey && (localKeys.has(k.appKey) || !k.cloud);
 async function keepOnDevice(nodes){
   const list = nodes.filter(n => n.cloud && n.kind === "file" && !localKeys.has(n.appKey));
   let i = 0;
@@ -1360,17 +1921,47 @@ async function keepOnDevice(nodes){
   await refreshLocal();
   libToast(list.length ? "Saved for offline reading" : "Already on this device");
 }
+async function removeFromDevice(nodes){
+  for (const n of nodes) if (n.appKey) {
+    await dbDel("comics", n.appKey);
+    if (!n.cloud) store.del("pos:" + n.path); // a OneDrive comic keeps its progress; only the device copy goes
+  }
+  if (CLOUD) { await refreshLocal(); libToast("Removed from this device"); }
+  else await openAppLibrary();
+}
+async function updateStorageUse(){
+  try { const e = await navigator.storage.estimate(); const gb = e.usage / 1e9;
+    $("storageUse").textContent = (gb >= 1 ? gb.toFixed(1) + " GB" : e.usage < 1e6 ? "Under 1 MB" : Math.round(e.usage / 1e6) + " MB") + " saved on this device"; } catch {}
+}
+// the ••• items that only make sense in the app
+function deviceItems(k){
+  if (!APP) return [];
+  if (k.kind === "dir") return [
+    ...(CLOUD ? [{label:"Keep series on this device", act: async () => { try { await keepOnDevice(await comicsIn(k)); } catch (e) { libToast(e.message, 4000); } }}] : []),
+    {label:"Remove series from this device", act: async () => {
+      const cs = (await comicsIn(k)).filter(onDevice);
+      if (!cs.length) { libToast("None of this series is saved on this device"); return; }
+      if (confirm("Remove " + cs.length + " saved issue" + (cs.length === 1 ? "" : "s") + " of " + k.name + " from this device?" + (CLOUD ? " OneDrive copies aren't affected." : ""))) await removeFromDevice(cs);
+    }}
+  ];
+  const items = [];
+  if (CLOUD && k.cloud && !onDevice(k)) items.push({label:"Keep on this device", act: async () => { try { await keepOnDevice([k]); } catch (e) { libToast(e.message, 4000); } }});
+  if (onDevice(k)) items.push({label:"Remove from this device", act: async () => {
+    if (confirm("Remove " + baseName(k.name) + " from this device?" + (k.cloud ? " The OneDrive copy isn't affected." : ""))) await removeFromDevice([k]);
+  }});
+  return items;
+}
+
 let libToastT;
 function libToast(t, ms = 2200){ const el = $("libToast"); el.textContent = t; el.classList.add("show"); clearTimeout(libToastT); if (ms) libToastT = setTimeout(() => el.classList.remove("show"), ms); }
 function showNotice(t){ const n = $("notice"); n.textContent = t || ""; n.hidden = !t; }
 function updateCloudButton(){
   const b = $("cloudBtn");
   b.querySelector("b").textContent = msAccount ? "Sign out of OneDrive" : "Sign in to OneDrive";
-  b.querySelector("small").textContent = msAccount ? "Comics saved to this device stay readable" : "Show the comics in OneDrive\\Apps\\Panel Reader\\" + CLOUD_FOLDER;
+  b.querySelector("small").textContent = msAccount ? "Comics saved to this device stay readable" : "Show the comics in OneDrive\\" + appFolderPath + "\\" + CLOUD_FOLDER;
   $("acWho").textContent = msAccount ? "Signed in as " + msAccount.username : "Not signed in";
 }
-// account button: one round button in the corner instead of storage text and a sign-out button
-$("acctBtn").onclick = () => { $("acVersion").textContent = "Version " + APP_VERSION; updateStorageUse(); openSheet("acctPanel"); };
+$("acctBtn").onclick = () => { $("acVersion").textContent = "Version " + APP_VERSION; updateCloudButton(); updateStorageUse(); openSheet("acctPanel"); };
 $("acHelp").onclick = () => { closeSheet("acctPanel"); toggleHelp(true); };
 $("acRefresh").onclick = async () => { closeSheet("acctPanel"); await refreshLibrary(); };
 async function signIn(){
@@ -1384,8 +1975,29 @@ $("cloudBtn").onclick = async () => {
   if (!msAccount) return signIn();
   if (!confirm("Sign out of OneDrive on this device? Comics you saved to this device stay readable.")) return;
   await msalApp.logoutRedirect({account: msAccount, onRedirectNavigate: () => false}); // forget this device's sign-in only
-  msAccount = null; CLOUD = false; updateCloudButton(); await openAppLibrary();
+  msAccount = null; CLOUD = false; closeSheet("acctPanel"); updateCloudButton(); await openAppLibrary();
 };
+function showSignIn(){
+  document.body.classList.add("signedout");
+  rootNode = null; stack = [];
+  $("grid").innerHTML = ""; $("crumbs").innerHTML = "";
+}
+// signed out, or offline: just the issues kept on this device
+async function openAppLibrary(){
+  if (!msAccount) { showSignIn(); return; }     // OneDrive is the only source: signed out means sign in first
+  document.body.classList.remove("signedout");
+  CLOUD = false;
+  await refreshLocal();
+  const has = localTree.children.size > 0;
+  if (!has) {
+    rootNode = null; stack = []; $("grid").innerHTML = ""; $("crumbs").innerHTML = ""; $("listsWrap").hidden = true;
+    $("search").hidden = $("sortSel").hidden = $("viewBtn").hidden = $("jumpBtn").hidden = true;
+    $("empty").hidden = false;
+    $("empty").innerHTML = "Nothing saved on this device yet. When you're online your OneDrive shelf shows here, and <b>Keep on this device</b> (in an issue's ••• menu) saves issues for offline reading.";
+    return;
+  }
+  await openRoot(localTree);
+}
 async function openCloudLibrary(){
   CLOUD = true;
   await refreshLocal();
@@ -1395,8 +2007,7 @@ async function openCloudLibrary(){
     const a = await graph("/me/drive/special/approot");
     if (a.ok) { const j = await a.json(); if (j.name) appFolderPath = "Apps\\" + j.name; }
     await listNode(root);
-  }
-  catch (e) {
+  } catch (e) {
     CLOUD = false;
     showNotice(e.message === "NO_COMICS_FOLDER"
       ? "Connected. Now move your " + CLOUD_FOLDER + " folder into OneDrive\\" + appFolderPath + " (in the OneDrive folder on your computer), then reopen Panel Reader. That's the only folder Panel Reader can see."
@@ -1406,66 +2017,176 @@ async function openCloudLibrary(){
   showNotice("");
   document.body.classList.remove("signedout");
   $("empty").hidden = true;
-  cloudSync(true);
+  await cloudSync(true);
   await openRoot(root);
   return true;
 }
-
-function setReopen(h){
-  const b = $("reopenBtn");
-  b.textContent = "Open " + h.name; b.hidden = false;
-  b.onclick = async () => {
-    try {
-      let perm = await h.queryPermission({mode:"read"});
-      if (perm !== "granted") perm = await h.requestPermission({mode:"read"});
-      if (perm === "granted") { b.hidden = true; await openRoot({name:h.name, path:h.name, kind:"dir", handle:h}); }
-      else { $("empty").textContent = "Access wasn't allowed. Use Choose library folder instead."; }
-    } catch (err) { $("empty").textContent = "Couldn't open it: " + err.message + ". Use Choose library folder instead."; }
-  };
+async function startApp(){
+  $("openBtn").hidden = $("reopenBtn").hidden = true; $("acctBtn").hidden = false;
+  $("empty").textContent = "";
+  for (const el of document.querySelectorAll(".cloudOnly")) el.classList.remove("cloudOnly");
+  if ("serviceWorker" in navigator && !window.__PR_TEST) navigator.serviceWorker.register("sw.js").catch(()=>{});
+  try { await msalInit(); } catch { /* offline or the sign-in library didn't load: comics on this device only */ }
+  updateCloudButton();
+  if (msAccount && navigator.onLine !== false && await openCloudLibrary()) return;
+  await openAppLibrary();
+  if (msAccount && navigator.onLine === false) showNotice("You're offline, so this shows comics saved on this device. Your OneDrive shelf comes back when you're online.");
 }
-(async () => {
-  // Served from the PC? Then the library comes from the server and there's nothing to choose.
-  if (/^https?:$/.test(location.protocol)) {
-    try {
-      const r = await fetch("api/info", {cache:"no-store"});
-      if (r.ok) {
-        const info = await r.json();
-        SERVER = true;
-        await refreshState();
-        $("libActions").hidden = true;
-        $("empty").hidden = true;
-        await openRoot({name:info.name, path:info.name, kind:"dir", remote:true, rel:""});
-        return;
-      }
-    } catch {}
-    // Not the PC server: the hosted iPad app (https), with its own on-device library
-    if (location.protocol === "https:") {
-      APP = true; loadAppState();
-      $("libActions").hidden = true; $("appActions").hidden = false;
-      if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});
-      try { await msalInit(); } catch { /* offline or sign-in library unavailable: device library only */ }
-      updateCloudButton();
-      if (msAccount && navigator.onLine !== false && await openCloudLibrary()) return;
-      await openAppLibrary();
-      if (msAccount && navigator.onLine === false) showNotice("You're offline, so this shows comics saved on this device. Your OneDrive shelf comes back when you're online.");
-      return;
-    }
+
+/* ---------- Touch: sheets, long-press, swipe from the edge to go back, pull down to refresh ---------- */
+const touchUI = matchMedia("(pointer: coarse)").matches;
+function openSheet(id){ closeMenu(); closeJump(); $(id).classList.add("open"); }
+function closeSheet(id){ $(id).classList.remove("open"); }
+const anySheetOpen = () => !!document.querySelector(".modal.open");
+// the ••• options as a sheet of big buttons (touch screens, and long-press)
+function openMenuSheet(title, items){
+  $("mpTitle").textContent = title;
+  $("mpBtns").replaceChildren(...items.map(it => {
+    const b = document.createElement("button"); b.className = "shBtn";
+    const s = document.createElement("span"); const bb = document.createElement("b"); bb.textContent = it.label; s.append(bb); b.append(s);
+    b.onclick = async () => { closeSheet("menuPanel"); await it.act(); renderLib(); };
+    return b;
+  }));
+  openSheet("menuPanel");
+}
+for (const m of document.querySelectorAll(".modal")) {
+  m.addEventListener("click", e => { if (e.target === m) m.classList.remove("open"); }); // tap outside
+  const box = m.querySelector(".modalBox"); if (!box) continue;
+  let y0 = null, dy = 0;
+  box.addEventListener("touchstart", e => { y0 = box.scrollTop <= 0 ? e.touches[0].clientY : null; dy = 0; }, {passive:true});
+  box.addEventListener("touchmove", e => {
+    if (y0 === null) return;
+    dy = Math.max(0, e.touches[0].clientY - y0);
+    box.style.transform = dy ? "translateY(" + dy + "px)" : "";
+  }, {passive:true});
+  box.addEventListener("touchend", () => {
+    box.style.transform = "";
+    if (y0 !== null && dy > 90) m.classList.remove("open"); // swipe down
+    y0 = null; dy = 0;
+  });
+}
+document.addEventListener("keydown", e => { if (e.key === "Escape") document.querySelectorAll(".modal.open").forEach(m => m.classList.remove("open")); });
+
+const shelfBusy = () => $("reader").classList.contains("open") || flipOpen() || anySheetOpen() || document.body.classList.contains("signedout");
+// long-press a cover: the same options as its ••• button
+let lp = null, swallowClick = false;
+document.addEventListener("click", e => { if (swallowClick) { swallowClick = false; e.preventDefault(); e.stopPropagation(); } }, true);
+document.addEventListener("touchstart", e => {
+  lp = null;
+  if (shelfBusy()) return;
+  const t = e.touches[0], card = e.target.closest && e.target.closest(".card");
+  if (card && card._menu && !e.target.closest(".more")) {
+    lp = {x: t.clientX, y: t.clientY, timer: setTimeout(() => {
+      swallowClick = true; closeMenu();
+      openMenuSheet(card.title.split("\n")[0].replace(/\.[^.]+$/, ""), card._menu());
+    }, 480)};
   }
-  if (!window.showDirectoryPicker) return;
-  try {
-    const h = await dbGet("kv", "root");
-    if (h) {
-      setReopen(h);
-      // Chrome/Edge sometimes keep access between visits; open straight away when they do
-      if ((await h.queryPermission({mode:"read"})) === "granted") { $("reopenBtn").hidden = true; openRoot({name:h.name, path:h.name, kind:"dir", handle:h}); }
-      else $("empty").innerHTML = "Click <b>Open " + h.name.replace(/[<&]/g, "") + "</b> to return to your shelf.";
-    }
-  } catch {}
-})();
+}, {passive:true});
+document.addEventListener("touchmove", e => {
+  if (lp) { const t = e.touches[0]; if (Math.hypot(t.clientX - lp.x, t.clientY - lp.y) > 10) { clearTimeout(lp.timer); lp = null; } }
+}, {passive:true});
+document.addEventListener("touchend", () => { if (lp) { clearTimeout(lp.timer); lp = null; } setTimeout(() => { swallowClick = false; }, 400); });
+
+// swipe in from the left edge: back one step; pull down at the top of the shelf: refresh
+let edgeSw = null, pull = null;
+document.addEventListener("touchstart", e => {
+  edgeSw = pull = null;
+  if (shelfBusy() || !rootNode) return;
+  const t = e.touches[0];
+  edgeSw = t.clientX < 28 && (stack.length > 1 || $("search").value.trim()) ? {x: t.clientX, y: t.clientY} : null;
+  pull = !edgeSw && window.scrollY <= 0 && !(e.target.closest && e.target.closest("#grid.wheel,input,select")) ? {y: t.clientY, x: t.clientX, d: 0} : null;
+}, {passive:true});
+document.addEventListener("touchmove", e => {
+  if (!pull) return;
+  const t = e.touches[0];
+  pull.d = t.clientY - pull.y;
+  if (Math.abs(t.clientX - pull.x) > Math.abs(pull.d)) { pull = null; $("pullHint").style.transform = ""; return; }
+  const d = Math.max(0, Math.min(140, pull.d)), h = $("pullHint");
+  h.style.transform = "translate(-50%," + (d - 70) + "px)";
+  h.classList.toggle("ready", d > 90); h.textContent = d > 90 ? "Release to refresh" : "Pull to refresh";
+}, {passive:true});
+document.addEventListener("touchend", e => {
+  const t = e.changedTouches[0];
+  if (edgeSw) { const dx = t.clientX - edgeSw.x, dy = Math.abs(t.clientY - edgeSw.y); if (dx > 70 && dy < 60) goBack(); }
+  if (pull) { const go = pull.d > 90; $("pullHint").style.transform = ""; $("pullHint").classList.remove("ready"); if (go) refreshLibrary(); }
+  edgeSw = null; pull = null;
+});
+async function refreshLibrary(){
+  if (!rootNode) { if (APP) { libToast("Refreshing…", 0); await startApp(); libToast("Library up to date"); } return; }
+  libToast("Refreshing…", 0);
+  listCache.clear(); searchIdx = null;
+  try { if (CLOUD) { await refreshLocal(); await cloudSync(true); await loadPlaylists(); } } catch {}
+  await renderLib();
+  libToast("Library up to date");
+}
+
+// Touch screens: the Controls list shows taps and gestures only, no keyboard or mouse rows
+function touchHelp(){
+  for (const tr of document.querySelectorAll("#helpBox tr")) {
+    const td = tr.cells[0]; if (!td) continue;
+    const txt = td.textContent;
+    if (/mouse|wheel|ctrl|trackpad|hover/i.test(txt) && !/tap/i.test(txt)) { tr.hidden = true; continue; }
+    td.innerHTML = td.innerHTML.replace(/\bClick(s?)\b/g, "Tap$1").replace(/\bclick(s?)\b/g, "tap$1");
+    tr.cells[1] && (tr.cells[1].innerHTML = tr.cells[1].innerHTML.replace(/\bClick\b/g, "Tap").replace(/\bclick\b/g, "tap").replace(/the mouse wheel, a drag, or the arrow keys/, "a swipe up or down").replace(/Hover a stack and the top copy pokes up\. /, "").replace(/ \(or Enter\)/g, ""));
+    if (!td.querySelector("kbd")) continue;
+    td.querySelectorAll("kbd").forEach(k => k.remove());
+    let t = td.textContent.replace(/\s+/g, " ").replace(/^[\s/+,]*(or\s+)?/i, "").replace(/[\s/+,]+$/, "").trim();
+    if (!t || !/[a-z]/i.test(t)) { tr.hidden = true; continue; }
+    td.textContent = t.charAt(0).toUpperCase() + t.slice(1);
+  }
+  for (const td of document.querySelectorAll("#helpBox td:first-child")) {
+    td.textContent = td.textContent.replace(/\s*\(touchscreen\)/i, "").replace(/^Drag, or scroll, while zoomed$/, "Drag while zoomed").replace(/^Library$/, "Library button").replace(/^Back, or your mouse's back button$/, "Back button");
+  }
+  const shelf = [...document.querySelectorAll("#helpBox h3")].find(h => /shelf/i.test(h.textContent));
+  const tbl = shelf && shelf.nextElementSibling;
+  if (tbl && tbl.tagName === "TABLE") {
+    const rows = [["Long-press a cover", "Its options (same as •••)"], ["Swipe in from the left edge", "Back one step"], ["Pull down at the top", "Refresh: picks up comics just added"]];
+    if (APP) rows.push(["Account button (top right)", "Sign out, refresh, this help"]);
+    for (const [a, b] of rows.reverse()) { const tr = tbl.insertRow(0); tr.insertCell().textContent = a; tr.insertCell().textContent = b; }
+  }
+  for (const h of document.querySelectorAll("#helpBox h3")) { // drop a section if every row in it is hidden
+    const t = h.nextElementSibling;
+    if (t && t.tagName === "TABLE" && ![...t.rows].some(r => !r.hidden)) { h.hidden = true; t.hidden = true; }
+  }
+  $("flipHint").textContent = "Swipe up or down to flip through · tap the front copy to pull it out";
+}
+document.body.append($("helpPanel")); // the Controls list opens from the shelf too
+if (touchUI) touchHelp();
 
 /* ---------- Reader ---------- */
 const R = { node:null, file:null, pages:[], cache:new Map(), index:0, shown:1, tok:0, siblings:[], two:true, cover:true,
+  dims:[], spreads:[], at:[], ready:false,   // spreads: how the pages sit together; at[page] = which spread it's in
   layout: store.get("layout", "auto"), fitw: store.get("fitWidth", false) };
+
+/* ---------- Spreads: worked out once per issue, front to back, like flipping a printed comic ---------- */
+async function measure(){
+  const file = R.file, pages = R.pages, dims = new Array(pages.length).fill(null);
+  let k = 0;
+  const work = async () => {
+    while (k < pages.length) {
+      const i = k++;
+      let s = null;
+      try { s = imgSize(await headBytes(file, pages[i])); } catch {}
+      if (!s && R.file === file) { try { const im = await page(i); s = {w: im.w, h: im.h}; } catch {} } // unusual format: load the page itself
+      dims[i] = s;
+    }
+  };
+  await Promise.all([work(), work(), work(), work()]);
+  if (R.file === file) R.dims = dims;
+}
+const isWide = i => { const d = R.dims[i]; return !!d && d.w > d.h; };
+function buildSpreads(){
+  // cover alone, a wide (double-page) image alone, everything else in pairs
+  const n = R.pages.length, out = [], at = new Array(n);
+  for (let i = 0; i < n;) {
+    const two = R.two && !(R.cover && i === 0) && i + 1 < n && !isWide(i) && !isWide(i + 1);
+    const s = two ? [i, i + 1] : [i];
+    for (const p of s) at[p] = out.length;
+    out.push(s); i += s.length;
+  }
+  R.spreads = out; R.at = at;
+}
+const spreadStart = p => R.spreads[R.at[Math.max(0, Math.min(R.pages.length - 1, p))]][0];
 
 // Auto shows two pages on wide screens, but a phone turned sideways keeps one page (two would be tiny)
 const isPhone = () => matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) < 600;
@@ -1475,39 +2196,112 @@ function nextIssueNode(){
   const i = R.siblings.findIndex(s => s.path === R.node.path);
   return i >= 0 && i + 1 < R.siblings.length ? R.siblings[i + 1] : null;
 }
-function nextIssue(){ const n = nextIssueNode(); if (n) openComic(n, R.siblings); else toast("That was the last issue in this folder"); }
+function nextIssue(){
+  const n = nextIssueNode();
+  if (n) openComic(n, R.siblings);
+  else { const l = R.lists[R.listAt]; toast("That was the last issue in " + (l ? "“" + l.name + "”" : "this folder")); }
+}
 
-async function openComic(node, siblings){
+function prevIssueNode(){
+  const i = R.siblings.findIndex(s => s.path === R.node.path);
+  return i > 0 ? R.siblings[i - 1] : null;
+}
+// paging back from the first page opens the previous issue at its last page (same list Next issue follows)
+function prevIssue(){
+  const n = prevIssueNode();
+  if (n) { toast("Back to " + baseName(n.name)); openComic(n, R.siblings, true); }
+  else { const l = R.lists[R.listAt]; toast("This is the first issue in " + (l ? "“" + l.name + "”" : "this folder")); }
+}
+
+/* ---------- Next from: which list Next issue follows, the book's series or a playlist it's in ---------- */
+R.lists = []; R.listAt = -1;
+const samePaths = (a, b) => a.length === b.length && a.every((x, i) => x.path === b[i].path);
+async function refreshLists(node){
+  const opts = [];
+  try {
+    const r = await resolvePath(node.path);
+    if (r && r.parent && !r.parent.playlist) opts.push({name: r.parent.name, kind: "series", items: await comicsIn(r.parent)});
+    for (const pl of playlists) if (pl.items.includes(relOf(node.path)))
+      opts.push({name: pl.name, kind: "playlist", items: await listNode({name: pl.name, path: "playlist:" + pl.name, kind: "dir", playlist: pl})});
+  } catch {}
+  if (R.node !== node) return;
+  R.lists = opts;
+  R.listAt = opts.findIndex(o => samePaths(o.items, R.siblings)); // the list you opened it from
+  if (R.listAt < 0 && !R.siblings.length && opts.length) { R.listAt = 0; R.siblings = opts[0].items; }
+  syncListBtn();
+}
+function syncListBtn(){
+  const b = $("listBtn"), l = R.lists[R.listAt];
+  b.hidden = R.lists.length < 2; // only when the book is in a playlist too
+  b.querySelector(".lbl").textContent = "Next from: " + (l ? l.name : "…");
+  b.title = "Which list Next issue follows (L)" + (l ? ": " + l.name : "");
+  const n = R.node && nextIssueNode();
+  $("nextIssueBtn").disabled = !n;
+  $("nextIssueBtn").title = n ? "Next issue (N): " + baseName(n.name) : "No next issue in this list";
+}
+function pickList(i){
+  const l = R.lists[i]; if (!l) return;
+  R.listAt = i; R.siblings = l.items;
+  syncListBtn(); closeListMenu();
+  const n = nextIssueNode();
+  toast("Next issue now follows “" + l.name + "”" + (n ? ": " + baseName(n.name) : ""));
+}
+function closeListMenu(){ const m = $("listMenu"); if (m) m.remove(); }
+function openListMenu(){
+  if ($("listMenu")) { closeListMenu(); return; }
+  const m = document.createElement("div"); m.id = "listMenu"; m.className = "menu";
+  R.lists.forEach((l, i) => {
+    const mi = document.createElement("button");
+    mi.textContent = (i === R.listAt ? "✓ " : "  ") + l.name + (l.kind === "series" ? "  (series)" : "  (playlist)");
+    mi.onclick = e => { e.stopPropagation(); pickList(i); };
+    m.append(mi);
+  });
+  const r = $("listBtn").getBoundingClientRect();
+  m.style.position = "fixed"; m.style.top = (r.bottom + 6) + "px"; m.style.right = Math.max(8, innerWidth - r.right) + "px"; m.style.zIndex = 6;
+  m.onclick = e => e.stopPropagation();
+  $("reader").append(m);
+}
+
+async function openComic(node, siblings, atEnd){
   enterFs();   // iPad: hide the time/battery bar while reading (must run right at the tap, before any waiting)
   freePages();
   if (siblings) R.siblings = siblings;
   R.node = node; R.tok++;
   R.cover = !store.get("shift:" + node.path, false);
   R.two = wantTwo();
+  if (!$("reader").classList.contains("open") && rootNode) pushPlace({reader:true}); // Back (or the mouse's back button) closes the reader
   $("reader").classList.add("open");
   $("title").textContent = baseName(node.name);
+  $("credit").textContent = "";
+  comicInfo(node).then(ci => { if (R.node === node) $("credit").textContent = [ci.Title, creditLine(ci)].filter(Boolean).join(" — "); }).catch(()=>{});
   $("nextIssueBtn").disabled = !nextIssueNode();
+  closeListMenu(); refreshLists(node);
   $("stage").innerHTML = ""; status("Opening…");
   syncButtons(); peekUI();
+  let file;
   try {
-    await refreshState();
-    R.cover = !store.get("shift:" + node.path, false);
-    syncButtons();
-    R.file = await fileOf(node);
-    R.pages = pageEntries(await zipEntries(R.file));
+    if (CLOUD) { await cloudSync(); R.cover = !store.get("shift:" + node.path, false); }
+    file = await fileOf(node);
+    if (R.node !== node) return; // another issue was opened meanwhile
+    R.file = file;
+    R.pages = pageEntries(await zipEntries(file));
     if (!R.pages.length) throw new Error("No pages found inside this file.");
-  } catch (err) { status(err.message); return; }
+    await measure();
+  } catch (err) { if (R.node === node) status(err.message); return; }
+  if (R.file !== file) return; // another issue was opened meanwhile
+  buildSpreads(); R.ready = true;
   $("slider").max = R.pages.length;
   const pos = progressOf(node.path);
-  const start = pos && !pos.done && pos.i < R.pages.length ? pos.i : 0;
-  show(parityStart(start));
+  const start = atEnd ? R.pages.length - 1 : pos && !pos.done && pos.i < R.pages.length ? pos.i : 0; // atEnd: came back from the next issue
+  show(start);
 }
 function freePages(){
-  R.tok++;
+  R.tok++; R.ready = false; R.dims = []; R.spreads = []; R.at = [];
   for (const p of R.cache.values()) p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{});
   R.cache.clear(); R.pages = []; R.file = null;
 }
-function closeReader(){
+function closeReader(fromBack){
+  if (fromBack !== true && history.state && history.state.reader) { history.back(); return; } // the Back step closes it, so history stays in order
   freePages();
   $("reader").classList.remove("open");
   toggleHelp(false);
@@ -1530,25 +2324,15 @@ function page(i){
   R.cache.set(i, pr);
   return pr;
 }
-function parityStart(p){
-  if (!R.two) return p;
-  if (R.cover) return p === 0 ? 0 : p - ((p - 1) % 2);
-  return p - (p % 2);
-}
-async function spreadFor(i){
-  const n = R.pages.length;
-  if (!R.two || (R.cover && i === 0) || i + 1 >= n) return [i];
-  const [a, b] = await Promise.all([page(i), page(i + 1)]);
-  if (a.w > a.h || b.w > b.h) return [i]; // wide double-page images show alone
-  return [i, i + 1];
-}
-async function show(i){
-  const n = R.pages.length; if (!n) return;
-  i = Math.max(0, Math.min(n - 1, i));
+// show the spread that page i belongs to; forward = got here by reading on, not by jumping
+async function show(i, forward){
+  const n = R.pages.length; if (!n || !R.ready) return;
+  i = spreadStart(i);
+  const idx = R.spreads[R.at[i]];
   const tok = ++R.tok;
   const slow = setTimeout(() => { if (tok === R.tok) status("Loading…"); }, 200);
-  let idx, imgs;
-  try { idx = await spreadFor(i); imgs = await Promise.all(idx.map(page)); }
+  let imgs;
+  try { imgs = await Promise.all(idx.map(page)); }
   catch (err) { clearTimeout(slow); if (tok === R.tok) status("Couldn't load this page: " + err.message); return; }
   clearTimeout(slow);
   if (tok !== R.tok) return;
@@ -1559,28 +2343,31 @@ async function show(i){
   for (const im of imgs) { const el = document.createElement("img"); el.src = im.url; el.alt = ""; el.draggable = false; pair.append(el); }
   $("stage").replaceChildren(pair);
   Z.s = 1; Z.x = 0; Z.y = 0; $("reader").classList.remove("zoomed"); // each new page starts unzoomed
-  $("stage").scrollTo({top: 0, behavior: "instant"});                  // fit width: each new page starts at the top (also stops any smooth scroll still running)
-  const atEnd = i + idx.length >= n;
+  $("stage").scrollTo({top: 0, behavior: "instant"});                  // fit width: each new page starts at the top
+  const atEnd = R.at[i] === R.spreads.length - 1;
   $("slider").value = i + 1;
   $("plabel").textContent = (idx.length === 2 ? (i + 1) + "–" + (i + 2) : (i + 1)) + " of " + n;
   const prevPos = progressOf(R.node.path);
-  const nowDone = atEnd || !!(prevPos && prevPos.done);
-  store.set("pos:" + R.node.path, {i, n, done: nowDone, t: Date.now()}); // finished stays finished on a re-read
+  // finished = read your way to the last page (jumping there doesn't count); finished stays finished on a re-read
+  const nowDone = (atEnd && !!forward) || !!(prevPos && prevPos.done);
+  store.set("pos:" + R.node.path, {i, n, done: nowDone, t: Date.now()});
   if (!nowDone && !(prevPos && prevPos.i === i)) claimSeriesSpot(R.node.path); // this issue is now the series' one spot
   for (const [k, p] of R.cache) if (k < i - 6 || k > i + 8) { p.then(x => URL.revokeObjectURL(x.url)).catch(()=>{}); R.cache.delete(k); }
   for (let k = i + idx.length; k < Math.min(n, i + idx.length + 4); k++) page(k).catch(()=>{});
   if (i > 0) page(i - 1).catch(()=>{});
 }
 function next(){
-  if (!R.pages.length) return;
-  if (R.index + R.shown < R.pages.length) show(R.index + R.shown);
-  else nextIssue();
+  if (!R.ready) return;
+  const k = R.at[R.index];
+  if (k + 1 < R.spreads.length) { show(R.spreads[k + 1][0], true); return; }
+  store.set("pos:" + R.node.path, {i: R.index, n: R.pages.length, done: true, t: Date.now()}); // paging past the end also counts as finishing it
+  nextIssue();
 }
-async function prev(){
-  const t = R.index - 1; if (t < 0) return;
-  let s = parityStart(t);
-  if (s < t) { try { if ((await spreadFor(s)).length === 1) s = t; } catch { s = t; } }
-  show(s);
+function prev(){
+  if (!R.ready) return;
+  const k = R.at[R.index];
+  if (k > 0) show(R.spreads[k - 1][0]);
+  else prevIssue();
 }
 
 const LAYOUT_LABEL = {auto:"Auto layout", single:"One page", two:"Two pages"};
@@ -1589,11 +2376,10 @@ const LAYOUT_ICON = {
   two:    '<rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5"/>',
   auto:   '<rect x="3" y="5" width="8" height="14" rx="1.5"/><rect x="13" y="5" width="8" height="14" rx="1.5" stroke-dasharray="2.5 2.5"/>' // dashed: second page only when it fits
 };
-// Fullscreen does nothing in the Home Screen app (already full screen) or on iPhone (not supported)
-const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
-// iPads support true fullscreen (hides the time/battery bar), iPhones don't; show the button only where it works
+// iPads allow true fullscreen (it hides the time/battery bar), iPhones don't; the button only shows where it works
 const canFullscreen = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
-// On touch devices (iPad), go fullscreen automatically while reading instead of offering a button
+const standalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+// touch screens (iPad) go fullscreen automatically while reading instead of offering a button
 const autoFs = canFullscreen && matchMedia("(pointer: coarse)").matches;
 const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
 function enterFs(){
@@ -1601,13 +2387,10 @@ function enterFs(){
   const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen;
   try { const p = req && req.call(el); if (p && p.catch) p.catch(() => {}); } catch {}
 }
-const APP_VERSION = 16;
-function aboutText(){
-  return "Version " + APP_VERSION + ". Full screen on this device: " +
-    (canFullscreen ? (autoFs ? "allowed, automatic while reading" : "allowed, use the Fullscreen button") : "not allowed by this browser") +
-    (standalone ? ". Running as a Home Screen app." : ".");
-}
 function exitFs(){ if (autoFs && isFs()) { try { const p = (document.exitFullscreen || document.webkitExitFullscreen).call(document); if (p && p.catch) p.catch(() => {}); } catch {} } }
+function aboutText(){
+  return "Version " + APP_VERSION + (APP ? (standalone ? ". Running as an installed app." : ". Running in the browser.") : ". Reading a folder on this computer.");
+}
 function syncButtons(){
   const lb = $("layoutBtn");
   lb.innerHTML = '<svg viewBox="0 0 24 24">' + LAYOUT_ICON[R.layout] + '</svg><span class="lbl">' + LAYOUT_LABEL[R.layout] + '</span>';
@@ -1616,7 +2399,7 @@ function syncButtons(){
   $("fitBtn").classList.toggle("on", R.fitw);
   $("shiftBtn").hidden = !R.two;
   $("shiftBtn").classList.toggle("on", !R.cover);
-  $("fsBtn").hidden = !canFullscreen || autoFs; // automatic on iPad, button on PC
+  $("fsBtn").hidden = !canFullscreen || autoFs; // automatic on iPad, a button on PC
   $("reader").classList.toggle("fitw", R.fitw);
   // iPad only (touch screen with a short side of 600+ points); iPhones already have space above the page
   $("reader").classList.toggle("padtop", matchMedia("(pointer: coarse)").matches && Math.min(screen.width, screen.height) >= 600);
@@ -1624,7 +2407,7 @@ function syncButtons(){
 function setFitW(v){
   R.fitw = v; store.set("fitWidth", v);
   resetZoom(); relayout();
-  if (R.pages.length) show(parityStart(R.index));
+  if (R.ready) show(R.index);
   toast(v ? "Fit width: scroll up and down" : "Fit page");
 }
 function cycleLayout(){
@@ -1635,22 +2418,20 @@ function cycleLayout(){
 function relayout(){
   const t = wantTwo();
   syncButtons();
-  if (t !== R.two) { R.two = t; syncButtons(); if (R.pages.length) show(parityStart(R.index)); }
+  if (t !== R.two) { R.two = t; syncButtons(); if (R.ready) { buildSpreads(); show(R.index); } }
 }
 function toggleShift(){
   if (!R.two || !R.node) return;
   R.cover = !R.cover;
   if (R.cover) store.del("shift:" + R.node.path); else store.set("shift:" + R.node.path, true);
-  syncButtons(); show(parityStart(R.index));
+  syncButtons();
+  if (R.ready) { buildSpreads(); show(R.index); }
 }
 function toggleFs(){
-  const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-  if (fsEl) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
-  else {
-    const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen; // whole app, so it stays on across issues and the shelf
-    if (req) { const p = req.call(el); if (p && p.catch) p.catch(()=>{}); }
-    else toast("Fullscreen isn't available in this browser");
-  }
+  if (isFs()) { try { const p = (document.exitFullscreen || document.webkitExitFullscreen).call(document); if (p && p.catch) p.catch(()=>{}); } catch {} return; }
+  const el = document.documentElement, req = el.requestFullscreen || el.webkitRequestFullscreen; // whole app, so it stays on across issues and the shelf
+  if (canFullscreen && req) { try { const p = req.call(el); if (p && p.catch) p.catch(()=>{}); } catch {} }
+  else toast("Fullscreen isn't available in this browser");
 }
 function toggleHelp(v){ if (v) $("aboutLine").textContent = aboutText(); $("helpPanel").classList.toggle("open", v); }
 addEventListener("resize", () => { if ($("reader").classList.contains("open")) relayout(); });
@@ -1671,7 +2452,7 @@ $("reader").addEventListener("pointermove", e => {
   if (e.clientY < 90 || e.clientY > innerHeight - 90) showUI(1500);
 });
 
-/* ---------- Zoom: pinch, double-tap, Ctrl+wheel, + / - / 0 ---------- */
+/* ---------- Zoom: Ctrl+wheel, + / - / 0, pinch and double-tap on touchscreens ---------- */
 const Z = {s:1, x:0, y:0};
 const MAX_ZOOM = 5;
 const pairEl = () => $("stage").querySelector(".pair");
@@ -1691,7 +2472,7 @@ function applyZoom(){
 }
 function zoomAt(ns, cx, cy){
   ns = Math.min(MAX_ZOOM, Math.max(1, ns));
-  if (R.fitw) { // keep the spot under your fingers (or mouse) in place while the page grows
+  if (R.fitw) { // keep the spot under the mouse (or fingers) in place while the page grows
     const st = $("stage"), k = ns / Z.s, sl = st.scrollLeft, stp = st.scrollTop;
     Z.s = ns; applyZoom();
     st.scrollLeft = (sl + cx) * k - cx; st.scrollTop = (stp + cy) * k - cy;
@@ -1704,11 +2485,11 @@ function zoomAt(ns, cx, cy){
 function resetZoom(){ Z.s = 1; Z.x = 0; Z.y = 0; applyZoom(); }
 function toggleZoomAt(cx, cy){ zoomAt(Z.s > 1 ? 1 : 2.5, cx, cy); }
 
-/* ---------- Gestures: tap sides to turn, swipe, pinch, drag to pan when zoomed ---------- */
+/* ---------- Clicks and gestures: sides turn, drag to pan when zoomed, swipe and pinch on touchscreens ---------- */
 const ptrs = new Map();
 let gest = null, lastTap = null, tapTimer = null;
-// Tap zones: outer quarter on each side turns pages; the middle half, and a strip along the top and
-// bottom edges (where the controls live), shows or hides the controls. Bigger target, fewer accidental turns.
+// Click zones: outer quarter on each side turns pages; the middle half, and a strip along the top and
+// bottom edges (where the controls live), shows or hides the controls.
 function singleTap(x, y){
   const f = x / innerWidth, edge = y !== undefined && (y < innerHeight * 0.15 || y > innerHeight * 0.85);
   if (Z.s === 1 && !edge && f < 0.25) prev();
@@ -1774,7 +2555,7 @@ function endPointer(e){
     }
     return;
   }
-  // a tap: on touch, wait briefly to see if it's a double-tap (zoom)
+  // a tap: on touch, wait briefly to see if it's a double-tap (zoom); mouse clicks act right away
   if (g.ptype === "touch" || g.ptype === "pen") {
     const now = performance.now();
     if (lastTap && now - lastTap.t < 300 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) {
@@ -1787,7 +2568,7 @@ function endPointer(e){
 }
 stageEl.addEventListener("pointerup", endPointer);
 stageEl.addEventListener("pointercancel", endPointer);
-stageEl.addEventListener("dblclick", e => { if (e.pointerType !== "touch") e.preventDefault(); });
+stageEl.addEventListener("dblclick", e => e.preventDefault());
 // Safari's own page zoom gestures would fight ours
 for (const ev of ["gesturestart", "gesturechange"]) document.addEventListener(ev, e => { if ($("reader").classList.contains("open")) e.preventDefault(); });
 
@@ -1807,52 +2588,30 @@ $("reader").addEventListener("wheel", e => {
 }, {passive:false});
 addEventListener("resize", () => { if (Z.s > 1) applyZoom(); });
 
-$("closeBtn").onclick = closeReader;
+$("closeBtn").onclick = () => closeReader();
 $("layoutBtn").onclick = cycleLayout;
 $("fitBtn").onclick = () => setFitW(!R.fitw);
-$("stage").addEventListener("contextmenu", e => e.preventDefault()); // no long-press "Save Image" popup on pages
+$("stage").addEventListener("contextmenu", e => e.preventDefault()); // no "Save image" menu over pages
 $("shiftBtn").onclick = toggleShift;
 $("fsBtn").onclick = toggleFs;
 $("nextIssueBtn").onclick = nextIssue;
+$("listBtn").onclick = e => { e.stopPropagation(); openListMenu(); };
+document.addEventListener("click", closeListMenu);
 $("helpBtn").onclick = () => toggleHelp(true);
 $("helpClose").onclick = () => { toggleHelp(false); hideUI(); };
-// Help opens from the shelf too (account sheet), so it lives at the top level
-document.body.append($("helpPanel"));
-// Touch devices: help shows touch gestures and buttons only, no keyboard or mouse rows
-if (touchUI) {
-  for (const tr of document.querySelectorAll("#helpBox tr")) {
-    const td = tr.cells[0]; if (!td) continue;
-    const txt = td.textContent;
-    if (/mouse|wheel|ctrl|trackpad|click/i.test(txt) && !/tap/i.test(txt)) { tr.hidden = true; continue; }
-    if (!td.querySelector("kbd")) continue;
-    td.querySelectorAll("kbd").forEach(k => k.remove());
-    let t = td.textContent.replace(/\s+/g, " ").replace(/^[\s/+,]*(or\s+)?/i, "").replace(/[\s/+,]+$/, "").trim();
-    if (!t || !/[a-z]/i.test(t)) { tr.hidden = true; continue; }
-    td.textContent = t.charAt(0).toUpperCase() + t.slice(1);
-  }
-  for (const td of document.querySelectorAll("#helpBox td:first-child")) {
-    td.textContent = td.textContent.replace(/\s*\(touch\)/i, "").replace(/^Drag, or scroll, while zoomed$/, "Drag while zoomed").replace(/^Library$/, "Library button");
-  }
-  const shelf = [...document.querySelectorAll("#helpBox h3")].find(h => /shelf/i.test(h.textContent));
-  const tbl = shelf && shelf.nextElementSibling;
-  if (tbl && tbl.tagName === "TABLE") {
-    for (const [a, b] of [["Long-press a cover", "Its options (same as •••)"], ["Swipe from the left edge", "Back one level"], ["Pull down at the top", "Refresh: picks up comics just added in OneDrive"], ["Account button (top right)", "Sign out, refresh, this help"]]) {
-      const tr = tbl.insertRow(0); tr.insertCell().textContent = a; tr.insertCell().textContent = b;
-    }
-  }
-  for (const h of document.querySelectorAll("#helpBox h3")) {   // drop a section if every row in it is hidden
-    const tbl = h.nextElementSibling;
-    if (tbl && tbl.tagName === "TABLE" && ![...tbl.rows].some(r => !r.hidden)) { h.hidden = true; tbl.hidden = true; }
-  }
-}
 $("helpPanel").onclick = e => { if (e.target.id === "helpPanel") toggleHelp(false); };
 $("slider").oninput = () => { $("plabel").textContent = $("slider").value + " of " + R.pages.length; };
-$("slider").onchange = () => show(parityStart(+$("slider").value - 1));
+$("slider").onchange = () => show(+$("slider").value - 1);
 
 document.addEventListener("keydown", e => {
   const k = e.key;
   if (!$("reader").classList.contains("open")) {
-    if (k === "Backspace" && stack.length > 1 && e.target.tagName !== "INPUT") { e.preventDefault(); stack.pop(); renderLib(); }
+    if (e.target.tagName === "INPUT" || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (k === "/") { e.preventDefault(); $("search").focus(); $("search").select(); }
+    else if (k === "Backspace" && (stack.length > 1 || $("search").value.trim())) { e.preventDefault(); goBack(); }
+    else if (k === "j" || k === "J") { e.preventDefault(); openJump(); }
+    else if (wheelOn() && (k === "ArrowRight" || k === "ArrowLeft")) { e.preventDefault(); spinWheel(k === "ArrowRight" ? 1 : -1); }
+    else if (wheelOn() && k === "Enter" && !e.target.closest(".card")) { const c = gridEl.querySelector(".card.center"); if (c) c.click(); }
     return;
   }
   if (e.target.tagName === "INPUT" && (k === "ArrowLeft" || k === "ArrowRight")) return;
@@ -1869,15 +2628,16 @@ document.addEventListener("keydown", e => {
   else if (k === "ArrowLeft" || k === "PageUp" || (k === " " && e.shiftKey)) { e.preventDefault(); prev(); }
   else if (k === "w" || k === "W") setFitW(!R.fitw);
   else if (k === "Home") show(0);
-  else if (k === "End") show(parityStart(R.pages.length - 1));
+  else if (k === "End") show(R.pages.length - 1);
   else if (k === "+" || k === "=") zoomAt(Z.s * 1.5, innerWidth / 2, innerHeight / 2);
   else if (k === "-" || k === "_") zoomAt(Z.s / 1.5, innerWidth / 2, innerHeight / 2);
   else if (k === "0") resetZoom();
   else if (k === "n" || k === "N") nextIssue();
+  else if ((k === "l" || k === "L") && R.lists.length > 1) pickList((R.listAt + 1) % R.lists.length);
   else if (k === "d" || k === "D") cycleLayout();
   else if (k === "s" || k === "S") toggleShift();
   else if (k === "f" || k === "F") toggleFs();
-  else if (k === "Escape") closeReader();
+  else if (k === "Escape") { if ($("listMenu")) closeListMenu(); else closeReader(); }
 });
 </script>
 </body>
