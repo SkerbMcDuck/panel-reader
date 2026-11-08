@@ -479,7 +479,7 @@ const collator = new Intl.Collator(undefined, {numeric:true, sensitivity:"base"}
 const IMG_RE = /\.(jpe?g|png|webp|gif|avif|bmp)$/i;
 const MIME = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",gif:"image/gif",avif:"image/avif",bmp:"image/bmp"};
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const APP_VERSION = 22;
+const APP_VERSION = 23;
 
 /* Two ways in, same reader:
    - The app (the GitHub address, on iPhone, iPad or PC): the library is the Comics folder in Panel Reader's own
@@ -603,7 +603,7 @@ async function cleanCaches(root){
   const pre = root.path + "/";
   try {
     await dbDelMany("thumbs", (await dbKeys("thumbs")).filter(k => typeof k === "string" && k.startsWith(pre) && !valid.has(k)));
-    await dbDelMany("kv", (await dbKeys("kv")).filter(k => typeof k === "string" && k.startsWith("ci:" + pre) && !valid.has(k.slice(3))));
+    await dbDelMany("kv", (await dbKeys("kv")).filter(k => typeof k === "string" && /^(ci|ze|dims):/.test(k) && k.slice(k.indexOf(":") + 1).startsWith(pre) && !valid.has(k.slice(k.indexOf(":") + 1))));
   } catch {}
 }
 
@@ -2171,15 +2171,31 @@ async function measure(){
       dims[i] = s;
     }
   };
-  await Promise.all([work(), work(), work(), work()]);
+  await Promise.all(Array.from({length: file.remote ? 3 : 4}, work));
   if (R.file === file) R.dims = dims;
+  return dims;
+}
+// Page shapes decide which pages pair up. They're only needed for two pages side by side, so one-page
+// reading never waits for them; otherwise the issue opens one page at a time and pairs up once they're in.
+// Measured once per file and remembered, so the next open pairs straight away.
+const fileKey = (node, f) => node.path + "|" + f.size + "|" + f.lastModified;
+async function ensureDims(){
+  if (R.measured || !R.file || R.measuring === R.file) return;
+  const file = R.file, node = R.node; R.measuring = file;
+  try {
+    const dims = await measure();
+    if (R.file !== file) return;
+    R.measured = true;
+    dbPut("kv", "dims:" + fileKey(node, file), dims).catch(() => {});
+    if (R.two && R.ready) { buildSpreads(); show(R.index); }
+  } finally { if (R.measuring === file) R.measuring = null; }
 }
 const isWide = i => { const d = R.dims[i]; return !!d && d.w > d.h; };
 function buildSpreads(){
   // cover alone, a wide (double-page) image alone, everything else in pairs
   const n = R.pages.length, out = [], at = new Array(n);
   for (let i = 0; i < n;) {
-    const two = R.two && !(R.cover && i === 0) && i + 1 < n && !isWide(i) && !isWide(i + 1);
+    const two = R.two && R.measured && !(R.cover && i === 0) && i + 1 < n && !isWide(i) && !isWide(i + 1);
     const s = two ? [i, i + 1] : [i];
     for (const p of s) at[p] = out.length;
     out.push(s); i += s.length;
@@ -2280,13 +2296,17 @@ async function openComic(node, siblings, atEnd){
   syncButtons(); peekUI();
   let file;
   try {
-    if (CLOUD) { await cloudSync(); R.cover = !store.get("shift:" + node.path, false); }
+    if (CLOUD) cloudSync(); // in the background: the shelf already synced
     file = await fileOf(node);
     if (R.node !== node) return; // another issue was opened meanwhile
-    R.file = file;
-    R.pages = pageEntries(await zipEntries(file));
+    R.file = file; R.measured = false;
+    const key = fileKey(node, file);
+    let entries = await dbGet("kv", "ze:" + key).catch(() => null);
+    if (!entries) { entries = await zipEntries(file); dbPut("kv", "ze:" + key, entries).catch(() => {}); }
+    R.pages = pageEntries(entries);
     if (!R.pages.length) throw new Error("No pages found inside this file.");
-    await measure();
+    const dims = await dbGet("kv", "dims:" + key).catch(() => null);
+    if (Array.isArray(dims) && dims.length === R.pages.length) { R.dims = dims; R.measured = true; }
   } catch (err) { if (R.node === node) status(err.message); return; }
   if (R.file !== file) return; // another issue was opened meanwhile
   buildSpreads(); R.ready = true;
@@ -2294,6 +2314,7 @@ async function openComic(node, siblings, atEnd){
   const pos = progressOf(node.path);
   const start = atEnd ? R.pages.length - 1 : pos && !pos.done && pos.i < R.pages.length ? pos.i : 0; // atEnd: came back from the next issue
   show(start);
+  if (R.two) ensureDims();
 }
 function freePages(){
   R.tok++; R.ready = false; R.dims = []; R.spreads = []; R.at = [];
@@ -2418,7 +2439,7 @@ function cycleLayout(){
 function relayout(){
   const t = wantTwo();
   syncButtons();
-  if (t !== R.two) { R.two = t; syncButtons(); if (R.ready) { buildSpreads(); show(R.index); } }
+  if (t !== R.two) { R.two = t; syncButtons(); if (R.ready) { buildSpreads(); show(R.index); if (t) ensureDims(); } }
 }
 function toggleShift(){
   if (!R.two || !R.node) return;
