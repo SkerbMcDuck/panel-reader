@@ -479,7 +479,7 @@ const collator = new Intl.Collator(undefined, {numeric:true, sensitivity:"base"}
 const IMG_RE = /\.(jpe?g|png|webp|gif|avif|bmp)$/i;
 const MIME = {jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",webp:"image/webp",gif:"image/gif",avif:"image/avif",bmp:"image/bmp"};
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const APP_VERSION = 23;
+const APP_VERSION = 24;
 
 /* Two ways in, same reader:
    - The app (the GitHub address, on iPhone, iPad or PC): the library is the Comics folder in Panel Reader's own
@@ -1253,11 +1253,15 @@ $("flipStage").addEventListener("wheel", e => {
   fAcc += Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
   if (Math.abs(fAcc) > 35) { flipStep(Math.sign(fAcc)); fAcc = 0; fLock = now + 120; }
 }, {passive: false});
-$("flipStage").addEventListener("pointerdown", e => { fDrag = {x: e.clientX, y: e.clientY}; F.dragged = false; });
+// A mouse drag flips as you move. On a touchscreen each swipe flips one copy, however long the swipe.
+$("flipStage").addEventListener("pointerdown", e => { fDrag = {x: e.clientX, y: e.clientY, touch: e.pointerType !== "mouse", used: false}; F.dragged = false; });
 addEventListener("pointermove", e => {
-  if (!fDrag || !flipOpen()) return;
+  if (!fDrag || !flipOpen() || fDrag.used) return;
   const dx = e.clientX - fDrag.x, dy = e.clientY - fDrag.y, big = Math.abs(dy) >= Math.abs(dx) ? dy : -dx;
-  if (Math.abs(big) > 55) { flipStep(big > 0 ? 1 : -1); fDrag = {x: e.clientX, y: e.clientY}; F.dragged = true; } // pull down (or drag left) to tip the front one toward you
+  if (Math.abs(big) > (fDrag.touch ? 40 : 55)) { // pull down (or drag left) to tip the front one toward you
+    flipStep(big > 0 ? 1 : -1); F.dragged = true;
+    if (fDrag.touch) fDrag.used = true; else { fDrag.x = e.clientX; fDrag.y = e.clientY; }
+  }
 });
 addEventListener("pointerup", () => { fDrag = null; setTimeout(() => { F.dragged = false; }, 0); });
 document.addEventListener("keydown", e => { // while flipping (and not reading), the keys flip
