@@ -1,8 +1,7 @@
-// Panel Reader offline support: keeps the app itself available with no connection.
-// Your comics live in the app's on-device storage, not here.
-// The app page itself loads fresh whenever you're online (so updates show on the next launch),
+// Panel Reader: keeps the app itself quick to open and available with a weak connection.
+// The app page loads fresh whenever you're online (so updates show on the next launch),
 // and falls back to the saved copy when you're offline or the network is slow.
-const CACHE = "panel-reader-v20";
+const CACHE = "panel-reader-v25";
 const CORE = ["./", "index.html", "manifest.json", "icon-180.png", "icon-192.png", "icon-512.png", "msal-browser.min.js"];
 
 self.addEventListener("install", e => {
@@ -19,8 +18,7 @@ self.addEventListener("fetch", e => {
   const req = e.request;
   if (req.method !== "GET") return;
   const url = new URL(req.url);
-  const isFont = /(^|\.)fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
-  if (url.origin !== self.location.origin && !isFont) return;
+  if (url.origin !== self.location.origin) return;
   const isPage = req.mode === "navigate" || url.pathname.endsWith("/") || url.pathname.endsWith("index.html");
 
   e.respondWith(caches.open(CACHE).then(async cache => {
@@ -38,7 +36,7 @@ self.addEventListener("fetch", e => {
       if (hit) { e.waitUntil(fresh.catch(() => {})); return hit; }
       return fresh;
     }
-    // Everything else (sign-in library, icons, fonts): saved copy straight away, refreshed quietly
+    // Everything else (sign-in library, icons): saved copy straight away, refreshed quietly
     if (hit) { e.waitUntil(fresh.catch(() => {})); return hit; }
     return fresh;
   }));
